@@ -3,3 +3,13 @@ nbproject/
 build/
 dist/
 manifest.mf
+jwrapperJREs/
+wrappers/
+jwrapperlib/
+lib/nblibraries.properties
+lib/CopyLibs/
+JWrapperBuild/JWrapper-Windows32JRE-00036405087-archive.p2.l2.encoding
+LastExtractedJWrapperVersion
+jwrapper-00036138363.jar
+jwrapper.xml
+jwrapperJREpack.zip

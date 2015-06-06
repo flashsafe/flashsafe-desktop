@@ -10,7 +10,10 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -18,6 +21,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import ru.flashsafe.http.HttpAPI;
+import ru.flashsafe.model.FSObject;
 
 /**
  * FXML Controller class
@@ -25,14 +30,26 @@ import javafx.scene.layout.VBox;
  * @author alex_xpert
  */
 public class MainSceneController implements Initializable {
-    private final Node folderIcon = new ImageView(
-        new Image(getClass().getResourceAsStream("/ru/flashsafe/img/folder.png"))
+    private final ImageView cloud_enabled = new ImageView(
+            new Image(getClass().getResourceAsStream("/ru/flashsafe/img/cloud_enabled.png"))
     );
-    private final Node lockIcon = new ImageView(
-        new Image(getClass().getResourceAsStream("/ru/flashsafe/img/lock.png"))
+    private final ImageView folderIcon = new ImageView(
+            new Image(getClass().getResourceAsStream("/ru/flashsafe/img/folder.png"))
     );
-    private final Node dividerIcon = new ImageView(
-        new Image(getClass().getResourceAsStream("/ru/flashsafe/img/divider.png"))
+    private final ImageView folderBlackIcon = new ImageView(
+            new Image(getClass().getResourceAsStream("/ru/flashsafe/img/folder_black.png"))
+    );
+    private final ImageView lockIcon = new ImageView(
+            new Image(getClass().getResourceAsStream("/ru/flashsafe/img/lock.png"))
+    );
+    private final ImageView lockBlackIcon = new ImageView(
+            new Image(getClass().getResourceAsStream("/ru/flashsafe/img/lock_black.png"))
+    );
+    private final ImageView dividerIcon = new ImageView(
+            new Image(getClass().getResourceAsStream("/ru/flashsafe/img/divider.png"))
+    );
+    private final ImageView fileIcon = new ImageView(
+            new Image(getClass().getResourceAsStream("/ru/flashsafe/img/file.png"))
     );
     
     private boolean menu_opened = false;
@@ -40,32 +57,75 @@ public class MainSceneController implements Initializable {
     @FXML
     private AnchorPane myFilesPane;
     @FXML
+    private Label upload_button;   
+    @FXML
+    private Label download_button;
+    @FXML
+    private Label create_path_button;
+    @FXML
+    private Label back_button;
+    @FXML
     private Label settings;
     @FXML
+    private Label filename;
+    @FXML
+    private Label filetype;
+    @FXML
+    private Label filesize;
+    @FXML
+    private Label cloud;
+    @FXML
     private Pane menu;
+    @FXML
+    private Pane network;
+    @FXML
+    private Label status;
+    @FXML
+    private Pane pincode_dialog;
+    @FXML
+    private TextField pincode_textfield;
+    @FXML
+    private Button pincode_submit;
     @FXML
     private VBox files1;
     @FXML
     private VBox files2;
+    @FXML
+    private TextField current_path;
+    @FXML
+    TitledPane mf;
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-        TreeItem<String> rootItem = new TreeItem<String> ("Отпуск", folderIcon);
-        rootItem.setExpanded(true);
-        rootItem.getChildren().add(new TreeItem<String> ("", dividerIcon));
-        rootItem.getChildren().add(new TreeItem<String> ("Девчонки", lockIcon));
-        TreeView myFilesTree = new TreeView<String>(rootItem);
-        myFilesPane.getChildren().add(myFilesTree);
-        
-        String[] images = {"Катюша", "Катюша 2", "Катюша 3", "Катюша 4", "Катюша 5", "Настя", "Ира 4 размер", "IMG_0047", "IMG_0048",
-                "Анька", "Ксюша бар", "бухие", "PHOTO472", "PHOTO 476", "PHOTO 477", "PHOTO 478", "PHOTO 479", "PHOTO 480", "alisa"};
-        for(int i=0;i<19;i++) {
-            Label label = new Label(images[i], new ImageView(new Image(getClass().getResourceAsStream("/ru/flashsafe/img/image.png"))));
-            if(i % 2 == 0) files1.getChildren().add(label); else files2.getChildren().add(label);
+        int auth = HttpAPI.auth();
+        if (auth == 0) {
+            network.setVisible(true);
+        } else {
+            while (cloud_enabled.getImage().isBackgroundLoading()) {}
+            cloud.setGraphic(cloud_enabled);
+            FSObject[] content = HttpAPI.getContent();
+            while (dividerIcon.getImage().isBackgroundLoading()) {}
+            TreeItem<String> root_item = new TreeItem("", dividerIcon);
+            root_item.setExpanded(true);
+            TreeView myFilesTree = new TreeView(root_item);
+            myFilesPane.getChildren().add(myFilesTree);
+            mf.setExpanded(true);
+            while (folderIcon.getImage().isBackgroundLoading() || lockIcon.getImage().isBackgroundLoading()
+                    || folderBlackIcon.getImage().isBackgroundLoading() || fileIcon.getImage().isBackgroundLoading()
+                    || lockBlackIcon.getImage().isBackgroundLoading()) {}
+            for (int i=0;i<content.length;i++) {
+                FSObject fso = content[i];
+                if (fso.type.equals("dir")) {
+                    TreeItem<String> treeitem = new TreeItem(fso.name, fso.pincode ? lockIcon : folderIcon);
+                    root_item.getChildren().add(treeitem);
+                }
+                Label label = new Label(fso.name, fso.type.equals("dir") ? fso.pincode ? lockBlackIcon : folderBlackIcon : fileIcon);
+                (i % 2 == 0 ? files1 : files2).getChildren().add(label);
+            }
+            current_path.setText("/");
         }
     }    
     

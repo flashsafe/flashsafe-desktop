@@ -126,7 +126,7 @@
 }
 
 #Cloud {
-    -fx-graphic: url("../img/cloud_disabled.png");
+    //-fx-graphic: url("../img/cloud_disabled.png");
 }
 
 .tree-cell {
@@ -163,4 +163,26 @@
 
 .files > .label {
     -fx-padding: 5px;
+}
+
+.pincode_dialog {
+    -fx-background-color: transparent;
+}
+
+.pincode_title {
+    -fx-background-color: transparent;
+    -fx-text-fill: #7C7C7C;
+}
+
+.pincode_pane {
+    -fx-background-color: #7C7C7C;
+}
+
+.pincode_textfield {
+    -fx-background-color: #959595;
+    -fx-text-fill: #F3F3F3;
+}
+
+.pincode_submit {
+    -fx-background-color: #959595;
 }

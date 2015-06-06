@@ -15,17 +15,17 @@
          <items>
             <HBox id="Operations" alignment="CENTER" prefHeight="65.0" prefWidth="215.0">
                <children>
-                  <Label id="Upload" alignment="CENTER" contentDisplay="CENTER" prefHeight="65.0" prefWidth="65.0" />
-                  <Label id="Download" alignment="CENTER" contentDisplay="CENTER" prefHeight="65.0" prefWidth="65.0" />
-                  <Label id="CreatePath" alignment="CENTER" contentDisplay="CENTER" prefHeight="65.0" prefWidth="65.0" />
+                  <Label id="Upload" fx:id="upload_button" alignment="CENTER" contentDisplay="CENTER" prefHeight="65.0" prefWidth="65.0" />
+                  <Label id="Download" fx:id="download_button" alignment="CENTER" contentDisplay="CENTER" prefHeight="65.0" prefWidth="65.0" />
+                  <Label id="CreatePath" fx:id="create_path_button" alignment="CENTER" contentDisplay="CENTER" prefHeight="65.0" prefWidth="65.0" />
                </children>
             </HBox>
-            <TextField id="Path" editable="false" focusTraversable="false" prefHeight="30.0" prefWidth="525.0" text="Мои файлы/Отпуск/Девчонки">
+            <TextField id="Path" fx:id="current_path" editable="false" focusTraversable="false" prefHeight="30.0" prefWidth="525.0" text="Мои файлы/Отпуск/Девчонки">
                <font>
                   <Font name="Ubuntu" size="18.0" />
                </font>
             </TextField>
-            <Label id="Back" alignment="CENTER" contentDisplay="CENTER" prefHeight="65.0" prefWidth="65.0" />
+            <Label id="Back" fx:id="back_button" alignment="CENTER" contentDisplay="CENTER" prefHeight="65.0" prefWidth="65.0" />
             <Label id="Settings" fx:id="settings" alignment="CENTER" contentDisplay="CENTER" onMousePressed="#toggleSettings" prefHeight="105.0" prefWidth="77.0" />
          </items>
          <padding>
@@ -37,12 +37,12 @@
                <children>
                   <VBox prefHeight="55.0" prefWidth="495.0">
                      <children>
-                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="48.0" prefWidth="140.0" text="Название файла" textFill="#7c7c7c">
+                        <Label fx:id="filename" alignment="CENTER" contentDisplay="CENTER" prefHeight="48.0" prefWidth="140.0" text="Название файла" textFill="#7c7c7c">
                            <font>
                               <Font name="Ubuntu" size="18.0" />
                            </font>
                         </Label>
-                        <Label contentDisplay="CENTER" prefHeight="50.0" prefWidth="140.0" text="Тип файла" textFill="#7c7c7c">
+                        <Label fx:id="filetype" contentDisplay="CENTER" prefHeight="50.0" prefWidth="140.0" text="Тип файла" textFill="#7c7c7c">
                            <font>
                               <Font name="Ubuntu" size="18.0" />
                            </font>
@@ -51,20 +51,20 @@
                   </VBox>
                   <VBox prefHeight="55.0" prefWidth="90.0">
                      <children>
-                        <Label contentDisplay="CENTER" prefHeight="50.0" prefWidth="104.0" text="Размер" textFill="#7c7c7c">
+                        <Label fx:id="filesize" contentDisplay="CENTER" prefHeight="50.0" prefWidth="104.0" text="Размер" textFill="#7c7c7c">
                            <font>
                               <Font name="Ubuntu" size="18.0" />
                            </font>
                         </Label>
                      </children>
                   </VBox>
-                  <Label id="Cloud" alignment="CENTER" contentDisplay="CENTER" prefHeight="65.0" prefWidth="60.0" />
+                  <Label id="Cloud" fx:id="cloud" alignment="CENTER" contentDisplay="CENTER" prefHeight="65.0" prefWidth="60.0" />
                </children>
             </HBox>
          </items></ToolBar>
       <Accordion id="Accordion" layoutY="75.0" prefHeight="590.0" prefWidth="215.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="675.0" AnchorPane.topAnchor="75.0">
         <panes>
-          <TitledPane id="MyFilesPane" animated="true" prefHeight="85.0" prefWidth="205.0" text="Мои файлы" textFill="#f3f3f3">
+          <TitledPane id="MyFilesPane" fx:id="mf" animated="true" prefHeight="85.0" prefWidth="205.0" text="Мои файлы" textFill="#f3f3f3">
             <content>
               <AnchorPane fx:id="myFilesPane" minHeight="0.0" minWidth="0.0" prefHeight="215.0" prefWidth="215.0" />
             </content>
@@ -141,14 +141,37 @@
             </Label>
          </children>
       </Pane>
-      <Pane layoutX="800.0" layoutY="520.0" prefHeight="50.0" prefWidth="100.0" styleClass="network" visible="false">
+      <Pane fx:id="network" layoutX="800.0" layoutY="520.0" prefHeight="50.0" prefWidth="100.0" styleClass="network" visible="false">
          <children>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="40.0" prefWidth="100.0" text="Нет сети" textFill="#7c7c7c">
+            <Label fx:id="status" alignment="CENTER" contentDisplay="CENTER" prefHeight="40.0" prefWidth="100.0" text="Нет сети" textFill="#7c7c7c">
                <font>
                   <Font name="Ubuntu" size="18.0" />
                </font>
             </Label>
             <Label layoutY="40.0" prefHeight="5.0" prefWidth="100.0" styleClass="bottomTriangle" />
+         </children>
+      </Pane>
+      <Pane fx:id="pincode_dialog" layoutX="288.0" layoutY="263.0" prefHeight="150.0" prefWidth="325.0" styleClass="pincode_dialog" visible="false">
+         <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="325.0" styleClass="pincode_title" text="Введите пин-код" textFill="#7c7c7c">
+               <font>
+                  <Font name="Ubuntu Condensed" size="18.0" />
+               </font>
+            </Label>
+            <Pane layoutY="20.0" prefHeight="130.0" prefWidth="325.0" styleClass="pincode_pane">
+               <children>
+                  <TextField fx:id="pincode_textfield" layoutX="40.0" layoutY="25.0" prefHeight="40.0" prefWidth="245.0" styleClass="pincode_textfield">
+                     <font>
+                        <Font name="Ubuntu Condensed" size="20.0" />
+                     </font>
+                  </TextField>
+                  <Button fx:id="pincode_submit" layoutX="40.0" layoutY="75.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="245.0" styleClass="pincode_submit" text="OK" textFill="#f3f3f3">
+                     <font>
+                        <Font name="Ubuntu Condensed" size="20.0" />
+                     </font>
+                  </Button>
+               </children>
+            </Pane>
          </children>
       </Pane>
    </children>

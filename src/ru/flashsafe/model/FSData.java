@@ -9,10 +9,14 @@ package ru.flashsafe.model;
  *
  * @author alex_xpert
  */
-public class FSMeta {
-    public int code;
-    public String msg;
-    public int dir_id;
-    public int file_id;
+public class FSData {
+    public long timestamp;
+    public String token;
+    public int uid;
+    public String name;
+    public String lastname;
+    public long total_size;
+    public long used_size;
+    public int timeout;
     
 }
