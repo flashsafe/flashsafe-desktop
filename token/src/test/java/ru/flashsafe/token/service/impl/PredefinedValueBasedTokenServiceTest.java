@@ -23,4 +23,6 @@ public class PredefinedValueBasedTokenServiceTest {
         assertNotNull(expectedToken);
     }
     
+    
+    
 }

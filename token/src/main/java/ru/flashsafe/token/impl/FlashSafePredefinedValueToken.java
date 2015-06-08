@@ -1,6 +1,7 @@
 package ru.flashsafe.token.impl;
 
 import ru.flashsafe.token.FlashSafeToken;
+import ru.flashsafe.token.exception.FlashSafeTokenUnavailableException;
 
 /**
  * 
@@ -14,7 +15,7 @@ public class FlashSafePredefinedValueToken implements FlashSafeToken {
     
     private final String value;
     
-    private volatile boolean available;
+    private volatile boolean available = true;
     
     public FlashSafePredefinedValueToken(String tokenId, String value) {
         this.id = tokenId;
@@ -27,7 +28,10 @@ public class FlashSafePredefinedValueToken implements FlashSafeToken {
     }
 
     @Override
-    public String generateCode(String key) {
+    public String generateCode(String key) throws FlashSafeTokenUnavailableException {
+        if (!isAvailable()) {
+            throw new FlashSafeTokenUnavailableException("The token with Id = " + id + " is unavailable");
+        }
         return value;
     }
 
