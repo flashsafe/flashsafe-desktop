@@ -2,6 +2,7 @@ package ru.flashsafe.token.service.impl;
 
 import ru.flashsafe.token.FlashSafeToken;
 import ru.flashsafe.token.event.FlashSafeTokenEvent;
+import ru.flashsafe.token.exception.FlashSafeTokenNotFoundException;
 import ru.flashsafe.token.impl.FlashSafePredefinedValueToken;
 import ru.flashsafe.token.service.FlashSafeTokenService;
 
@@ -28,7 +29,10 @@ public class PredefinedValueBasedTokenService extends FlashSafeTokenServiceBase 
     }
     
     @Override
-    public FlashSafeToken lookup(String tokenId) {
+    public FlashSafeToken lookup(String tokenId) throws FlashSafeTokenNotFoundException {
+        if (!this.tokenId.equals(tokenId)) {
+            throw new FlashSafeTokenNotFoundException();
+        }
         return token;
     }
     
@@ -47,13 +51,13 @@ public class PredefinedValueBasedTokenService extends FlashSafeTokenServiceBase 
     }
     
     public synchronized void fireAttachEvent() {
-        token.setAvailable(false);
+        token.setUnavailable();
         token = createTokenInstance(tokenId, tokenCode);
         fireEvent(FlashSafeTokenEvent.ATTACHED, token);
     }
     
     public synchronized void fireDetachEvent() {
-        token.setAvailable(false);
+        token.setUnavailable();
         fireEvent(FlashSafeTokenEvent.DETACHED, token);
     }
     

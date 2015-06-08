@@ -18,7 +18,7 @@ public class FlashSafePredefinedValueTokenTest {
     @Test(expected = FlashSafeTokenUnavailableException.class)
     public void testGenerateCode_fails_if_token_unavailable() throws FlashSafeTokenUnavailableException {
         FlashSafePredefinedValueToken token = new FlashSafePredefinedValueToken("TEST_TOKEN_ID", "TEST_TOKEN_CODE");
-        token.setAvailable(false);
+        token.setUnavailable();
         token.generateCode("TEST_KEY");
     }
     
