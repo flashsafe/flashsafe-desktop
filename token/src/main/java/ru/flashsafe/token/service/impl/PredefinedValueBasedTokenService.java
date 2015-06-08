@@ -41,6 +41,7 @@ public class PredefinedValueBasedTokenService extends FlashSafeTokenServiceBase 
             throw new IllegalStateException("Token's id may not be NULL");
         }
         tokenId = id;
+        token = createTokenInstance(tokenId, tokenCode);
     }
     
     public void defineTokenCode(String code) {
@@ -48,6 +49,7 @@ public class PredefinedValueBasedTokenService extends FlashSafeTokenServiceBase 
             throw new IllegalStateException("Token's code may not be NULL");
         }
         tokenCode = code;
+        token = createTokenInstance(tokenId, tokenCode);
     }
     
     public synchronized void fireAttachEvent() {

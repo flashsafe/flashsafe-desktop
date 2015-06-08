@@ -48,6 +48,7 @@ public abstract class FlashSafeTokenServiceBase implements FlashSafeTokenService
         List<FlashSafeTokenEventHandler> handlersForToken = tokenToHandlersMap.get(tokenId);
         if (handlersForToken == null) {
             handlersForToken = new LinkedList<>();
+            tokenToHandlersMap.put(tokenId, handlersForToken);
         }
         handlersForToken.add(handler);
     }
