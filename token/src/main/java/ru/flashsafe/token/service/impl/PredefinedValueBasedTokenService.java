@@ -24,14 +24,14 @@ public class PredefinedValueBasedTokenService extends FlashSafeTokenServiceBase 
     private PredefinedValueBasedTokenService() {
     }
     
-    public static PredefinedValueBasedTokenService getInstace() {
+    public static PredefinedValueBasedTokenService getTokenService() {
         return INSTANCE;
     }
     
     @Override
     public FlashSafeToken lookup(String tokenId) throws FlashSafeTokenNotFoundException {
         if (!this.tokenId.equals(tokenId)) {
-            throw new FlashSafeTokenNotFoundException();
+            throw new FlashSafeTokenNotFoundException(tokenId);
         }
         return token;
     }

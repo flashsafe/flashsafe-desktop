@@ -19,7 +19,7 @@ public class PredefinedValueBasedTokenServiceTest {
     
     @Before
     public void before() {
-        service = PredefinedValueBasedTokenService.getInstace();
+        service = PredefinedValueBasedTokenService.getTokenService();
     }
     
     @Test
