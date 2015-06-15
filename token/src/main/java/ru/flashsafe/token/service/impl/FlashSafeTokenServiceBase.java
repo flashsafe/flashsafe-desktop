@@ -10,6 +10,14 @@ import ru.flashsafe.token.event.FlashSafeTokenEvent;
 import ru.flashsafe.token.event.FlashSafeTokenEventHandler;
 import ru.flashsafe.token.service.FlashSafeTokenService;
 
+/**
+ * This class provides base functionality for any {@link FlashSafeTokenService}
+ * implementation (subscription/cancel subscription events, fire event). Use
+ * it to create a new {@link FlashSafeTokenService} implementation.
+ * 
+ * @author Andrew
+ * 
+ */
 public abstract class FlashSafeTokenServiceBase implements FlashSafeTokenService {
 
     private final Map<String, List<FlashSafeTokenEventHandler>> tokenToHandlersMap = new HashMap<>();

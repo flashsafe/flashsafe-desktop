@@ -12,6 +12,8 @@ public class EventMonitor implements Runnable {
     
     private Thread monitorThread;
     
+    private volatile boolean shouldContinue = true;
+    
     private final EventHandler handler;
     
     private final String name;
@@ -37,15 +39,21 @@ public class EventMonitor implements Runnable {
         }
         monitorThread.start();
     }
+    
+    public void stop() {
+        shouldContinue = false;
+    }
 
     @Override
     public void run() {
-        while (!monitorThread.isInterrupted()) {
+        while (!Thread.currentThread().isInterrupted() && shouldContinue) {
             handler.onEvent();
-            try {
-                Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                continue;
+            if (delay > 0) { 
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException e) {
+                    continue;
+                }
             }
         }
     }

@@ -1,6 +1,12 @@
 package ru.flashsafe.token.impl;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,8 +15,8 @@ import ru.flashsafe.token.FlashSafeToken;
 import ru.flashsafe.token.event.BaseEventHandler;
 import ru.flashsafe.token.exception.CodeGenerationException;
 import ru.flashsafe.token.exception.FlashSafeTokenUnavailableException;
+import ru.flashsafe.token.generator.CodeGenerationStrategy;
 import ru.flashsafe.token.service.impl.USBFlashDriveBasedTokenService;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * USB flash drive implementation of the FlashSafeToken interface. This implementation of
@@ -21,7 +27,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class FlashSafeUSBFlashDriveToken implements FlashSafeToken {
     
-    private static final Logger logger = LogManager.getLogger(FlashSafeUSBFlashDriveToken.class);
+    private static final Logger LOGGER = LogManager.getLogger(FlashSafeUSBFlashDriveToken.class);
+    
+    private static final String ID_FILE_PATH = ".flashsafe" + File.separator + "flashsafe.id";
 
     private final String id;
     
@@ -31,10 +39,14 @@ public class FlashSafeUSBFlashDriveToken implements FlashSafeToken {
     
     private volatile boolean available = true;
     
-    public FlashSafeUSBFlashDriveToken(String id, File tokenRoot, USBFlashDriveBasedTokenService tokenService) {
+    private final CodeGenerationStrategy codeGenerationStrategy;
+    
+    public FlashSafeUSBFlashDriveToken(String id, File tokenRoot, CodeGenerationStrategy codeGenerationStrategy,
+            USBFlashDriveBasedTokenService tokenService) {
         this.id = id;
         this.tokenRoot = tokenRoot;
-        tokenIdFile = new File(tokenRoot, ".flashsafe" + File.separator + "flashsafe.id");
+        tokenIdFile = new File(tokenRoot, ID_FILE_PATH);
+        this.codeGenerationStrategy = codeGenerationStrategy;
         subscrubeToDetach(tokenService);
     }
     
@@ -45,7 +57,7 @@ public class FlashSafeUSBFlashDriveToken implements FlashSafeToken {
 
     @Override
     public String generateCode(String key) throws CodeGenerationException, FlashSafeTokenUnavailableException {
-        throw new NotImplementedException();
+        return codeGenerationStrategy.generateCodeFor(key);
     }
 
     @Override
@@ -71,12 +83,28 @@ public class FlashSafeUSBFlashDriveToken implements FlashSafeToken {
             protected void onDetach(FlashSafeToken flashSafeToken) {
                 available = false;
                 tokenService.unsubscribeFromEvents(FlashSafeUSBFlashDriveToken.this, this);
-                logger.debug("FlashSafeUSBFlashDriveToken [id = " + id + "] detached and unsubscribed");
+                LOGGER.debug("FlashSafeUSBFlashDriveToken " + FlashSafeUSBFlashDriveToken.this + " detached and unsubscribed");
             }
             
             @Override
             protected void onAttach(FlashSafeToken flashSafeToken) {
             }
         });
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("[id = %s, path = %s, available = %b]", id, tokenRoot.getAbsolutePath(), available);
+    }
+    
+    public static boolean isFlashSafeToken(File pathToToken) {
+        File pathToTokenId = new File(pathToToken, ID_FILE_PATH);
+        return pathToTokenId.exists();
+    }
+    
+    public static String getTokenId(File pathToToken) throws IOException {
+        URI tokenIdFileURI = new File(pathToToken, ID_FILE_PATH).toURI();
+        List<String> lines = Files.readAllLines(Paths.get(tokenIdFileURI), Charset.forName("UTF-8"));
+        return lines.isEmpty() ? FlashSafeToken.UNDEFINED_TOKEN_ID : lines.iterator().next();
     }
 }

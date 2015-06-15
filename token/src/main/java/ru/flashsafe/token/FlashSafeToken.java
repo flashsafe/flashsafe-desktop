@@ -20,6 +20,8 @@ import ru.flashsafe.token.service.FlashSafeTokenService;
  */
 public interface FlashSafeToken {
 
+    String UNDEFINED_TOKEN_ID = "UNDEFINED_TOKEN_ID";
+    
     /**
      * @return the token's identifier
      */

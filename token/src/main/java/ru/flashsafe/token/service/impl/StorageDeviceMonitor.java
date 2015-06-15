@@ -40,7 +40,7 @@ public class StorageDeviceMonitor implements EventHandler {
                 }
             }
         } else {
-            tokenService.checkExistedTokens();
+            tokenService.checkExistedDevices();
         }
         previousDevicesList = currentDevicesList;
     }

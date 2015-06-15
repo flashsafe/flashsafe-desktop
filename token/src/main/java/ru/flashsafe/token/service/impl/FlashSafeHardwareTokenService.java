@@ -20,9 +20,9 @@ import ru.flashsafe.token.FlashSafeToken;
 import ru.flashsafe.token.event.FlashSafeTokenEvent;
 import ru.flashsafe.token.exception.FlashSafeTokenNotFoundException;
 import ru.flashsafe.token.exception.TokenServiceInitializationException;
-import ru.flashsafe.token.impl.FlashSafePredefinedValueToken;
 import ru.flashsafe.token.service.FlashSafeTokenService;
 import ru.flashsafe.token.usb.USBClassTypes;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * 
@@ -33,7 +33,7 @@ import ru.flashsafe.token.usb.USBClassTypes;
 //TODO waiting for token implementation
 public class FlashSafeHardwareTokenService extends FlashSafeTokenServiceBase implements FlashSafeTokenService {
 
-    private static final Logger logger = LogManager.getLogger(FlashSafeHardwareTokenService.class);
+    private static final Logger LOGGER = LogManager.getLogger(FlashSafeHardwareTokenService.class);
     
     private static FlashSafeHardwareTokenService instance;
     
@@ -52,11 +52,12 @@ public class FlashSafeHardwareTokenService extends FlashSafeTokenServiceBase imp
     }
     
     public static synchronized FlashSafeTokenService getTokenService() throws TokenServiceInitializationException {
-        if (instance == null) {
+        throw new NotImplementedException();
+        /*if (instance == null) {
             instance = new FlashSafeHardwareTokenService();
             instance.initService();
         }
-        return instance;
+        return instance;*/
     }
     
     private void initService() throws TokenServiceInitializationException {
@@ -64,7 +65,7 @@ public class FlashSafeHardwareTokenService extends FlashSafeTokenServiceBase imp
             UsbServices usbServices = UsbHostManager.getUsbServices();
             attachHandlers(usbServices);
         } catch (SecurityException | UsbException e) {
-            logger.error("Failed to access the USB service", e);
+            LOGGER.error("Failed to access the USB service", e);
             throw new TokenServiceInitializationException("Failed to access the USB service", e);
         }
     }
@@ -78,7 +79,7 @@ public class FlashSafeHardwareTokenService extends FlashSafeTokenServiceBase imp
                 if (!matchesUSBClassType(device, USBClassTypes.MASS_STORAGE_DEVICE_TYPE)) {
                     return;
                 }
-                logger.debug("USB FlashSafe token detached");
+                LOGGER.debug("USB FlashSafe token detached");
                 //TODO remove token from availableTokens
                 //FlashSafeToken token = availableTokens.remove("some_id");
                 fireEvent(FlashSafeTokenEvent.DETACHED, null);
@@ -90,7 +91,7 @@ public class FlashSafeHardwareTokenService extends FlashSafeTokenServiceBase imp
                 if (!matchesUSBClassType(device, USBClassTypes.MASS_STORAGE_DEVICE_TYPE)) {
                     return;
                 }
-                logger.debug("USB FlashSafe token attached" + " " + device);
+                LOGGER.debug("USB FlashSafe token attached" + " " + device);
                 FlashSafeToken token = createTokenInstance();
                 availableTokens.put(token.getId(), token);
                 fireEvent(FlashSafeTokenEvent.ATTACHED, token);
@@ -99,7 +100,7 @@ public class FlashSafeHardwareTokenService extends FlashSafeTokenServiceBase imp
     }
     
     private static FlashSafeToken createTokenInstance() {
-        return new FlashSafePredefinedValueToken("some_ide", "some_code");
+        throw new NotImplementedException();
     }
     
     @SuppressWarnings("unchecked")
