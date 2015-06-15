@@ -13,3 +13,9 @@ LastExtractedJWrapperVersion
 jwrapper-00036138363.jar
 jwrapper.xml
 jwrapperJREpack.zip
+bin/
+.project
+.classpath
+.settings
+.checkstyle
+.gradle/
