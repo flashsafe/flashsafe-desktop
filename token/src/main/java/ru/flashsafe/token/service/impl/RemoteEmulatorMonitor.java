@@ -24,6 +24,8 @@ public class RemoteEmulatorMonitor implements EventHandler {
     
     private static final String  DETACH_COMMAND = "detach";
     
+    private static final String COMMAND_ARGS_DELIMITER = "=";
+    
     private static final Logger LOGGER = LogManager.getLogger(RemoteEmulatorMonitor.class);
 
     private final EventMonitor monitor;
@@ -69,7 +71,7 @@ public class RemoteEmulatorMonitor implements EventHandler {
     }
     
     private void processCommand(String commandString) {
-        String[] command = commandString.split("=");
+        String[] command = commandString.split(COMMAND_ARGS_DELIMITER);
         if (command.length != 2) {
             LOGGER.warn("Bad command format: " + commandString);
             return;

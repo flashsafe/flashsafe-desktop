@@ -6,6 +6,7 @@ import ru.flashsafe.token.exception.FlashSafeTokenNotFoundException;
 
 /**
  * An object that represents a service to work with {@link FlashSafeToken}.
+ * An implementation of this interface has to be thread-safe.
  * 
  * @author Andrew
  * 

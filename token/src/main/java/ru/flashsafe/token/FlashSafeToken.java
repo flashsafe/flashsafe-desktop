@@ -15,6 +15,8 @@ import ru.flashsafe.token.service.FlashSafeTokenService;
  * unavailable you can not use it anymore - use {@link FlashSafeTokenService#lookup()} to
  * get new representation of the token.
  * 
+ * An implementation of this interface has to be thread-safe.
+ * 
  * @author Andrew
  * 
  */
