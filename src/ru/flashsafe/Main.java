@@ -1,18 +1,26 @@
 package ru.flashsafe;
 
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javax.swing.ImageIcon;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Main class of a FlashSafe Desktop Client
  * @author alex_xpert
  */
 public class Main extends Application {
-    private static Stage _stage;
+    private static final Logger log = LogManager.getLogger(Main.class);
+    public static Stage _stage;
+    private SystemTray tray;
+    private TrayIcon ticon;
     
     @Override
     public void start(Stage stage) throws Exception {
@@ -29,8 +37,19 @@ public class Main extends Application {
         stage.setHeight(675);
         stage.setScene(scene);
         stage.show();
+        if(SystemTray.isSupported()) {
+            tray = SystemTray.getSystemTray();
+            ticon = new TrayIcon(new ImageIcon(getClass().getResource("/ru/flashsafe/img/logo1.png")).getImage(), "FlashSafe");
+            tray.add(ticon);
+            ticon.displayMessage("Соединение установлено", "Успешно установлено соединение с облаком. Ваша флешка готова к работе.", TrayIcon.MessageType.INFO);
+        }
     }
 
+    @Override
+    public void stop() throws Exception {
+        tray.remove(ticon);
+    }
+    
     /**
      * @param args the command line arguments
      */

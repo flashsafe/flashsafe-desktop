@@ -91,15 +91,15 @@
 }
 
 #Upload {
-    -fx-graphic: url("../img/upload_disabled.png");
+    //-fx-graphic: url("../img/upload_disabled.png");
 }
 
 #Download {
-    -fx-graphic: url("../img/download_disabled.png");
+    //-fx-graphic: url("../img/download_disabled.png");
 }
 
 #CreatePath {
-    -fx-graphic: url("../img/create_folder_disabled.png");
+    //-fx-graphic: url("../img/create_folder_disabled.png");
 }
 
 #Back {
