@@ -1,15 +1,13 @@
-package ru.flashsafe.core.storage;
+package ru.flashsafe.core.old.storage.rest.data;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@XmlRootElement
 public class ResponseMeta {
     
-    @XmlElement(name = "code")
+    @JsonProperty("code")
     private int responseCode;
     
-    @XmlElement(name = "msg")
+    @JsonProperty("msg")
     private String responseMessage;
 
     public int getResponseCode() {

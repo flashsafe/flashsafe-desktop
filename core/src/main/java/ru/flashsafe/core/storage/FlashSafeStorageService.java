@@ -1,11 +1,17 @@
 package ru.flashsafe.core.storage;
 
 import java.nio.file.Path;
+import java.util.List;
+
+import ru.flashsafe.core.old.storage.FlashSafeStorageDirectory;
+import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 
 
 public interface FlashSafeStorageService {
+    
+    String FLASH_SAFE_STORAGE_PATH_PREFIX = "fls://";
 
-    FlashSafeStorageFileObject list(long directoryId);
+    List<FlashSafeStorageFileObject> list(long directoryId);
     
     FlashSafeStorageDirectory createDirectory(long parentDirectoryId, String name);
     
