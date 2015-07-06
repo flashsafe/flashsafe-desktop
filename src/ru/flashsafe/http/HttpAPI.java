@@ -15,14 +15,20 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.flashsafe.controller.MainSceneController;
 import ru.flashsafe.model.FSData;
 import ru.flashsafe.model.FSMeta;
 import ru.flashsafe.model.FSObject;
+import ru.flashsafe.token.FlashSafeToken;
+import ru.flashsafe.token.exception.CodeGenerationException;
+import ru.flashsafe.token.exception.FlashSafeTokenNotFoundException;
+import ru.flashsafe.token.exception.FlashSafeTokenUnavailableException;
 
 /**
  * Something like REST-client
@@ -33,12 +39,16 @@ public class HttpAPI {
     private static final String API_URL = "https://flashsafe-alpha.azurewebsites.net";
     private static final ThreadLocal<JsonParser> THREAD_CACHE = new ThreadLocal<>();
     private static final Gson GSON = new Gson();
+    @Deprecated
     private static final Properties PROPERTIES = new Properties();
+    
     // Эти поля будут использоваться всеми потоками и, при необходимости, обновляться повторной авторизацией.
     // Дабы несколько потоков не инициировали авторизацию одновременно, метод auth() синхронизирован.
     private static volatile String token;
     private static volatile long timeout;
+    
     private static final HashMap<String, String> MIME = new HashMap();
+    private static final ArrayList<UploadProgressListener> LISTENERS = new ArrayList();
     
     private static HttpAPI API;
     
@@ -50,6 +60,14 @@ public class HttpAPI {
             loadMimeTypes();
         }
         return API;
+    }
+    
+    public void addListener(UploadProgressListener listener) {
+        LISTENERS.add(listener);
+    }
+    
+    public void removeListener(UploadProgressListener listener) {
+        LISTENERS.remove(listener);
     }
     
     private JsonObject get(String script, String request) {
@@ -115,7 +133,7 @@ public class HttpAPI {
                 FileInputStream fis = new FileInputStream(file);
                 int b;
                 while((b = fis.read()) != -1) {
-                    out.write((byte) b);
+                    out.write(b);
                 }
                 fis.close();
                 out.write("\r\n".getBytes("UTF-8"));
@@ -148,36 +166,64 @@ public class HttpAPI {
         }
     }
     
-    public synchronized int auth() {
-        if (timeout - System.currentTimeMillis() > 0L) {
-            return 1;
-        }
-        readProperties();
-        // Step 1
-        HashMap<String, String> form = new HashMap();
-        form.put("id", PROPERTIES.getProperty("id"));
-        JsonObject result = post("/auth.php", form, null);
-        if(result != null) {
-            // Step 2
-            FSData data = (FSData)GSON.fromJson(result.get("data"), FSData.class);
-            String hash = md5(data.token + PROPERTIES.getProperty("secret") + data.timestamp);
-            form.put("access_token", hash);
-            result = post("/auth.php", form, null);
-            if(result != null) {
-                data = (FSData)GSON.fromJson(result.get("data"), FSData.class);
-                token = data.token;
-                timeout = System.currentTimeMillis() + data.timeout * 1000;
-                return 1;
+    public synchronized boolean auth() {
+        try {
+            if (timeout - System.currentTimeMillis() > 0L) {
+                return true;
             }
+            //readProperties();
+            FlashSafeToken fstoken = MainSceneController.rets.lookup("1");
+            // Step 1
+            HashMap<String, String> form = new HashMap();
+            form.put("id", /*PROPERTIES.getProperty("id")*/fstoken.getId());
+            JsonObject result = post("/auth.php", form, null);
+            if(result != null) {
+                // Step 2
+                FSData data = (FSData)GSON.fromJson(result.get("data"), FSData.class);
+                String hash = md5(data.token + /*PROPERTIES.getProperty("secret")*/fstoken.generateCode("") + data.timestamp);
+                form.put("access_token", hash);
+                result = post("/auth.php", form, null);
+                if(result != null) {
+                    data = (FSData)GSON.fromJson(result.get("data"), FSData.class);
+                    token = data.token;
+                    timeout = System.currentTimeMillis() + data.timeout * 1000;
+                    return true;
+                }
+            }
+        } catch(FlashSafeTokenNotFoundException | CodeGenerationException | FlashSafeTokenUnavailableException e) {
+            log.error(e);
         }
-        return 0;
+        return false;
     }
     
-    public FSObject[] getContent() {
+    /**
+     * Get content from directory
+     * @return Array of the objects, when first is the content or null
+     * and second is the result code:
+     * 0 - OK
+     * 1 - Directory is empty
+     * 2 - Directory not found
+     * 3 - Pincode is incorrect, need a valid pincode
+     * 4 - Server error
+     */
+    public Object[] getContent() {
         return getContent(0, "");
     }
    
-    public FSObject[] getContent(int id, String pincode) {
+    /**
+     * Get content from directory
+     * @param id
+     * @param pincode
+     * @return Array of the objects, when first is the content or null
+     * and second is the result code:
+     * 0 - OK
+     * 1 - Directory is empty
+     * 2 - Directory not found
+     * 3 - Pincode is incorrect, need a valid pincode
+     * 4 - Server error
+     */
+    public Object[] getContent(int id, String pincode) {
+        Object[] answer = new Object[2];
         if (timeout - System.currentTimeMillis() <= 0) {
             auth();
         }
@@ -191,17 +237,32 @@ public class HttpAPI {
                     for (int i=0;i<data.size();i++) {
                         content[i] = GSON.fromJson(data.get(i), FSObject.class);
                     }
-                    return content;
+                    answer[0] = content;
+                    answer[1] = 0;
+                } else {
+                    answer[0] = null;
+                    answer[1] = 1;
                 }
             break;
+            case 404:
+                answer[0] = null;
+                answer[1] = 2;
+                break;
             case 423:
                 if(meta.msg.equals("take_token")) {
                     auth();
                     getContent(id, pincode);
+                } else {
+                    answer[0] = null;
+                    answer[1] = 3;
                 }
             break;
+            case 911:
+                answer[0] = null;
+                answer[1] = 4;
+                break;
         }
-        return null;
+        return answer;
     }
     
     public int createPath(int parent, String pincode, String name) {
@@ -277,6 +338,7 @@ public class HttpAPI {
         }
     }
     
+    @Deprecated
     private void readProperties(){
         if(!PROPERTIES.isEmpty()) return;
         try {
