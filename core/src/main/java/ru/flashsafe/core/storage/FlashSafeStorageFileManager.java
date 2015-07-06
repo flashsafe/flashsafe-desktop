@@ -9,6 +9,12 @@ import ru.flashsafe.core.file.FileObject;
 
 public class FlashSafeStorageFileManager implements FileManager {
 
+    private FlashSafeStorageService storageService;
+    
+    public FlashSafeStorageFileManager(FlashSafeStorageService storageService) {
+        this.storageService = storageService;
+    }
+    
     @Override
     public List<FileObject> list(String path) {
         // TODO Auto-generated method stub

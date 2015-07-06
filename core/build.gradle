@@ -12,8 +12,8 @@ repositories {
 
 dependencies {
     compile group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.19'
-    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-jaxb', version: '2.19'
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.19'
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.19'
     compile group: 'ru.flashsafe', name: 'token', version: '0.1'
 }
 

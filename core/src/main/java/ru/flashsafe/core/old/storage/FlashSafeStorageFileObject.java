@@ -1,8 +1,12 @@
-package ru.flashsafe.core.storage;
+package ru.flashsafe.core.old.storage;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@XmlRootElement
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({ @JsonSubTypes.Type(value = FlashSafeStorageFile.class),
+        @JsonSubTypes.Type(value = FlashSafeStorageDirectory.class) })
 public class FlashSafeStorageFileObject {
 
     private long id;
@@ -11,10 +15,13 @@ public class FlashSafeStorageFileObject {
 
     private long size;
 
+    @JsonProperty("create_time")
     private long creationTime;
 
+    @JsonProperty("update_time")
     private long lastModifiedTime;
 
+    @JsonProperty("pincode")
     private boolean needPassword;
 
     public long getId() {
@@ -40,7 +47,7 @@ public class FlashSafeStorageFileObject {
     public void setSize(long size) {
         this.size = size;
     }
-
+    
     public long getCreationTime() {
         return creationTime;
     }
@@ -64,5 +71,4 @@ public class FlashSafeStorageFileObject {
     public void setNeedPassword(boolean needPassword) {
         this.needPassword = needPassword;
     }
-
 }
