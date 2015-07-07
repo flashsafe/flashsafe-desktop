@@ -12,6 +12,10 @@ public class FlashSafeStorageDirectory extends FlashSafeStorageFileObject implem
     @Deprecated
     private String format;
 
+    public FlashSafeStorageDirectory() {
+        
+    }
+    
     @Override
     public String getAbsolutePath() {
         // TODO Auto-generated method stub

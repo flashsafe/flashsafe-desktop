@@ -15,7 +15,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
 
@@ -58,27 +57,24 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
 
     private static void applyAccessTokenToRequest(ClientRequestContext requestContext, String token) {
         String query = requestContext.getUri().getQuery();
-        String accessTokenParameter = query != null ? "&" : "?" + ACCESS_TOKEN_PARAMETER + "=" + token;
+        String accessTokenParameter = (query == null) ? "?" : "&";
+        accessTokenParameter += ACCESS_TOKEN_PARAMETER + "=" + token;
         requestContext.setUri(URI.create(requestContext.getUri().toString() + accessTokenParameter));
     }
 
     private AuthData doAuth() {
-        Response response = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(new Form(ID_PARAMETER, "1")));
-        if (response.getStatus() == 200) {
-            AuthResponse authResponse = response.readEntity(AuthResponse.class);
+        AuthResponse authResponse = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(new Form(ID_PARAMETER, "1")), AuthResponse.class);
+        
             AuthData authData = authResponse.getAuthData();
             String hash = md5(authData.getToken() + getSecret() + authData.getTimestamp());
 
             Form form = new Form(ID_PARAMETER, "1");
             form.param(ACCESS_TOKEN_PARAMETER, hash);
-            Response response2 = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(form));
-            if (response2.getStatus() == 200) {
-                AuthResponse authResponse2 = response2.readEntity(AuthResponse.class);
-                return authResponse2.getAuthData();
-            }
+            AuthResponse authResponse2 = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(form), AuthResponse.class);
 
-        }
-        return null;
+               System.out.println(authResponse2);
+                return authResponse2.getAuthData();
+
     }
 
     private boolean isAuthDataInvalid() {
