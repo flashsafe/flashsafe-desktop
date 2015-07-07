@@ -12,19 +12,19 @@ import ru.flashsafe.core.storage.FlashSafeStorageFileManager;
 import ru.flashsafe.core.storage.FlashSafeStorageService;
 
 public class UnifiedFileManager implements FileManager {
-    
+
     private final LocalFileManager localFileSystemManager;
-    
+
     private final FlashSafeStorageFileManager flashSafeStorageFileManager;
-    
+
     private final FlashSafeStorageService flashSafeStorageService;
-    
-    protected  UnifiedFileManager() {
+
+    protected UnifiedFileManager() {
         localFileSystemManager = new LocalFileManager();
-        flashSafeStorageService = new DefaultFlashSafeStorageService(); 
+        flashSafeStorageService = new DefaultFlashSafeStorageService();
         flashSafeStorageFileManager = new FlashSafeStorageFileManager(flashSafeStorageService);
     }
-    
+
     @Override
     public List<FileObject> list(String path) {
         FileManager fileManager = getFileManagerForPath(path);
@@ -53,13 +53,21 @@ public class UnifiedFileManager implements FileManager {
         }
     }
 
+    private void copyToFlashSafeStorage(String fromPath, String toPath) {
+        
+    }
+
+    private void copyFromFlashSafeStorage(String fromPath, String toPath) {
+        
+    }
+
     @Override
     public void move(String fromPath, String toPath) {
         if (pathsRelateToSameStorage(fromPath, toPath)) {
             FileManager fileManager = getFileManagerForPath(fromPath);
             fileManager.move(fromPath, toPath);
         } else {
-            
+
         }
     }
 
@@ -68,16 +76,15 @@ public class UnifiedFileManager implements FileManager {
         FileManager fileManager = getFileManagerForPath(path);
         fileManager.delete(path);
     }
-    
+
     private static boolean pathsRelateToSameStorage(String firstPath, String secondPath) {
         boolean firstPathOnRemoteStorage = firstPath.startsWith(FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX);
         boolean secondPathOnRemoteStorage = secondPath.startsWith(FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX);
         return firstPathOnRemoteStorage == secondPathOnRemoteStorage;
     }
-    
+
     private FileManager getFileManagerForPath(String path) {
         return path.startsWith(FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX) ? flashSafeStorageFileManager
                 : localFileSystemManager;
     }
-
 }

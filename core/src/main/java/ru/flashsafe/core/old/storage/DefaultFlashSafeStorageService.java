@@ -46,12 +46,13 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
 
     @Override
     public List<FlashSafeStorageFileObject> list(long directoryId) {
-        Response response = directoryTarget.queryParam(DIRECTORY_ID_PARAMETER, directoryId)
-                .request(MediaType.APPLICATION_JSON_TYPE).get();
-        DirectoryListResponse listResponse = response.readEntity(DirectoryListResponse.class);
+        DirectoryListResponse listResponse = directoryTarget.queryParam(DIRECTORY_ID_PARAMETER, directoryId)
+                .request(MediaType.APPLICATION_JSON_TYPE).get(DirectoryListResponse.class);
         ResponseMeta responseMeta = listResponse.getResponseMeta();
         if (responseMeta.getResponseCode() == 200) {
             return listResponse.getFileObjects();
+        } else {
+            System.out.println(responseMeta.getResponseMessage());
         }
         return null;
     }
@@ -112,15 +113,96 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
         throw new NotImplementedException();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         DefaultFlashSafeStorageService service = new DefaultFlashSafeStorageService();
         
         // service.createDirectory(0, "Alf folder");
          /*service.uploadFile(0,
          Paths.get("D:/Перепродажа через одностраничные сайты.docx"));*/
-         List<FlashSafeStorageFileObject> secondList = service.list(0);
-         List<FlashSafeStorageFileObject> secondList2 = service.list(0);
-        System.out.println(4);
+         long start = System.currentTimeMillis();
+         
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         for (FlashSafeStorageFileObject obj : service.list(0)) {
+             System.out.print(obj + ";");
+         }
+         System.out.println();
+         
+         long end = System.currentTimeMillis();
+         System.out.println((float) (end - start) / 1000);
     }
-
 }
