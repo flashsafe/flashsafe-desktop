@@ -1,8 +1,9 @@
 package ru.flashsafe.core.old.storage;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-
 import ru.flashsafe.core.file.File;
+import ru.flashsafe.core.file.FileObjectType;
+
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @JsonTypeName("file")
 public class FlashSafeStorageFile extends FlashSafeStorageFileObject implements File {
@@ -11,6 +12,10 @@ public class FlashSafeStorageFile extends FlashSafeStorageFileObject implements 
 
     @Deprecated
     private int count;
+    
+    public FlashSafeStorageFile() {
+        setObjectType(FileObjectType.FILE);
+    }
     
     @Override
     public String getAbsolutePath() {

@@ -5,23 +5,24 @@ import java.util.List;
 
 import ru.flashsafe.core.old.storage.FlashSafeStorageDirectory;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
+import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 
 public interface FlashSafeStorageService {
 
     String FLASH_SAFE_STORAGE_PATH_PREFIX = "fls://";
 
-    List<FlashSafeStorageFileObject> list(long directoryId);
+    List<FlashSafeStorageFileObject> list(long directoryId) throws FlashSafeStorageException;
 
-    FlashSafeStorageDirectory createDirectory(long parentDirectoryId, String name);
+    FlashSafeStorageDirectory createDirectory(long parentDirectoryId, String name) throws FlashSafeStorageException;
 
-    void downloadFile(long fileId, Path directory);
+    StorageOperationStatus downloadFile(long fileId, Path directory) throws FlashSafeStorageException;
 
-    void uploadFile(long directoryId, Path file);
+    StorageOperationStatus uploadFile(long directoryId, Path file) throws FlashSafeStorageException;
 
-    void copy(long fileObjectId, long destinationDirectoryId);
+    void copy(long fileObjectId, long destinationDirectoryId) throws FlashSafeStorageException;
 
-    void move(long fileObjectId, long destinationDirectoryId);
+    void move(long fileObjectId, long destinationDirectoryId) throws FlashSafeStorageException;
 
-    void delete(long fileObjectId);
-
+    void delete(long fileObjectId) throws FlashSafeStorageException;
+    
 }

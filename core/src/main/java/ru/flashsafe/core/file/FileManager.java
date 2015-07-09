@@ -2,6 +2,8 @@ package ru.flashsafe.core.file;
 
 import java.util.List;
 
+import ru.flashsafe.core.file.exception.FileOperationException;
+
 /**
  * 
  * @author Andrew
@@ -9,16 +11,16 @@ import java.util.List;
  */
 public interface FileManager {
 
-    List<FileObject> list(String path);
+    List<FileObject> list(String path) throws FileOperationException;
     
-    File createFile(String path);
+    File createFile(String path) throws FileOperationException;
     
-    Directory createDirectory(String path);
+    Directory createDirectory(String path) throws FileOperationException;
     
-    void copy(String fromPath, String toPath);
+    FileOperationStatus copy(String fromPath, String toPath) throws FileOperationException;
     
-    void move(String fromPath, String toPath);
+    FileOperationStatus move(String fromPath, String toPath) throws FileOperationException;
     
-    void delete(String path);
+    FileOperationStatus delete(String path) throws FileOperationException;
     
 }

@@ -9,11 +9,11 @@ import ru.flashsafe.core.file.File;
 public class LocalFile implements File {
 
     private final Path filePath;
-    
+
     protected LocalFile(Path filePath) {
         this.filePath = filePath;
     }
-    
+
     @Override
     public String getName() {
         return filePath.getFileName().toString();
@@ -25,14 +25,8 @@ public class LocalFile implements File {
     }
 
     @Override
-    public long getSize() {
-        try {
-            return Files.size(filePath);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return -1;
+    public long getSize() throws IOException {
+        return Files.size(filePath);
     }
 
 }

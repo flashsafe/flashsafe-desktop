@@ -50,6 +50,7 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
                     AuthData authData = doAuth();
                     currentAuthData = authData;
                 }
+                //TODO change apply call
                 applyAccessTokenToRequest(requestContext, currentAuthData.getToken());
             }
         }
@@ -63,17 +64,18 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
     }
 
     private AuthData doAuth() {
-        AuthResponse authResponse = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(new Form(ID_PARAMETER, "1")), AuthResponse.class);
-        
-            AuthData authData = authResponse.getAuthData();
-            String hash = md5(authData.getToken() + getSecret() + authData.getTimestamp());
+        AuthResponse authResponse = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(
+                Entity.form(new Form(ID_PARAMETER, "1")), AuthResponse.class);
 
-            Form form = new Form(ID_PARAMETER, "1");
-            form.param(ACCESS_TOKEN_PARAMETER, hash);
-            AuthResponse authResponse2 = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(form), AuthResponse.class);
+        AuthData authData = authResponse.getAuthData();
+        String hash = md5(authData.getToken() + getSecret() + authData.getTimestamp());
 
-               System.out.println(authResponse2);
-                return authResponse2.getAuthData();
+        Form form = new Form(ID_PARAMETER, "1");
+        form.param(ACCESS_TOKEN_PARAMETER, hash);
+        //TODO add try-catch and try again - just temporary workaround
+        AuthResponse authResponse2 = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(form),
+                AuthResponse.class);
+        return authResponse2.getAuthData();
 
     }
 

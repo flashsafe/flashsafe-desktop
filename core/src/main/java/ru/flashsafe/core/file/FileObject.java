@@ -1,5 +1,7 @@
 package ru.flashsafe.core.file;
 
+import java.io.IOException;
+
 /**
  * 
  * 
@@ -12,6 +14,6 @@ public interface FileObject {
 
     String getAbsolutePath();
     
-    long getSize();
+    long getSize() throws IOException;
 
 }

@@ -1,4 +1,4 @@
-package ru.flashsafe.core.localfs;
+package ru.flashsafe.core.old.storage.util;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -8,23 +8,22 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import ru.flashsafe.core.file.FileOperationType;
-import ru.flashsafe.core.file.impl.FileOperationStatusComposite;
-import ru.flashsafe.core.file.impl.FileOperationStatusImpl;
-import ru.flashsafe.core.operation.OperationState;
-
 public class MoveDirectoryVisitor extends SimpleFileVisitor<Path> {
 
-    private final Path fromPath;
+    private Path fromPath;
 
-    private final Path toPath;
+    private Path toPath;
 
-    private final FileOperationStatusComposite operationStatus;
+    private StandardCopyOption copyOption;
 
-    public MoveDirectoryVisitor(Path fromPath, Path toPath, FileOperationStatusComposite operationStatus) {
+    public MoveDirectoryVisitor(Path fromPath, Path toPath, StandardCopyOption copyOption) {
         this.fromPath = fromPath;
         this.toPath = toPath;
-        this.operationStatus = operationStatus;
+        this.copyOption = copyOption;
+    }
+
+    public MoveDirectoryVisitor(Path fromPath, Path toPath) {
+        this(fromPath, toPath, StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Override
@@ -38,13 +37,7 @@ public class MoveDirectoryVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        long fileSize = Files.size(file);
-        FileOperationStatusImpl fileOperationStatus = new FileOperationStatusImpl(FileOperationType.MOVE, fileSize);
-        operationStatus.setActiveOperationStatus(fileOperationStatus);
-        Files.move(file, toPath.resolve(fromPath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
-        fileOperationStatus.setProcessedBytes(fileSize);
-        fileOperationStatus.setState(OperationState.FINISHED);
-        operationStatus.submitActiveOperationStatusAsFinished();
+        Files.move(file, toPath.resolve(fromPath.relativize(file)), copyOption);
         return FileVisitResult.CONTINUE;
     }
 

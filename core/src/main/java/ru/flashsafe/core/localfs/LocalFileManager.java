@@ -2,95 +2,113 @@ package ru.flashsafe.core.localfs;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
-import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ru.flashsafe.core.file.Directory;
 import ru.flashsafe.core.file.File;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.FileObject;
+import ru.flashsafe.core.file.FileOperationStatus;
+import ru.flashsafe.core.file.FileOperationType;
+import ru.flashsafe.core.file.exception.FileOperationException;
+import ru.flashsafe.core.file.impl.FileOperationStatusComposite;
+import ru.flashsafe.core.file.util.AsyncFileTreeWalker;
 
 /**
  * 
  * @author Andrew
- *
+ * 
  */
+//TOD add logging
 public class LocalFileManager implements FileManager {
 
+    // TODO return the usage of configuration registry (or properties)
+    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+    public LocalFileManager() {
+//        Runtime.getRuntime().addShutdownHook(new Thread() {
+//            
+//            @Override
+//            public void run() {
+//                executor.shutdownNow();
+//                try {
+//                    executor.awaitTermination(500, TimeUnit.MILLISECONDS);
+//                } catch (InterruptedException e) {
+//                    // TODO Auto-generated catch block
+//                    e.printStackTrace();
+//                }
+//            }
+//            
+//        });
+    }
+    
     @Override
-    public List<FileObject> list(String path) {
+    public List<FileObject> list(String path) throws FileOperationException {
         List<FileObject> fileObjects = new ArrayList<>();
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(path))) {
             for (Path currentPath : directoryStream) {
+                // TODO fix creating file
                 FileObject fileObject = Files.isDirectory(currentPath) ? new LocalDirectory(currentPath) : new LocalFile(
                         currentPath);
                 fileObjects.add(fileObject);
             }
-        } catch (IOException ex) {
-            // TODO fix
+            return Collections.unmodifiableList(fileObjects);
+        } catch (IOException e) {
+            throw new FileOperationException(e);
         }
-        return Collections.unmodifiableList(fileObjects);
     }
 
     @Override
-    public File createFile(String path) {
+    public File createFile(String path) throws FileOperationException {
         try {
             Path newFile = Files.createFile(Paths.get(path));
             return new LocalFile(newFile);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new FileOperationException(e);
         }
-        return null;
     }
 
     @Override
-    public Directory createDirectory(String path) {
+    public Directory createDirectory(String path) throws FileOperationException {
         try {
             Path newDirectory = Files.createDirectory(Paths.get(path));
             return new LocalDirectory(newDirectory);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public void copy(String fromPath, String toPath) {
-        try {
-            Files.walkFileTree(Paths.get(fromPath), EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE,
-                    new CopyDirectoryVisitor(Paths.get(fromPath), Paths.get(toPath)));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new FileOperationException(e);
         }
     }
 
     @Override
-    public void move(String fromPath, String toPath) {
-        try {
-            Files.walkFileTree(Paths.get(fromPath), EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE,
-                    new MoveDirectoryVisitor(Paths.get(fromPath), Paths.get(toPath)));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public FileOperationStatus copy(String fromPath, String toPath) throws FileOperationException {
+        Path from = Paths.get(fromPath);
+        FileOperationStatusComposite operationStatus = new FileOperationStatusComposite(FileOperationType.COPY);
+        executorService.execute(new AsyncFileTreeWalker(from, new CopyDirectoryVisitor(from, Paths.get(toPath), operationStatus),
+                operationStatus));
+        return operationStatus;
     }
-    
+
     @Override
-    public void delete(String path) {
-        try {
-            Files.walkFileTree(Paths.get(path), new DeleteDirectoryVisitor());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public FileOperationStatus move(String fromPath, String toPath) throws FileOperationException {
+        Path from = Paths.get(fromPath);
+        FileOperationStatusComposite operationStatus = new FileOperationStatusComposite(FileOperationType.MOVE);
+        executorService.execute(new AsyncFileTreeWalker(from, new MoveDirectoryVisitor(from, Paths.get(toPath), operationStatus),
+                operationStatus));
+        return operationStatus;
     }
+
+    @Override
+    public FileOperationStatus delete(String path) throws FileOperationException {
+        Path pathToDelete = Paths.get(path);
+        FileOperationStatusComposite operationStatus = new FileOperationStatusComposite(FileOperationType.DELETE);
+        executorService.execute(new AsyncFileTreeWalker(pathToDelete, new DeleteDirectoryVisitor(operationStatus), operationStatus));
+        return operationStatus;
+    }
+
 }

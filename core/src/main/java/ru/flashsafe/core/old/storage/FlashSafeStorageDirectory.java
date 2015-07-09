@@ -1,8 +1,9 @@
 package ru.flashsafe.core.old.storage;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-
 import ru.flashsafe.core.file.Directory;
+import ru.flashsafe.core.file.FileObjectType;
+
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @JsonTypeName("dir")
 public class FlashSafeStorageDirectory extends FlashSafeStorageFileObject implements Directory {
@@ -13,7 +14,7 @@ public class FlashSafeStorageDirectory extends FlashSafeStorageFileObject implem
     private String format;
 
     public FlashSafeStorageDirectory() {
-        
+        setObjectType(FileObjectType.DIRECTORY);
     }
     
     @Override

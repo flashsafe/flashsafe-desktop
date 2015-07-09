@@ -1,5 +1,8 @@
 package ru.flashsafe.core.old.storage;
 
+import ru.flashsafe.core.file.FileObject;
+import ru.flashsafe.core.file.FileObjectType;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -7,13 +10,17 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({ @JsonSubTypes.Type(value = FlashSafeStorageFile.class),
         @JsonSubTypes.Type(value = FlashSafeStorageDirectory.class) })
-public class FlashSafeStorageFileObject {
+public abstract class FlashSafeStorageFileObject implements FileObject {
 
     private long id;
 
     private String name;
 
     private long size;
+    
+    private FileObjectType objectType;
+    
+    private String absolutePath;
 
     @JsonProperty("create_time")
     private long creationTime;
@@ -70,5 +77,21 @@ public class FlashSafeStorageFileObject {
 
     public void setNeedPassword(boolean needPassword) {
         this.needPassword = needPassword;
+    }
+
+    public FileObjectType getObjectType() {
+        return objectType;
+    }
+
+    public void setObjectType(FileObjectType objectType) {
+        this.objectType = objectType;
+    }
+    
+    public String getAbsolutePath() {
+        return absolutePath;
+    }
+    
+    public void setAbsolutePath(String path) {
+        absolutePath = path;
     }
 }

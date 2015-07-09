@@ -14,7 +14,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JSONHelper {
 
-    private JSONHelper() {}
+    private JSONHelper() {
+    }
     
     public static <T> T fromJson(String jsonString, Class<? extends T> type) throws JsonParseException, JsonMappingException,
             IOException {

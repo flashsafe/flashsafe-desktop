@@ -9,6 +9,8 @@ public class ResponseMeta {
     
     @JsonProperty("msg")
     private String responseMessage;
+    
+    private String info;
 
     public int getResponseCode() {
         return responseCode;
@@ -25,5 +27,12 @@ public class ResponseMeta {
     public void setResponseMessage(String responseMessage) {
         this.responseMessage = responseMessage;
     }
-    
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
 }
