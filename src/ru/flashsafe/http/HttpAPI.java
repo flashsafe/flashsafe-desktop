@@ -21,25 +21,25 @@ import java.util.Properties;
 import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.flashsafe.controller.MainSceneController;
+//import ru.flashsafe.controller.MainSceneController;
 import ru.flashsafe.model.FSData;
 import ru.flashsafe.model.FSMeta;
 import ru.flashsafe.model.FSObject;
-import ru.flashsafe.token.FlashSafeToken;
-import ru.flashsafe.token.exception.CodeGenerationException;
-import ru.flashsafe.token.exception.FlashSafeTokenNotFoundException;
-import ru.flashsafe.token.exception.FlashSafeTokenUnavailableException;
+//import ru.flashsafe.token.FlashSafeToken;
+//import ru.flashsafe.token.exception.CodeGenerationException;
+//import ru.flashsafe.token.exception.FlashSafeTokenNotFoundException;
+//import ru.flashsafe.token.exception.FlashSafeTokenUnavailableException;
 
 /**
  * Something like REST-client
  * @author alex_xpert
  */
 public class HttpAPI {
-    private static final Logger log = LogManager.getLogger(HttpAPI.class);
+    //private static final Logger log = LogManager.getLogger(HttpAPI.class);
     private static final String API_URL = "https://flashsafe-alpha.azurewebsites.net";
     private static final ThreadLocal<JsonParser> THREAD_CACHE = new ThreadLocal<>();
     private static final Gson GSON = new Gson();
-    @Deprecated
+    //@Deprecated
     private static final Properties PROPERTIES = new Properties();
     
     // Эти поля будут использоваться всеми потоками и, при необходимости, обновляться повторной авторизацией.
@@ -83,7 +83,7 @@ public class HttpAPI {
             connection.disconnect();
             return response.getAsJsonObject();
         } catch(IOException ioe) {
-            log.error("Error on GET request", ioe);
+            //log.error("Error on GET request", ioe);
             return null;
         } finally {
             try {
@@ -94,7 +94,7 @@ public class HttpAPI {
                     in.close();
                 }
             } catch(IOException ioe) {
-                log.error("Error on closing HttpURLConnection and InputStream", ioe);
+                //log.error("Error on closing HttpURLConnection and InputStream", ioe);
             }
         }
     }
@@ -131,9 +131,16 @@ public class HttpAPI {
             out.write(start.getBytes("UTF-8"));
             if(file != null) {
                 FileInputStream fis = new FileInputStream(file);
+                double total = file.length();
+                double uploaded = 0;
+                byte[] block = new byte[1024];
                 int b;
-                while((b = fis.read()) != -1) {
-                    out.write(b);
+                while((b = fis.read(block)) != -1) {
+                    out.write(block);
+                    uploaded += b;
+                    for(UploadProgressListener upl : LISTENERS) {
+                        upl.onUpdateProgress(uploaded / total);
+                    }
                 }
                 fis.close();
                 out.write("\r\n".getBytes("UTF-8"));
@@ -147,7 +154,7 @@ public class HttpAPI {
             connection.disconnect();
             return response.getAsJsonObject();
         } catch(IOException ioe) {
-            log.error("Error on POST request", ioe);
+            //log.error("Error on POST request", ioe);
             return null;
         } finally {
             try {
@@ -161,26 +168,26 @@ public class HttpAPI {
                     out.close();
                 }
             } catch(IOException ioe) {
-                log.error("Error on closing HttpURLConnection, InputStream and OutputStream", ioe);
+                //log.error("Error on closing HttpURLConnection, InputStream and OutputStream", ioe);
             }
         }
     }
     
     public synchronized boolean auth() {
-        try {
+        //try {
             if (timeout - System.currentTimeMillis() > 0L) {
                 return true;
             }
-            //readProperties();
-            FlashSafeToken fstoken = MainSceneController.rets.lookup("1");
+            readProperties();
+            //FlashSafeToken fstoken = MainSceneController.rets.lookup("1");
             // Step 1
             HashMap<String, String> form = new HashMap();
-            form.put("id", /*PROPERTIES.getProperty("id")*/fstoken.getId());
+            form.put("id", PROPERTIES.getProperty("id")/*fstoken.getId()*/);
             JsonObject result = post("/auth.php", form, null);
             if(result != null) {
                 // Step 2
                 FSData data = (FSData)GSON.fromJson(result.get("data"), FSData.class);
-                String hash = md5(data.token + /*PROPERTIES.getProperty("secret")*/fstoken.generateCode("") + data.timestamp);
+                String hash = md5(data.token + PROPERTIES.getProperty("secret")/*fstoken.generateCode("")*/ + data.timestamp);
                 form.put("access_token", hash);
                 result = post("/auth.php", form, null);
                 if(result != null) {
@@ -190,9 +197,9 @@ public class HttpAPI {
                     return true;
                 }
             }
-        } catch(FlashSafeTokenNotFoundException | CodeGenerationException | FlashSafeTokenUnavailableException e) {
-            log.error(e);
-        }
+        //} catch(FlashSafeTokenNotFoundException | CodeGenerationException | FlashSafeTokenUnavailableException e) {
+            //log.error(e);
+        //}
         return false;
     }
     
@@ -333,18 +340,18 @@ public class HttpAPI {
             }
             return hexString.toString();
         } catch (NoSuchAlgorithmException nsae) {
-            log.error("Error on generate MD5", nsae);
+            //log.error("Error on generate MD5", nsae);
             return null;
         }
     }
     
-    @Deprecated
+    //@Deprecated
     private void readProperties(){
         if(!PROPERTIES.isEmpty()) return;
         try {
             PROPERTIES.loadFromXML(new FileInputStream("./flashsafe.xml"));
         } catch (Exception e) {
-            log.error("Error on loading properties, setting default values.", e);
+            //log.error("Error on loading properties, setting default values.", e);
             PROPERTIES.setProperty("id", "1");
             PROPERTIES.setProperty("secret", "open123458");
         }
@@ -377,14 +384,14 @@ public class HttpAPI {
                 }
             }
         } catch(IOException ioe) {
-            log.error("Error on loading MIME-types.", ioe);
+            //log.error("Error on loading MIME-types.", ioe);
         } finally {
             try {
                 if(fis != null) {
                     fis.close();
                 }
             } catch(IOException ioe) {
-                log.error("Error on closing MIME-types InputStream.", ioe);
+                //log.error("Error on closing MIME-types InputStream.", ioe);
             }
         }
     }

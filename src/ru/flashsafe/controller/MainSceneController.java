@@ -5,14 +5,15 @@
  */
 package ru.flashsafe.controller;
 
-import java.awt.AWTException;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.ResourceBundle;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -29,6 +30,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
@@ -42,17 +44,16 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javax.swing.ImageIcon;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.flashsafe.Main;
 import ru.flashsafe.http.HttpAPI;
 import ru.flashsafe.http.UploadProgressListener;
 import ru.flashsafe.model.FSObject;
-import ru.flashsafe.token.FlashSafeToken;
-import ru.flashsafe.token.event.BaseEventHandler;
-import ru.flashsafe.token.exception.TokenServiceInitializationException;
-import ru.flashsafe.token.generator.FixedValueGenerationStrategy;
+//import ru.flashsafe.token.FlashSafeToken;
+//import ru.flashsafe.token.event.BaseEventHandler;
+//import ru.flashsafe.token.exception.TokenServiceInitializationException;
+//import ru.flashsafe.token.generator.FixedValueGenerationStrategy;
 import ru.flashsafe.token.service.impl.RemoteEmulatorTokenService;
 
 /**
@@ -60,7 +61,7 @@ import ru.flashsafe.token.service.impl.RemoteEmulatorTokenService;
  * @author alex_xpert
  */
 public class MainSceneController implements Initializable, UploadProgressListener {
-    private static final Logger log = LogManager.getLogger(MainSceneController.class);
+    //private static final Logger log = LogManager.getLogger(MainSceneController.class);
     
     private final Image cloud_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/cloud_enabled.png"));
     private final Image upload_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/upload_enabled.png"));
@@ -84,8 +85,6 @@ public class MainSceneController implements Initializable, UploadProgressListene
     private int path;
     private String pincode = "";
     private ArrayList<ListView> lists = new ArrayList<>();
-    private SystemTray tray;
-    private TrayIcon ticon;
     private final ArrayList<FSObject> FORWARD_PATH = new ArrayList<>();
     public static RemoteEmulatorTokenService rets;
     private boolean run = false;
@@ -111,8 +110,30 @@ public class MainSceneController implements Initializable, UploadProgressListene
     private Pane pincode_dialog;
     @FXML
     private TextField pincode_textfield;
+//    @FXML
+//    private Button pincode_submit;
     @FXML
-    private Button pincode_submit;
+    private Button backspace;
+    @FXML
+    private Button one;
+    @FXML
+    private Button two;
+    @FXML
+    private Button three;
+    @FXML
+    private Button four;
+    @FXML
+    private Button five;
+    @FXML
+    private Button six;
+    @FXML
+    private Button seven;
+    @FXML
+    private Button eight;
+    @FXML
+    private Button nine;
+    @FXML
+    private Button zero;
     @FXML
     private VBox files1, files2;
     @FXML
@@ -123,136 +144,175 @@ public class MainSceneController implements Initializable, UploadProgressListene
     private Pane pathname_dialog;
     @FXML
     private TextField pathname_textfield;
-    @FXML
-    private Button pathname_submit;
+//    @FXML
+//    private Button pathname_submit;
     @FXML
     private ProgressBar progress;
+    
+    private class ConnectToCloudTask implements Callable<Boolean> {
+
+        @Override
+        public Boolean call() throws Exception {
+             return auth();
+        }
+        
+    }
+    
+    private class AddHandlersTask implements Callable {
+
+        @Override
+        public Object call() throws Exception {
+            Platform.runLater(new Runnable() {
+
+                @Override
+                public void run() { 
+                        cloud.setGraphic(new ImageView(cloud_enabled));
+                        upload_button.setGraphic(new ImageView(upload_enabled));
+                        download_button.setGraphic(new ImageView(download_enabled));
+                        create_path_button.setGraphic(new ImageView(create_path_enabled));
+                        window.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+
+                            @Override
+                            public void handle(MouseEvent event) {
+                                for(ListView l : lists) {
+                                    if(!l.isFocused()) {
+                                        l.setVisible(false);
+                                    }
+                                }
+                                if(!files1.isFocused() && !files2.isFocused()) {
+                                    for(int i=0;i<files1.getChildren().size();i++) {
+                                        files1.getChildren().get(i).setStyle("-fx-background-color: #FFFFFF");
+                                    }
+                                    for(int i=0;i<files2.getChildren().size();i++) {
+                                        files2.getChildren().get(i).setStyle("-fx-background-color: #FFFFFF");
+                                    }
+                                    filename.setText("");
+                                    filetype.setText("");
+                                    filesize.setText("");
+                                }
+                            }
+                        });
+                        files1.setOnDragDetected(new EventHandler<MouseEvent>() {
+                            public void handle(MouseEvent event) {
+                                Dragboard db = files1.startDragAndDrop(TransferMode.ANY);
+                                ClipboardContent content = new ClipboardContent();
+                                ArrayList<File> list = new ArrayList();
+                                list.add(new File("./.mime"));
+                                content.putFiles(list);
+                                db.setContent(content);
+                                event.consume();
+                            }
+                        });
+                        files1.setOnDragOver(new EventHandler<DragEvent>() {
+                            @Override
+                            public void handle(DragEvent event) {
+                                if (event.getGestureSource() != files1 &&
+                                        event.getDragboard().hasFiles()) {
+                                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                                }
+                                event.consume();
+                            }
+                        });
+                        files1.setOnDragDropped(new EventHandler <DragEvent>() {
+                            @Override
+                            public void handle(DragEvent event) {
+                                Dragboard db = event.getDragboard();
+                                if (db.hasFiles()) {
+                                    final File f = db.getFiles().get(0);
+                                    uploadFile(f);
+                                }
+                                event.setDropCompleted(true);
+                                event.consume();
+                            }
+                        });
+
+                }
+
+            });
+            backspace.setOnMouseClicked(new EventHandler() {
+
+                @Override
+                public void handle(Event event) {
+                    backspace();
+                }
+            });
+            one.setOnMouseClicked(getOnNumClick(one));
+            two.setOnMouseClicked(getOnNumClick(two));
+            three.setOnMouseClicked(getOnNumClick(three));
+            four.setOnMouseClicked(getOnNumClick(four));
+            five.setOnMouseClicked(getOnNumClick(five));
+            six.setOnMouseClicked(getOnNumClick(six));
+            seven.setOnMouseClicked(getOnNumClick(seven));
+            eight.setOnMouseClicked(getOnNumClick(eight));
+            nine.setOnMouseClicked(getOnNumClick(nine));
+            zero.setOnMouseClicked(getOnNumClick(zero));
+            return null;
+        }
+        
+    }
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        Thread t = new Thread(new Runnable() {
-            
+        HttpAPI.getInstance().addListener(this);
+        Main.es.submit(new AddHandlersTask());
+        Future connect = Main.es.submit(new ConnectToCloudTask());
+        while(!connect.isDone()) {}
+        try {
+            if ((boolean) connect.get()) {
+                loadContent(cur_path.id, "", current_tv);
+            } else {
+                network.setVisible(true);
+            }
+        } catch(InterruptedException | ExecutionException e) {
+            //log.error(e);
+        }
+    }
+    
+    private void backspace() {
+        if(!pincode_textfield.getText().isEmpty()) {
+            pincode_textfield.setText(pincode_textfield.getText().substring(0, pincode_textfield.getText().length() - 1));
+        }
+    }
+    
+    private void pincodeEnter(String num) {
+        pincode_textfield.setText(pincode_textfield.getText() + num);
+    }
+    
+    private void resetNums() {
+        ArrayList<String> nums = new ArrayList();
+        nums.add("1");
+        nums.add("2");
+        nums.add("3");
+        nums.add("4");
+        nums.add("5");
+        nums.add("6");
+        nums.add("7");
+        nums.add("8");
+        nums.add("9");
+        nums.add("0");
+        Button[] bnums = {one, two, three, four, five, six, seven, eight, nine, zero};
+        for(Button b : bnums) {
+            Random r = new Random();
+            int rand = r.nextInt(nums.size());
+            b.setText(nums.get(rand));
+            nums.remove(rand);
+        }
+    }
+    
+    private EventHandler<MouseEvent> getOnNumClick(Button num) {
+        return new EventHandler() {
+
             @Override
-            public void run() {
-//                while (cloud_enabled.isBackgroundLoading() || upload_enabled.isBackgroundLoading()
-//                        || download_enabled.isBackgroundLoading() || create_path_enabled.isBackgroundLoading()
-//                        || folderIcon.isBackgroundLoading() || lockIcon.isBackgroundLoading()
-//                        || folderBlackIcon.isBackgroundLoading() || fileIcon.isBackgroundLoading()
-//                        || lockBlackIcon.isBackgroundLoading() || dividerIcon.isBackgroundLoading()) {}
-                
-                Platform.runLater(new Runnable() {
-
-                    @Override
-                    public void run() { 
-                        if (auth()) {
-                            cloud.setGraphic(new ImageView(cloud_enabled));
-                            upload_button.setGraphic(new ImageView(upload_enabled));
-                            download_button.setGraphic(new ImageView(download_enabled));
-                            create_path_button.setGraphic(new ImageView(create_path_enabled));
-                            window.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-
-                                @Override
-                                public void handle(MouseEvent event) {
-                                    for(ListView l : lists) {
-                                        if(!l.isFocused()) {
-                                            l.setVisible(false);
-                                        }
-                                    }
-                                    if(!files1.isFocused() && !files2.isFocused()) {
-                                        for(int i=0;i<files1.getChildren().size();i++) {
-                                            files1.getChildren().get(i).setStyle("-fx-background-color: #FFFFFF");
-                                        }
-                                        for(int i=0;i<files2.getChildren().size();i++) {
-                                            files2.getChildren().get(i).setStyle("-fx-background-color: #FFFFFF");
-                                        }
-                                        filename.setText("");
-                                        filetype.setText("");
-                                        filesize.setText("");
-                                    }
-                                }
-                            });
-                            files1.setOnDragOver(new EventHandler<DragEvent>() {
-                                @Override
-                                public void handle(DragEvent event) {
-                                    if (event.getGestureSource() != files1 &&
-                                            event.getDragboard().hasFiles()) {
-                                        event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                                    }
-                                    event.consume();
-                                }
-                            });
-                            files1.setOnDragDropped(new EventHandler <DragEvent>() {
-                                @Override
-                                public void handle(DragEvent event) {
-                                    Dragboard db = event.getDragboard();
-                                    if (db.hasFiles()) {
-                                        final File f = db.getFiles().get(0);
-                                        Thread t = new Thread(new Runnable() {
-                                            public void run() {
-                                                Platform.runLater(new Runnable() {
-                                                    public void run() {
-                                                        uploadFile(f);
-                                                    }
-                                                });
-                                            }
-                                        });
-                                        t.setDaemon(true);
-                                        t.start();
-                                    }
-                                    event.setDropCompleted(true);
-                                    event.consume();
-                                }
-                            });
-                            
-                            loadContent(cur_path.id, "", current_tv);
-                            try {
-                                if(SystemTray.isSupported()) {
-                                    tray = SystemTray.getSystemTray();
-                                    ticon = new TrayIcon(new ImageIcon(getClass().getResource("/ru/flashsafe/img/logo1.png")).getImage(), "FlashSafe");
-                                    tray.add(ticon);
-                                    ticon.displayMessage("Соединение установлено", "Успешно установлено соединение с облаком. Ваша флешка готова к работе.", TrayIcon.MessageType.INFO);
-                                }
-                            } catch(AWTException e) {
-                                log.error(e);
-                            }
-                        } else {
-                            network.setVisible(true);
-                        }
-                    }
-
-                });
+            public void handle(Event event) {
+                pincodeEnter(num.getText());
+                resetNums();
             }
             
-        });
-        t.setDaemon(true);
-        try {
-            rets = RemoteEmulatorTokenService.getTokenService();
-            rets.setCodeGenerationStrategy(new FixedValueGenerationStrategy("open123458"));
-            rets.subscribeToEvents("1", new BaseEventHandler() {
-
-                @Override
-                protected void onDetach(FlashSafeToken flashSafeToken) {
-                    
-                }
-
-                @Override
-                protected void onAttach(FlashSafeToken flashSafeToken) {
-                    if(!run) {
-                        run = true;
-                        t.start();
-                    }
-                }
-            });
-            
-        } catch(TokenServiceInitializationException e) {
-            log.error(e);
-        }
-        
-        HttpAPI.getInstance().addListener(this);
-    }    
+        };
+    }
     
     private EventHandler<MouseEvent> getOnElementClick(Label label) {
         return new EventHandler<MouseEvent>() {
@@ -352,26 +412,48 @@ public class MainSceneController implements Initializable, UploadProgressListene
     }
     
     private void uploadFile(File selectedFile) {
-        progress.setProgress(0);
-        progress.setVisible(true);
-        int id = HttpAPI.getInstance().uploadFile(cur_path.id, pincode, -1, selectedFile);
-        progress.setVisible(false);
-        FSObject f = new FSObject(id, "file", selectedFile.getName(),
-                selectedFile.getName().split("\\.")[selectedFile.getName().split("\\.").length - 1].toLowerCase(),
-                selectedFile.length(), false, 0, System.currentTimeMillis(), System.currentTimeMillis());
-        Label label = new Label(f.name, new ImageView(fileIcon));
-        label.setFont(new Font("Ubuntu Condensed", 18));
-        label.setTextFill(Paint.valueOf("#7C7C7C"));
-        label.setId(String.valueOf(f.id));
-        label.setPrefWidth(340);
-        label.setOnMouseClicked(getOnElementClick(label));
-        (files1.getChildren().size() ==  files2.getChildren().size() ? files1 : files2).getChildren().add(label);
-        FSObject[] new_content = new FSObject[content.length + 1];
-        for(int i=0;i<content.length;i++) {
-            new_content[i] = content[i];
-        }
-        new_content[content.length] = f;
-        content = new_content;
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        progress.setProgress(0);
+                        progress.setVisible(true);
+                    }
+                });
+                int id = HttpAPI.getInstance().uploadFile(cur_path.id, pincode, -1, selectedFile);
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        progress.setVisible(false);
+                    }
+                });
+                FSObject f = new FSObject(id, "file", selectedFile.getName(),
+                        selectedFile.getName().split("\\.")[selectedFile.getName().split("\\.").length - 1].toLowerCase(),
+                        selectedFile.length(), false, 0, System.currentTimeMillis(), System.currentTimeMillis());
+                Label label = new Label(f.name, new ImageView(fileIcon));
+                label.setFont(new Font("Ubuntu Condensed", 18));
+                label.setTextFill(Paint.valueOf("#7C7C7C"));
+                label.setId(String.valueOf(f.id));
+                label.setPrefWidth(340);
+                label.setOnMouseClicked(getOnElementClick(label));
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        (files1.getChildren().size() ==  files2.getChildren().size() ? files1 : files2).getChildren().add(label);
+                    }
+                });
+                FSObject[] new_content = new FSObject[content.length + 1];
+                for(int i=0;i<content.length;i++) {
+                    new_content[i] = content[i];
+                }
+                new_content[content.length] = f;
+                content = new_content;
+            }
+        });
+        t.setDaemon(true);
+        t.start();
     }
     
     @Override

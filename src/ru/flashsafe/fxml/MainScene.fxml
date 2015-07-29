@@ -121,7 +121,6 @@
                <children>
                   <VBox fx:id="files1" prefHeight="493.0" prefWidth="330.0" styleClass="files" />
                   <VBox fx:id="files2" layoutX="330.0" prefHeight="493.0" prefWidth="330.0" styleClass="files" />
-                  <ProgressBar id="Progress" fx:id="progress" prefHeight="30.0" prefWidth="500.0" progress="0.0" visible="false" />
                </children>
             </AnchorPane>
         </content>
@@ -161,23 +160,78 @@
             <Label id="BottomTriangle" layoutY="40.0" prefHeight="5.0" prefWidth="100.0" />
          </children>
       </Pane>
-      <Pane id="PincodeDialog" fx:id="pincode_dialog" layoutX="288.0" layoutY="263.0" prefHeight="150.0" prefWidth="325.0" visible="false">
+      <Pane id="PincodeDialog" fx:id="pincode_dialog" layoutX="288.0" layoutY="150.0" prefHeight="150.0" prefWidth="300.0" visible="false">
          <children>
-            <Label id="PincodeTitle" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="325.0" text="Введите пин-код" textFill="#7c7c7c">
+            <Label id="PincodeTitle" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="300.0" text="Введите пин-код" textFill="#7c7c7c">
                <font>
                   <Font name="Ubuntu Condensed" size="18.0" />
                </font>
             </Label>
-            <Pane id="PincodePane" layoutY="20.0" prefHeight="130.0" prefWidth="325.0">
+            <Pane id="PincodePane" layoutY="20.0" prefHeight="320.0" prefWidth="300.0">
                <children>
-                  <TextField id="PincodeTextfield" fx:id="pincode_textfield" layoutX="40.0" layoutY="25.0" prefHeight="40.0" prefWidth="245.0">
+                  <TextField id="PincodeTextfield" fx:id="pincode_textfield" layoutX="28.0" layoutY="15.0" prefHeight="40.0" prefWidth="245.0">
                      <font>
                         <Font name="Ubuntu Condensed" size="20.0" />
                      </font>
                   </TextField>
-                  <Button id="PincodeSubmit" fx:id="pincode_submit" layoutX="40.0" layoutY="75.0" mnemonicParsing="false" onAction="#onPincodeSubmit" prefHeight="40.0" prefWidth="245.0" text="OK" textFill="#f3f3f3">
+                  <Button id="PincodeSubmit" fx:id="pincode_submit" layoutX="198.0" layoutY="255.0" mnemonicParsing="false" onAction="#onPincodeSubmit" prefHeight="50.0" prefWidth="75.0" text="OK" textFill="#f3f3f3">
                      <font>
+                        <Font name="Ubuntu Condensed" size="22.0" />
+                     </font>
+                  </Button>
+                  <Button id="PincodeSubmit" fx:id="one" layoutX="28.0" layoutY="75.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="1" textFill="#f3f3f3">
+                     <font>
+                        <Font name="Ubuntu Condensed" size="24.0" />
+                     </font>
+                  </Button>
+                  <Button id="PincodeSubmit" fx:id="two" layoutX="113.0" layoutY="75.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="2" textFill="#f3f3f3">
+                      <font>
+                        <Font name="Ubuntu Condensed" size="24.0" />
+                     </font>
+                  </Button>
+                  <Button id="PincodeSubmit" fx:id="three" layoutX="198.0" layoutY="75.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="3" textFill="#f3f3f3">
+                      <font>
+                        <Font name="Ubuntu Condensed" size="24.0" />
+                     </font>
+                  </Button>
+                  <Button id="PincodeSubmit" fx:id="four" layoutX="28.0" layoutY="135.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="4" textFill="#f3f3f3">
+                      <font>
+                        <Font name="Ubuntu Condensed" size="24.0" />
+                     </font>
+                  </Button>
+                  <Button id="PincodeSubmit" fx:id="five" layoutX="113.0" layoutY="135.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="5" textFill="#f3f3f3">
+                      <font>
+                        <Font name="Ubuntu Condensed" size="24.0" />
+                     </font>
+                  </Button>
+                  <Button id="PincodeSubmit" fx:id="six" layoutX="198.0" layoutY="135.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="6" textFill="#f3f3f3">
+                      <font>
+                        <Font name="Ubuntu Condensed" size="24.0" />
+                     </font>
+                  </Button>
+                  <Button id="PincodeSubmit" fx:id="seven" layoutX="28.0" layoutY="195.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="7" textFill="#f3f3f3">
+                      <font>
+                        <Font name="Ubuntu Condensed" size="24.0" />
+                     </font>
+                  </Button>
+                  <Button id="PincodeSubmit" fx:id="eight" layoutX="113.0" layoutY="195.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="8" textFill="#f3f3f3">
+                      <font>
+                        <Font name="Ubuntu Condensed" size="24.0" />
+                     </font>
+                  </Button>
+                  <Button id="PincodeSubmit" fx:id="nine" layoutX="198.0" layoutY="195.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="9" textFill="#f3f3f3">
+                      <font>
+                        <Font name="Ubuntu Condensed" size="24.0" />
+                     </font>
+                  </Button>
+                  <Button id="PincodeBackspace" fx:id="backspace" layoutX="28.0" layoutY="255.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" textFill="#f3f3f3">
+                      <font>
                         <Font name="Ubuntu Condensed" size="20.0" />
+                     </font>
+                  </Button>
+                  <Button id="PincodeSubmit" fx:id="zero" layoutX="113.0" layoutY="255.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="75.0" text="0" textFill="#f3f3f3">
+                      <font>
+                        <Font name="Ubuntu Condensed" size="24.0" />
                      </font>
                   </Button>
                </children>
@@ -207,5 +261,6 @@
             </Pane>
          </children>
       </Pane>
+      <ProgressBar id="Progress" fx:id="progress" prefHeight="30.0" prefWidth="500.0" progress="0.0" visible="false" />
    </children>
 </AnchorPane>

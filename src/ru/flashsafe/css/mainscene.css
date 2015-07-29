@@ -194,6 +194,11 @@
     -fx-background-color: #959595;
 }
 
+#PincodeBackspace {
+    -fx-background-color: #959595;
+    -fx-graphic: url("../img/backspace.png");
+}
+
 #Progress {}
 
 #Path > .label {
