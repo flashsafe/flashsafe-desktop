@@ -5,9 +5,14 @@
  */
 package ru.flashsafe.controller;
 
+import ch.randelshofer.quaqua.osx.OSXFile;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -15,6 +20,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -24,10 +33,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
@@ -39,11 +53,13 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Callback;
+import javax.swing.Icon;
+import javax.swing.filechooser.FileSystemView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.flashsafe.Main;
@@ -68,9 +84,9 @@ public class MainSceneController implements Initializable, UploadProgressListene
     private final Image download_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/download_enabled.png"));
     private final Image create_path_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/create_folder_enabled.png"));
     private final Image folderIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/folder.png"));
-    private final Image folderBlackIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/folder_black.png"));
+    private final Image folderBlackIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/folder_black1.png"));
     private final Image lockIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/lock.png"));
-    private final Image lockBlackIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/lock_black.png"));
+    private final Image lockBlackIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/lock_black1.png"));
     private final Image dividerIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/divider.png"));
     private final Image fileIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/file.png"));
     private final Image arrowIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/arrow.png"));
@@ -135,7 +151,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     @FXML
     private Button zero;
     @FXML
-    private VBox files1, files2;
+    private TableView files;
     @FXML
     private HBox current_path;
     @FXML
@@ -179,12 +195,9 @@ public class MainSceneController implements Initializable, UploadProgressListene
                                         l.setVisible(false);
                                     }
                                 }
-                                if(!files1.isFocused() && !files2.isFocused()) {
-                                    for(int i=0;i<files1.getChildren().size();i++) {
-                                        files1.getChildren().get(i).setStyle("-fx-background-color: #FFFFFF");
-                                    }
-                                    for(int i=0;i<files2.getChildren().size();i++) {
-                                        files2.getChildren().get(i).setStyle("-fx-background-color: #FFFFFF");
+                                if(!files.isFocused()) {
+                                    for(int i=0;i<files.getItems().size();i++) {
+                                        files.setStyle("-fx-background-color: #FFFFFF");
                                     }
                                     filename.setText("");
                                     filetype.setText("");
@@ -192,9 +205,9 @@ public class MainSceneController implements Initializable, UploadProgressListene
                                 }
                             }
                         });
-                        files1.setOnDragDetected(new EventHandler<MouseEvent>() {
+                        files.setOnDragDetected(new EventHandler<MouseEvent>() {
                             public void handle(MouseEvent event) {
-                                Dragboard db = files1.startDragAndDrop(TransferMode.ANY);
+                                Dragboard db = files.startDragAndDrop(TransferMode.ANY);
                                 ClipboardContent content = new ClipboardContent();
                                 ArrayList<File> list = new ArrayList();
                                 list.add(new File("./.mime"));
@@ -203,17 +216,17 @@ public class MainSceneController implements Initializable, UploadProgressListene
                                 event.consume();
                             }
                         });
-                        files1.setOnDragOver(new EventHandler<DragEvent>() {
+                        files.setOnDragOver(new EventHandler<DragEvent>() {
                             @Override
                             public void handle(DragEvent event) {
-                                if (event.getGestureSource() != files1 &&
+                                if (event.getGestureSource() != files &&
                                         event.getDragboard().hasFiles()) {
                                     event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
                                 }
                                 event.consume();
                             }
                         });
-                        files1.setOnDragDropped(new EventHandler <DragEvent>() {
+                        files.setOnDragDropped(new EventHandler <DragEvent>() {
                             @Override
                             public void handle(DragEvent event) {
                                 Dragboard db = event.getDragboard();
@@ -249,6 +262,34 @@ public class MainSceneController implements Initializable, UploadProgressListene
             return null;
         }
         
+    }
+    
+    /**
+     * Получаем системную иконку файла, размером 16x16
+     * @param filename
+     * @return 
+     */
+    private Image getFileIcon(String filename) {
+        Image image = null;
+        try {
+            String ext = filename.substring(filename.lastIndexOf(".") + 1);
+            File f = File.createTempFile("icon", "." + ext);
+            BufferedImage bimage;
+            String os = System.getProperty("os.name").toLowerCase();
+            if(os.contains("mac")) { // For Mac OS X
+                bimage = OSXFile.getIconImage(f, 16);
+            } else { // For Windows, Linux(?)
+                FileSystemView view = FileSystemView.getFileSystemView();      
+                Icon icon = view.getSystemIcon(f);
+                bimage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+                icon.paintIcon(null, bimage.getGraphics(), 0, 0);
+            }
+            f.delete();
+            image = SwingFXUtils.toFXImage(bimage, null);
+        } catch(IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return image;
     }
 
     /**
@@ -326,11 +367,8 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     }
                     switch(event.getClickCount()) {
                         case 1:
-                            for(int i=0;i<files1.getChildren().size();i++) {
-                                files1.getChildren().get(i).setStyle("-fx-background-color: #FFFFFF");
-                            }
-                            for(int i=0;i<files2.getChildren().size();i++) {
-                                files2.getChildren().get(i).setStyle("-fx-background-color: #FFFFFF");
+                            for(int i=0;i<files.getItems().size();i++) {
+                                files.setStyle("-fx-background-color: #FFFFFF");
                             }
                             label.setStyle("-fx-background-color: #59DAFF");
                             filename.setText(current_element.name);
@@ -384,7 +422,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
             label.setId(String.valueOf(path.id));
             label.setPrefWidth(340);
             label.setOnMouseClicked(getOnElementClick(label));
-            (files1.getChildren().size() ==  files2.getChildren().size() ? files1 : files2).getChildren().add(label);
+            files.getItems().add(new TableRow("dir", label, "0", new Date().toLocaleString()));
             FSObject[] new_content = new FSObject[content.length + 1];
             for(int i=0;i<content.length;i++) {
                 new_content[i] = content[i];
@@ -441,7 +479,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        (files1.getChildren().size() ==  files2.getChildren().size() ? files1 : files2).getChildren().add(label);
+                        files.getItems().add(label);
                     }
                 });
                 FSObject[] new_content = new FSObject[content.length + 1];
@@ -481,8 +519,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     }
     
     private void clearContent() {
-        files1.getChildren().clear();
-        files2.getChildren().clear();
+        files.getItems().clear();
     }
     
     private int loadContent(int path_id, String pin, TreeView tv) {
@@ -500,15 +537,49 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     tv.getRoot().getChildren().add(root_item);
                 }
                 mf.setExpanded(true);
+                ((TableColumn) files.getColumns().get(0)).setCellValueFactory(new PropertyValueFactory<TableRow, String>("type"));
+                ((TableColumn) files.getColumns().get(1)).setCellValueFactory(new Callback<CellDataFeatures<TableRow, TableRow>, ObservableValue<TableRow>>() {
+                    @Override
+                    public ObservableValue<TableRow> call(CellDataFeatures<TableRow, TableRow> features) {
+                        return new ReadOnlyObjectWrapper(features.getValue());
+                    }
+                  });
+                  ((TableColumn) files.getColumns().get(1)).setComparator(new Comparator<TableRow>() {
+                    @Override
+                    public int compare(TableRow p1, TableRow p2) {
+                      return p1.equals(p2) ? 1 : 0;
+                    }
+                  });
+                ((TableColumn) files.getColumns().get(1)).setCellFactory(new Callback<TableColumn<TableRow, TableRow>, TableCell<TableRow, TableRow>>() {
+                    @Override
+                    public TableCell<TableRow, TableRow> call(TableColumn<TableRow, TableRow> labelCol) {
+                      return new TableCell<TableRow, TableRow>() {
+                        final Label buttonGraphic = new Label();
+                        @Override
+                        public void updateItem(final TableRow person, boolean empty) {
+                          super.updateItem(person, empty);
+                          if (person != null) {
+                            buttonGraphic.setText(person.getName().getText());
+                            buttonGraphic.setGraphic(person.getName().getGraphic());
+                            setGraphic(buttonGraphic);
+                          } else {
+                            setGraphic(null);
+                          }
+                        }
+                      };
+                    }
+                  });
+                ((TableColumn) files.getColumns().get(2)).setCellValueFactory(new PropertyValueFactory<TableRow, String>("size"));
+                ((TableColumn) files.getColumns().get(3)).setCellValueFactory(new PropertyValueFactory<TableRow, String>("createDate"));
                 for (int i=0;i<content.length;i++) {
                     FSObject fso = content[i];
-                    Label label = new Label(fso.name, new ImageView(fso.type.equals("dir") ? fso.pincode ? lockBlackIcon : folderBlackIcon : fileIcon));
+                    Label label = new Label(fso.name, new ImageView(fso.type.equals("dir") ? fso.pincode ? lockBlackIcon : folderBlackIcon : /*fileIcon*/getFileIcon(fso.name)));
                     label.setFont(new Font("Ubuntu Condensed", 18));
                     label.setTextFill(Paint.valueOf("#7C7C7C"));
                     label.setId(String.valueOf(fso.id));
                     label.setPrefWidth(340);
                     label.setOnMouseClicked(getOnElementClick(label));
-                    (i % 2 == 0 ? files1 : files2).getChildren().add(label);
+                    files.getItems().add(new TableRow(fso.type, label, String.valueOf(fso.size / 1024) + "КБ", new Date(fso.create_time * 1000).toLocaleString()));
                     if(fso.type.equals("dir")) {
                         path_childrens.add(fso);
                         if(!back) {
@@ -755,6 +826,36 @@ public class MainSceneController implements Initializable, UploadProgressListene
             settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/ru/flashsafe/img/settings_opened.png"))));
             menu.setVisible(true);
             menu_opened = true;
+        }
+    }
+    
+    public class TableRow {
+        public SimpleStringProperty type;
+        public Label name;
+        public SimpleStringProperty size;
+        public SimpleStringProperty createDate;
+        
+        public TableRow(String _type, Label _name, String _size, String _create_date) {
+            this.type = new SimpleStringProperty(_type);
+            this.name = _name;
+            this.size = new SimpleStringProperty(_size);
+            this.createDate = new SimpleStringProperty(_create_date);
+        }
+        
+        public String getType() {
+            return type.get();
+        }
+        
+        public Label getName() {
+            return name;
+        }
+        
+        public String getSize() {
+            return size.get();
+        }
+        
+        public String getCreateDate() {
+            return createDate.get();
         }
     }
     

@@ -119,8 +119,14 @@
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" style="-fx-background-color: #FFFFFF;">
                <children>
-                  <VBox fx:id="files1" prefHeight="493.0" prefWidth="330.0" styleClass="files" />
-                  <VBox fx:id="files2" layoutX="330.0" prefHeight="493.0" prefWidth="330.0" styleClass="files" />
+                  <TableView fx:id="files" prefHeight="490.0" prefWidth="670.0" styleClass="files">
+                    <columns>
+                      <TableColumn prefWidth="90.0" text="Тип" />
+                      <TableColumn prefWidth="319.0" text="Имя" />
+                        <TableColumn minWidth="0.0" prefWidth="110.0" text="Размер" />
+                        <TableColumn minWidth="0.0" prefWidth="143.0" text="Дата создания" />
+                    </columns>
+                  </TableView>
                </children>
             </AnchorPane>
         </content>
