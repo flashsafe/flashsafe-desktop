@@ -30,11 +30,11 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         _stage = stage;
         
-        Parent root = FXMLLoader.load(getClass().getResource("fxml/MainScene.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/MainScene.fxml"));
         
         Scene scene = new Scene(root);
         
-        stage.getIcons().add(new Image(getClass().getResource("img/logo.png").toExternalForm()));
+        stage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
         stage.setTitle("Flashsafe");
         stage.setResizable(false);
         stage.setWidth(900);
@@ -45,7 +45,7 @@ public class Main extends Application {
         try {
             if(SystemTray.isSupported()) {
                 tray = SystemTray.getSystemTray();
-                ticon = new TrayIcon(new ImageIcon(getClass().getResource("/ru/flashsafe/img/logo1.png")).getImage(), "Flashsafe");
+                ticon = new TrayIcon(new ImageIcon(getClass().getResource("/img/logo1.png")).getImage(), "Flashsafe");
                 tray.add(ticon);
                 ticon.displayMessage("Соединение установлено", "Успешно установлено соединение с облаком. Ваша флешка готова к работе.", TrayIcon.MessageType.INFO);
             }

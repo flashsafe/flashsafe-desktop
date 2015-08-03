@@ -79,17 +79,17 @@ import ru.flashsafe.token.service.impl.RemoteEmulatorTokenService;
 public class MainSceneController implements Initializable, UploadProgressListener {
     //private static final Logger log = LogManager.getLogger(MainSceneController.class);
     
-    private final Image cloud_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/cloud_enabled.png"));
-    private final Image upload_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/upload_enabled.png"));
-    private final Image download_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/download_enabled.png"));
-    private final Image create_path_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/create_folder_enabled.png"));
-    private final Image folderIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/folder.png"));
-    private final Image folderBlackIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/folder_black1.png"));
-    private final Image lockIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/lock.png"));
-    private final Image lockBlackIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/lock_black1.png"));
-    private final Image dividerIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/divider.png"));
-    private final Image fileIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/file.png"));
-    private final Image arrowIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/arrow.png"));
+    private final Image cloud_enabled = new Image(getClass().getResourceAsStream("/img/cloud_enabled.png"));
+    private final Image upload_enabled = new Image(getClass().getResourceAsStream("/img/upload_enabled.png"));
+    private final Image download_enabled = new Image(getClass().getResourceAsStream("/img/download_enabled.png"));
+    private final Image create_path_enabled = new Image(getClass().getResourceAsStream("/img/create_folder_enabled.png"));
+    private final Image folderIcon = new Image(getClass().getResourceAsStream("/img/folder.png"));
+    private final Image folderBlackIcon = new Image(getClass().getResourceAsStream("/img/folder_black1.png"));
+    private final Image lockIcon = new Image(getClass().getResourceAsStream("/img/lock.png"));
+    private final Image lockBlackIcon = new Image(getClass().getResourceAsStream("/img/lock_black1.png"));
+    private final Image dividerIcon = new Image(getClass().getResourceAsStream("/img/divider.png"));
+    private final Image fileIcon = new Image(getClass().getResourceAsStream("/img/file.png"));
+    private final Image arrowIcon = new Image(getClass().getResourceAsStream("/img/arrow.png"));
     
     private final ArrayList<FSObject> PARENT_PATH = new ArrayList<>();
     private final HashMap<Integer, ArrayList<FSObject>> CHILDRENS = new HashMap<>();
