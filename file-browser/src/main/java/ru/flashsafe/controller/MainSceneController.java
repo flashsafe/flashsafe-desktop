@@ -619,7 +619,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     Label cb = new Label();
                     cb.setPadding(new Insets(0, 0, 0, 5));
                     cb.setTextFill(Paint.valueOf("#F3F3F3"));
-                    Font font = Font.loadFont(getClass().getResourceAsStream("/ru/flashsafe/font/ubuntu_regular.ttf"), 18);
+                    Font font = Font.loadFont(getClass().getResourceAsStream("/font/ubuntu_regular.ttf"), 18);
                     cb.setFont(font);
                     cb.setId(String.valueOf(path_id));
                     cb.setText(current_element.name);
@@ -654,7 +654,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                             for(FSObject fso : CHILDRENS.get(path_id)) {
                                 Label l = new Label();
                                 l.setTextFill(Paint.valueOf("#7C7C7C"));
-                                Font font = Font.loadFont(getClass().getResourceAsStream("/ru/flashsafe/font/ubuntu_regular.ttf"), 18);
+                                Font font = Font.loadFont(getClass().getResourceAsStream("/font/ubuntu_regular.ttf"), 18);
                                 l.setFont(font);
                                 l.setId(String.valueOf(fso.id));
                                 l.setText(fso.name);
@@ -714,7 +714,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     Label cb = new Label();
                     cb.setPadding(new Insets(0, 0, 0, 5));
                     cb.setTextFill(Paint.valueOf("#F3F3F3"));
-                    Font font = Font.loadFont(getClass().getResourceAsStream("/ru/flashsafe/font/ubuntu_regular.ttf"), 18);
+                    Font font = Font.loadFont(getClass().getResourceAsStream("/font/ubuntu_regular.ttf"), 18);
                     cb.setFont(font);
                     cb.setId(String.valueOf(path_id));
                     cb.setText(current_element.name);
@@ -749,7 +749,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                             for(FSObject fso : CHILDRENS.get(path_id)) {
                                 Label l = new Label();
                                 l.setTextFill(Paint.valueOf("#7C7C7C"));
-                                Font font = Font.loadFont(getClass().getResourceAsStream("/ru/flashsafe/font/ubuntu_regular.ttf"), 18);
+                                Font font = Font.loadFont(getClass().getResourceAsStream("/font/ubuntu_regular.ttf"), 18);
                                 l.setFont(font);
                                 l.setId(String.valueOf(fso.id));
                                 l.setText(fso.name);
@@ -818,12 +818,12 @@ public class MainSceneController implements Initializable, UploadProgressListene
     public void toggleSettings() {
         if(menu_opened) {
             settings.setStyle("-fx-background-color: transparent");
-            settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/ru/flashsafe/img/settings.png"))));
+            settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/settings.png"))));
             menu.setVisible(false);
             menu_opened = false;
         } else {
             settings.setStyle("-fx-background-color: #F3F3F3");
-            settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/ru/flashsafe/img/settings_opened.png"))));
+            settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/settings_opened.png"))));
             menu.setVisible(true);
             menu_opened = true;
         }
