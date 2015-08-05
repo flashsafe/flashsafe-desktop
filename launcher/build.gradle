@@ -1,0 +1,33 @@
+apply plugin: 'java'
+apply plugin: 'launch4j'
+
+launch4j {
+    mainClassName = 'ru.flashsafe.Main'
+    outfile = 'Flashsafe.exe'
+    dontWrapJar = false
+    icon = "$project.projectDir/resources/AppIcon.ico"
+}
+
+buildscript {
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath group: 'edu.sc.seis.gradle', name: 'launch4j', version: '1.0.6'
+    }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile group: 'ru.flashsafe', name: 'file-browser', version: '0.1'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
