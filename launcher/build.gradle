@@ -16,6 +16,7 @@ buildscript {
 
     dependencies {
         classpath group: 'edu.sc.seis.gradle', name: 'launch4j', version: '1.0.6'
+        classpath group: 'com.badlogicgames.packr', name: 'packr', version: '1.1'
     }
 }
 
@@ -28,6 +29,35 @@ dependencies {
     compile group: 'ru.flashsafe', name: 'file-browser', version: '0.1'
 }
 
+task copyAppLibs(type: Copy) {
+    into "$project.buildDir/appLibs"
+    from configurations.all
+}
+
+task execPackr(type: PackrTask, dependsOn: copyAppLibs) {}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '2.4'
+}
+
+import com.badlogicgames.packr.Packr
+import com.badlogicgames.packr.Packr.Config
+import com.badlogicgames.packr.Packr.Platform 
+
+class PackrTask extends DefaultTask {
+
+    @TaskAction
+    def packr() {
+        Config config = new Config();
+        config.platform = Platform.windows;
+        config.jdk = "D:/Workspaces/FlashSafe/openjdk-1.7.0-u80-unofficial-windows-i586-image.zip";
+        config.executable = "Flashsafe";
+        config.jar = "$project.buildDir/appLibs/file-browser-0.1.jar";
+        config.mainClass = 'ru.flashsafe.Main';
+        config.vmArgs = Arrays.asList("-Xmx1G");
+        config.minimizeJre = [ new String("jre/lib/rt/com/sun/corba"), new String("jre/lib/rt/com/sun/jndi") ];
+        config.outDir = "$project.buildDir/launch4mac";
+        new Packr().pack(config)
+    }
+
 }
