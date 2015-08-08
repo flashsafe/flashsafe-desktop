@@ -5,7 +5,6 @@
  */
 package ru.flashsafe.controller;
 
-import ch.randelshofer.quaqua.osx.OSXFile;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -14,17 +13,19 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -58,10 +59,10 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Callback;
+
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import ru.flashsafe.Main;
 import ru.flashsafe.http.HttpAPI;
 import ru.flashsafe.http.UploadProgressListener;
@@ -71,6 +72,7 @@ import ru.flashsafe.model.FSObject;
 //import ru.flashsafe.token.exception.TokenServiceInitializationException;
 //import ru.flashsafe.token.generator.FixedValueGenerationStrategy;
 import ru.flashsafe.token.service.impl.RemoteEmulatorTokenService;
+import ch.randelshofer.quaqua.osx.OSXFile;
 
 /**
  * FXML Controller class
@@ -91,8 +93,8 @@ public class MainSceneController implements Initializable, UploadProgressListene
     private final Image fileIcon = new Image(getClass().getResourceAsStream("/img/file.png"));
     private final Image arrowIcon = new Image(getClass().getResourceAsStream("/img/arrow.png"));
     
-    private final ArrayList<FSObject> PARENT_PATH = new ArrayList<>();
-    private final HashMap<Integer, ArrayList<FSObject>> CHILDRENS = new HashMap<>();
+    private final List<FSObject> PARENT_PATH = new ArrayList<>();
+    private final Map<Integer, List<FSObject>> CHILDRENS = new HashMap<>();
     private FSObject cur_path = new FSObject(0, "dir", "/", "", 0, false, 0, 0, 0);
     private FSObject current_element = cur_path;
     private FSObject[] content;
@@ -100,13 +102,13 @@ public class MainSceneController implements Initializable, UploadProgressListene
     private boolean menu_opened = false;
     private int path;
     private String pincode = "";
-    private ArrayList<ListView> lists = new ArrayList<>();
-    private final ArrayList<FSObject> FORWARD_PATH = new ArrayList<>();
+    private List<ListView<Label>> lists = new ArrayList<>();
+    private final List<FSObject> FORWARD_PATH = new ArrayList<>();
     public static RemoteEmulatorTokenService rets;
     private boolean run = false;
     private TreeView current_tv = null;
-    private final ArrayList<TreeView> TREE_VIEW = new ArrayList<>();
-    private final ArrayList<TreeView> TREE_VIEW_FORWARD = new ArrayList<>();
+    private final List<TreeView> TREE_VIEW = new ArrayList<>();
+    private final List<TreeView> TREE_VIEW_FORWARD = new ArrayList<>();
     
     @FXML
     private AnchorPane window, myFilesPane;
@@ -174,10 +176,10 @@ public class MainSceneController implements Initializable, UploadProgressListene
         
     }
     
-    private class AddHandlersTask implements Callable {
+    private class AddHandlersTask implements Callable<Void> {
 
         @Override
-        public Object call() throws Exception {
+        public Void call() throws Exception {
             Platform.runLater(new Runnable() {
 
                 @Override
@@ -209,7 +211,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                             public void handle(MouseEvent event) {
                                 Dragboard db = files.startDragAndDrop(TransferMode.ANY);
                                 ClipboardContent content = new ClipboardContent();
-                                ArrayList<File> list = new ArrayList();
+                                List<File> list = new ArrayList<>();
                                 list.add(new File("./.mime"));
                                 content.putFiles(list);
                                 db.setContent(content);
@@ -242,10 +244,10 @@ public class MainSceneController implements Initializable, UploadProgressListene
                 }
 
             });
-            backspace.setOnMouseClicked(new EventHandler() {
+            backspace.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
                 @Override
-                public void handle(Event event) {
+                public void handle(MouseEvent event) {
                     backspace();
                 }
             });
@@ -323,7 +325,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     }
     
     private void resetNums() {
-        ArrayList<String> nums = new ArrayList();
+        List<String> nums = new ArrayList<>();
         nums.add("1");
         nums.add("2");
         nums.add("3");
@@ -344,10 +346,10 @@ public class MainSceneController implements Initializable, UploadProgressListene
     }
     
     private EventHandler<MouseEvent> getOnNumClick(Button num) {
-        return new EventHandler() {
+        return new EventHandler<MouseEvent>() {
 
             @Override
-            public void handle(Event event) {
+            public void handle(MouseEvent event) {
                 pincodeEnter(num.getText());
                 resetNums();
             }
@@ -528,7 +530,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
         switch(code) {
             case 0:
                 content = (FSObject[]) answer[0];
-                ArrayList<FSObject> path_childrens = new ArrayList<>();
+                List<FSObject> path_childrens = new ArrayList<>();
                 TreeItem<String> root_item = new TreeItem("", new ImageView(dividerIcon));
                 root_item.setExpanded(false);
                 if(tv == null) {
@@ -629,26 +631,26 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     arrow.setPrefHeight(30);
                     current_path.getChildren().add(cb);
                     current_path.getChildren().add(arrow);
-                    cb.setOnMouseEntered(new EventHandler() {
+                    cb.setOnMouseEntered(new EventHandler<MouseEvent>() {
 
                         @Override
-                        public void handle(Event event) {
+                        public void handle(MouseEvent event) {
                             arrow.fireEvent(event);
                         }
 
                     });
-                    cb.setOnMouseExited(new EventHandler() {
+                    cb.setOnMouseExited(new EventHandler<MouseEvent>() {
 
                         @Override
-                        public void handle(Event event) {
+                        public void handle(MouseEvent event) {
                             arrow.fireEvent(event);
                         }
 
                     });
-                    arrow.setOnMouseClicked(new EventHandler() {
+                    arrow.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
                         @Override
-                        public void handle(Event event) {
+                        public void handle(MouseEvent event) {
                             ListView list = new ListView();
                             double width = 0;
                             for(FSObject fso : CHILDRENS.get(path_id)) {
@@ -693,7 +695,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                 }
                 break;
             case 1:
-                CHILDRENS.put(path_id, new ArrayList());
+                CHILDRENS.put(path_id, new ArrayList<>());
                 if(!pin.equals("")) {
                     pincode = pincode_textfield.getText();
                     pincode_textfield.setText("");
@@ -724,26 +726,26 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     arrow.setPrefHeight(30);
                     current_path.getChildren().add(cb);
                     current_path.getChildren().add(arrow);
-                    cb.setOnMouseEntered(new EventHandler() {
+                    cb.setOnMouseEntered(new EventHandler<MouseEvent>() {
 
                         @Override
-                        public void handle(Event event) {
+                        public void handle(MouseEvent event) {
                             arrow.fireEvent(event);
                         }
 
                     });
-                    cb.setOnMouseExited(new EventHandler() {
+                    cb.setOnMouseExited(new EventHandler<MouseEvent>() {
 
                         @Override
-                        public void handle(Event event) {
+                        public void handle(MouseEvent event) {
                             arrow.fireEvent(event);
                         }
 
                     });
-                    arrow.setOnMouseClicked(new EventHandler() {
+                    arrow.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
                         @Override
-                        public void handle(Event event) {
+                        public void handle(MouseEvent event) {
                             ListView list = new ListView();
                             double width = 0;
                             for(FSObject fso : CHILDRENS.get(path_id)) {
