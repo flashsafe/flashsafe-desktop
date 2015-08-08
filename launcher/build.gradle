@@ -1,23 +1,36 @@
 apply plugin: 'java'
 apply plugin: 'launch4j'
-
-launch4j {
-    mainClassName = 'ru.flashsafe.Main'
-    outfile = 'Flashsafe.exe'
-    dontWrapJar = false
-    icon = "$project.projectDir/resources/AppIcon.ico"
-}
+apply plugin: 'edu.sc.seis.macAppBundle'
 
 buildscript {
 
     repositories {
         mavenCentral()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
     }
 
     dependencies {
         classpath group: 'edu.sc.seis.gradle', name: 'launch4j', version: '1.0.6'
         classpath group: 'com.badlogicgames.packr', name: 'packr', version: '1.1'
+        classpath group: 'gradle.plugin.edu.sc.seis', name: 'macAppBundle', version: '2.1.1'
     }
+}
+
+launch4j {
+    mainClassName = 'ru.flashsafe.Main'
+    outfile = 'Flashsafe.exe'
+    icon = "$project.projectDir/resources/AppIcon.ico"
+}
+
+macAppBundle {
+    mainClassName = 'ru.flashsafe.Main'
+    appName = 'Flashsafe'
+    appOutputDir = 'launch4mac'
+    icon = "$project.projectDir/resources/AppMacIcon.icns"
+    bundleJRE = true
+    jreHome = 'D:/Workspaces/FlashSafe/jre_experiments/MacOS/jre1.8.0_51.jre/Contents/Home'
 }
 
 repositories {
@@ -50,14 +63,14 @@ class PackrTask extends DefaultTask {
     def packr() {
         Config config = new Config();
         config.platform = Platform.windows;
-        config.jdk = "D:/Workspaces/FlashSafe/openjdk-1.7.0-u80-unofficial-windows-i586-image.zip";
+        //config.jdk = "D:/Workspaces/FlashSafe/openjdk-1.7.0-u80-unofficial-windows-i586-image.zip";
         config.executable = "Flashsafe";
         config.jar = "$project.buildDir/appLibs/file-browser-0.1.jar";
         config.mainClass = 'ru.flashsafe.Main';
         config.vmArgs = Arrays.asList("-Xmx1G");
-        config.minimizeJre = [ new String("jre/lib/rt/com/sun/corba"), new String("jre/lib/rt/com/sun/jndi") ];
+        //config.minimizeJre = [ new String("jre/lib/rt/com/sun/corba"), new String("jre/lib/rt/com/sun/jndi") ];
         config.outDir = "$project.buildDir/launch4mac";
-        new Packr().pack(config)
+        new Packr().pack(config);
     }
 
 }
