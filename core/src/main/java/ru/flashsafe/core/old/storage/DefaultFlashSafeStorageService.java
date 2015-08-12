@@ -1,5 +1,7 @@
 package ru.flashsafe.core.old.storage;
 
+import static java.net.HttpURLConnection.HTTP_OK;
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,9 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 import javax.ws.rs.client.Client;
@@ -18,7 +19,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -27,13 +27,13 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.jackson.JacksonFeature;
-import org.glassfish.jersey.media.multipart.ContentDisposition;
+import org.glassfish.jersey.media.multipart.BodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.StreamDataBodyPart;
-import org.glassfish.jersey.message.internal.ReaderWriter;
+import org.glassfish.jersey.message.MessageProperties;
 
-import com.sun.xml.internal.org.jvnet.staxex.StreamingDataHandler;
+import com.sun.rmi.rmid.ExecOptionPermission;
 
 import ru.flashsafe.core.old.storage.rest.ContentTypeFixerFilter;
 import ru.flashsafe.core.old.storage.rest.FlashSafeAuthFeature;
@@ -54,6 +54,8 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
 
     /* "http://localhost:8088/hackathon-webapi/api/reviewee-request/" */
     private static final String STORAGE_API_URL = "https://flashsafe-alpha.azurewebsites.net";
+    
+    private static final int IO_BUFFER_SIZE = 8192;
 
     private static final String DIRECTORY_API_PATH = "dir.php";
 
@@ -62,14 +64,20 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
     private final Client restClient;
 
     private final WebTarget directoryTarget;
+    
+    static {
+        System.setProperty("sun.net.http.allowRestrictedHeaders", String.valueOf(Boolean.TRUE));
+        System.setProperty(MessageProperties.IO_BUFFER_SIZE, String.valueOf(IO_BUFFER_SIZE));
+    }
 
     public DefaultFlashSafeStorageService() {
-        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.register(JacksonFeature.class).register(FlashSafeAuthFeature.class).register(ContentTypeFixerFilter.class)
-                .register(MultiPartFeature.class).property(HttpUrlConnectorProvider.USE_FIXED_LENGTH_STREAMING, false)
-                .property(ClientProperties.OUTBOUND_CONTENT_LENGTH_BUFFER, 0)
-                .register(new LoggingFilter(Logger.getLogger("com.example.app"), true)).register(ProcessMonitorInputStream.class);
+                .register(MultiPartFeature.class)
+                .register(ProcessMonitorInputStream.class)
+                //.register(new LoggingFilter(Logger.getLogger(DefaultFlashSafeStorageService.class.getName()), true))
+                .property(HttpUrlConnectorProvider.USE_FIXED_LENGTH_STREAMING, true)
+                .property(ClientProperties.OUTBOUND_CONTENT_LENGTH_BUFFER, 0);
         restClient = ClientBuilder.newClient(clientConfig);
         directoryTarget = restClient.target(STORAGE_API_URL).path(DIRECTORY_API_PATH);
     }
@@ -79,7 +87,7 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
         DirectoryListResponse listResponse = directoryTarget.queryParam(DIRECTORY_ID_PARAMETER, directoryId)
                 .request(MediaType.APPLICATION_JSON_TYPE).get(DirectoryListResponse.class);
         ResponseMeta responseMeta = listResponse.getResponseMeta();
-        if (responseMeta.getResponseCode() == 200) {
+        if (responseMeta.getResponseCode() == HTTP_OK) {
             return listResponse.getFileObjects();
         }
         throw new FlashSafeStorageException("Error while listing directory. " + responseMeta.getResponseMessage(), null);
@@ -91,7 +99,7 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
                 .request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(new Form("create", name)));
         CreateDirectoryResponse createDirectoryRespose = response.readEntity(CreateDirectoryResponse.class);
         CreateDirectoryResponseMeta responseMeta = createDirectoryRespose.getResponseMeta();
-        if (responseMeta.getResponseCode() == 200) {
+        if (responseMeta.getResponseCode() == HTTP_OK) {
             return createLocalRepresentation(responseMeta.getDirectoryId(), name);
         }
         throw new FlashSafeStorageException("Error while creating directory. " + responseMeta.getResponseMessage(), null);
@@ -100,6 +108,8 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
     // TODO get directory attributes from back-end
     private static FlashSafeStorageDirectory createLocalRepresentation(long directoryId, String name) {
         FlashSafeStorageDirectory directory = new FlashSafeStorageDirectory();
+        directory.setId(directoryId);
+        directory.setName(name);
         return directory;
     }
 
@@ -117,19 +127,25 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
         multiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
         multiPart.field(DIRECTORY_ID_PARAMETER, Long.toString(directoryId));
 
+        long expectedLength = file.toFile().length() + IO_BUFFER_SIZE * 10;
         try {
             // TODO fix improve buffer
-            InputStream fileInStream = new ProcessMonitorInputStream(new BufferedInputStream(new FileInputStream(file.toFile()),
-                    81920), operationStatus);
+            RandomInputStream ris = new RandomInputStream(expectedLength);
+            InputStream fileInStream = new ProcessMonitorInputStream(new BufferedInputStream(new FileInputStream(file.toFile())),
+                    ris, operationStatus);
             StreamDataBodyPart bp = new StreamDataBodyPart("file", fileInStream, file.toFile().getName());
-            
             multiPart.bodyPart(bp);
+            
+            
+            StreamDataBodyPart wbp = new StreamDataBodyPart("additionalPayload", ris);
+            multiPart.bodyPart(wbp);
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } 
+        }
+
         
-        directoryTarget.request(MediaType.APPLICATION_JSON_TYPE).async()
+        directoryTarget.request(MediaType.APPLICATION_JSON_TYPE).header("Content-Length", expectedLength).async()
                 .post(Entity.entity(multiPart, multiPart.getMediaType()), new InvocationCallback<Response>() {
 
                     @Override
@@ -139,6 +155,7 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
 
                     @Override
                     public void failed(Throwable throwable) {
+                        throwable.printStackTrace();
                         setStatusToFinished(operationStatus);
                     }
 
@@ -176,15 +193,44 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
             throw new FlashSafeStorageException("Error while calculating file size", e);
         }
     }
+    
+    public class RandomInputStream extends InputStream {
+
+        private final long expectedSize;
+        
+        private long size;
+        
+        private final AtomicLong wasRead = new AtomicLong(0);
+        
+        public RandomInputStream(long expectedSize) {
+            this.expectedSize = expectedSize;
+        }
+        
+        public void setWroteSize(long wroteSize) {
+            size = expectedSize - wroteSize;
+        }
+        
+        @Override
+        public int read() throws IOException {
+            if (size > wasRead.get()) {
+                return -1;
+            }
+            wasRead.incrementAndGet();
+            return 0;
+        }
+    }
 
     public class ProcessMonitorInputStream extends InputStream {
 
         private final InputStream inputStream;
 
         private final StorageOperationStatusImpl fileOperationStatus;
+        
+        private final RandomInputStream ris;
 
-        public ProcessMonitorInputStream(InputStream inputStream, StorageOperationStatusImpl fileOperationStatus) {
+        public ProcessMonitorInputStream(InputStream inputStream, RandomInputStream ris, StorageOperationStatusImpl fileOperationStatus) {
             this.inputStream = inputStream;
+            this.ris = ris;
             this.fileOperationStatus = fileOperationStatus;
         }
 
@@ -244,6 +290,7 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
         }
 
         public void close() throws IOException {
+            ris.setWroteSize(fileOperationStatus.getProcessedBytes());
             inputStream.close();
         }
 

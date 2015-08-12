@@ -29,7 +29,7 @@ public class UnifiedMangerTest {
 //            System.out.println("-" + fsObject.getName() + " size " + fsObject.getSize());
 //        }
 //        
-        FileOperationStatus status = fileManager.copy("D:\\luwrain\\repo\\2repo.zip", FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX);
+        FileOperationStatus status = fileManager.copy("D:\\luwrain\\repo\\32repo.zip", FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX);
         
         while(status.getState() != OperationState.FINISHED) {
             System.out.println("Progress :" + status.getProgress());

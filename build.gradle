@@ -4,6 +4,12 @@ subprojects {
     version = '0.1'
 }
 
+project(':core') {
+    dependencies {
+        compile project(':token')
+    }
+}
+
 project(':token') {
 }
 

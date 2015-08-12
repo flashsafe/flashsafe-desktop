@@ -1,1 +1,1 @@
-include 'file-browser', 'token', 'token-examples', 'launcher'
+include 'file-browser', 'core', 'token', 'token-examples', 'launcher'
