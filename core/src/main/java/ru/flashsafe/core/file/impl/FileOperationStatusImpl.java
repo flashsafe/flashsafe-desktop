@@ -1,7 +1,10 @@
 package ru.flashsafe.core.file.impl;
 
+import java.util.Objects;
+
 import ru.flashsafe.core.file.FileOperationStatus;
 import ru.flashsafe.core.file.FileOperationType;
+import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.operation.OperationState;
 
 public class FileOperationStatusImpl implements FileOperationStatus {
@@ -14,9 +17,11 @@ public class FileOperationStatusImpl implements FileOperationStatus {
     
     private OperationState operationState;
     
+    private OperationResult operationResult = null;
+    
     public FileOperationStatusImpl(FileOperationType operationType, long fileSize) {
-        this.operationType = operationType;
-        this.fileSize = fileSize;
+        this.operationType = Objects.requireNonNull(operationType);
+        this.fileSize = Objects.requireNonNull(fileSize);
     }
     
     @Override
@@ -26,6 +31,15 @@ public class FileOperationStatusImpl implements FileOperationStatus {
     
     public void setState(OperationState operationState) {
         this.operationState = operationState;
+    }
+    
+    public void setResult(OperationResult operationResult) {
+        this.operationResult = operationResult;
+    }
+    
+    @Override
+    public OperationResult getResult() {
+        return operationResult;
     }
 
     @Override

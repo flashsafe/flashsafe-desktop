@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import ru.flashsafe.core.file.Directory;
@@ -16,7 +17,7 @@ public class LocalDirectory implements Directory {
     private final Path directoryPath;
 
     protected LocalDirectory(Path directoryPath) {
-        this.directoryPath = directoryPath;
+        this.directoryPath = Objects.requireNonNull(directoryPath);
     }
 
     @Override

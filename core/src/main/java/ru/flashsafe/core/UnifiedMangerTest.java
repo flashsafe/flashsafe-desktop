@@ -1,10 +1,8 @@
 package ru.flashsafe.core;
 
 import java.io.IOException;
-import java.util.List;
 
 import ru.flashsafe.core.file.FileManager;
-import ru.flashsafe.core.file.FileObject;
 import ru.flashsafe.core.file.FileOperationStatus;
 import ru.flashsafe.core.file.exception.FileOperationException;
 import ru.flashsafe.core.file.impl.UnifiedFileManager;
@@ -29,7 +27,7 @@ public class UnifiedMangerTest {
 //            System.out.println("-" + fsObject.getName() + " size " + fsObject.getSize());
 //        }
 //        
-        FileOperationStatus status = fileManager.copy("E:\\arch_for_replace\\docsLETO\\res1.ru.rar", FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX);
+        FileOperationStatus status = fileManager.copy("D:\\ChromeSetup444.exe", FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX);
         
         while(status.getState() != OperationState.FINISHED) {
             System.out.println("Progress :" + status.getProgress());

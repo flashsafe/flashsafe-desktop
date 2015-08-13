@@ -2,6 +2,9 @@ package ru.flashsafe.core.storage;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ru.flashsafe.core.file.Directory;
 import ru.flashsafe.core.file.File;
 import ru.flashsafe.core.file.FileManager;
@@ -11,10 +14,13 @@ import ru.flashsafe.core.file.exception.FileOperationException;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class FlashSafeStorageFileManager implements FileManager {
     
     private static final char PATH_SEPARATOR = '/';
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeStorageFileManager.class);
     
     private FlashSafeStorageService storageService;
 
@@ -38,7 +44,7 @@ public class FlashSafeStorageFileManager implements FileManager {
     @Override
     public File createFile(String path) {
         // TODO Auto-generated method stub
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
@@ -65,6 +71,8 @@ public class FlashSafeStorageFileManager implements FileManager {
             storageService.copy(resourceToCopy.getId(), targetDirectory.getId());
             return null;
         } catch (FlashSafeStorageException | ResourceResolverException e) {
+            //TODO fix messages
+            LOGGER.warn("Error while copying directory ", e);
             throw new FileOperationException("Error while copying directory", e);
         }
     }
@@ -78,6 +86,7 @@ public class FlashSafeStorageFileManager implements FileManager {
             return null;
         } catch (FlashSafeStorageException | ResourceResolverException e) {
           //TODO edit message
+            LOGGER.warn("Error while moving ", e);
             throw new FileOperationException("Error while moving ", e);
         }
     }
@@ -90,6 +99,7 @@ public class FlashSafeStorageFileManager implements FileManager {
             return null;
         } catch (FlashSafeStorageException | ResourceResolverException e) {
             //TODO edit message
+            LOGGER.warn("Error while deleting ", e);
             throw new FileOperationException("Error while deleting ", e);
         }
     }

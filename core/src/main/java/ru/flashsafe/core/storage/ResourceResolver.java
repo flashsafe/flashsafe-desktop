@@ -1,18 +1,30 @@
 package ru.flashsafe.core.storage;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
-import static java.util.Objects.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.flashsafe.core.old.storage.FlashSafeStorageDirectory;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
 
+/**
+ * 
+ * 
+ * @author Andrew
+ *
+ */
 public class ResourceResolver {
 
     private static final String PATH_DELIMITER = "/";
     
     private static final int PATH_OFFSET = FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX.length();
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceResolver.class);
     
     private static final FlashSafeStorageDirectory ROOT_DIRECTORY;
 
@@ -48,7 +60,7 @@ public class ResourceResolver {
     }
 
     private FlashSafeStorageFileObject resolveResource(FlashSafeStorageFileObject parent, String resourcePath,
-            boolean exceptionIfNotExists) throws ResourceResolverException {
+            final boolean exceptionIfNotExists) throws ResourceResolverException {
         if (resourcePath.startsWith(FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX)) {
             resourcePath = resourcePath.substring(PATH_OFFSET);
         }
@@ -74,6 +86,7 @@ public class ResourceResolver {
             content = storageService.list(parentId);
         } catch (FlashSafeStorageException e) {
             //TODO add message
+            LOGGER.warn("", e);
             throw new ResourceResolverException("", e);
         }
         for (FlashSafeStorageFileObject resource : content) {

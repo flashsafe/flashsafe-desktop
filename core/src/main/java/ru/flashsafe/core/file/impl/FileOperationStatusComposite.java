@@ -2,6 +2,7 @@ package ru.flashsafe.core.file.impl;
 
 import ru.flashsafe.core.file.FileOperationStatus;
 import ru.flashsafe.core.file.FileOperationType;
+import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.operation.OperationState;
 
 public class FileOperationStatusComposite implements FileOperationStatus {
@@ -13,6 +14,8 @@ public class FileOperationStatusComposite implements FileOperationStatus {
     private volatile long processedBytes;
     
     private OperationState state = OperationState.PLANNED;
+    
+    private OperationResult operationResult = null;
     
     private FileOperationStatus activeOperationStatus;
     
@@ -46,6 +49,15 @@ public class FileOperationStatusComposite implements FileOperationStatus {
 
     public synchronized void setState(OperationState state) {
         this.state = state;
+    }
+    
+    public void setResult(OperationResult operationResult) {
+        this.operationResult = operationResult;
+    }
+    
+    @Override
+    public OperationResult getResult() {
+        return operationResult;
     }
 
     @Override

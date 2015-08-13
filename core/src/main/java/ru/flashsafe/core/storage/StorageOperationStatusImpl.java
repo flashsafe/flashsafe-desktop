@@ -5,6 +5,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.operation.OperationState;
 
 public class StorageOperationStatusImpl implements StorageOperationStatus {
@@ -15,13 +16,15 @@ public class StorageOperationStatusImpl implements StorageOperationStatus {
     
     private final StorageOperationType operationType;
     
+    private volatile OperationState state = OperationState.PLANNED;
+    
+    private OperationResult operationResult = null;
+    
     private final Lock lock = new ReentrantLock();
     
     private final Condition isOperationFinished = lock.newCondition();
     
     private AtomicLong processedBytes = new AtomicLong(0);
-    
-    private volatile OperationState state = OperationState.PLANNED;
     
     public StorageOperationStatusImpl(long id, StorageOperationType operationType, long lenght) {
         this.id = id;
@@ -37,7 +40,16 @@ public class StorageOperationStatusImpl implements StorageOperationStatus {
     public OperationState getState() {
         return state;
     }
-
+    
+    public void setResult(OperationResult operationResult) {
+        this.operationResult = operationResult;
+    }
+    
+    @Override
+    public OperationResult getResult() {
+        return operationResult;
+    }
+    
     @Override
     public int getProgress() {
         return (int) ((processedBytes.longValue() * 100) / lenght );
@@ -49,7 +61,6 @@ public class StorageOperationStatusImpl implements StorageOperationStatus {
     
     @Override
     public long getProcessedBytes() {
-        System.out.println("Storage processed bytes: " + processedBytes.longValue() );
         return processedBytes.longValue();
     }
     
@@ -64,8 +75,8 @@ public class StorageOperationStatusImpl implements StorageOperationStatus {
     
     @Override
     public void markAsFinished() {
+        lock.lock();
         try {
-            lock.lock();
             isOperationFinished.signalAll();
         } finally {
             lock.unlock();
@@ -74,8 +85,8 @@ public class StorageOperationStatusImpl implements StorageOperationStatus {
 
     @Override
     public void waitUntilFinished() throws InterruptedException {
+        lock.lock();
         try {
-            lock.lock();
             if (state == OperationState.FINISHED) {
                 return;
             }

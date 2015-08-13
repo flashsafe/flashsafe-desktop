@@ -4,6 +4,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ru.flashsafe.core.file.FileOperationStatus;
 import ru.flashsafe.core.file.FileOperationType;
 import ru.flashsafe.core.file.exception.FileOperationException;
@@ -14,6 +17,8 @@ import ru.flashsafe.core.old.storage.util.CopyDirectoryVisitor;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
 
 public class FlashSafeStorageServiceHelper {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeStorageServiceHelper.class);
     
     private final FlashSafeStorageService storageService;
     
@@ -37,6 +42,7 @@ public class FlashSafeStorageServiceHelper {
             return operationStatus;
         } catch (ResourceResolverException e) {
             // TODO add message
+            LOGGER.warn("", e);
             throw new FileOperationException("", e);
         }
     }

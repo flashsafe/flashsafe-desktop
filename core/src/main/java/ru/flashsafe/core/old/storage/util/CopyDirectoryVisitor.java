@@ -8,6 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ru.flashsafe.core.file.FileOperationType;
 import ru.flashsafe.core.file.impl.FileOperationStatusComposite;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
@@ -19,6 +22,8 @@ import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
 
 public class CopyDirectoryVisitor extends SimpleFileVisitor<Path> {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(CopyDirectoryVisitor.class);
     
     private final Path fromPath;
     
@@ -78,6 +83,7 @@ public class CopyDirectoryVisitor extends SimpleFileVisitor<Path> {
             return resolver.resolveResource(parent, name);
         } catch (ResourceResolverException e) {
             // TODO add message
+            LOGGER.warn("", e);
             throw new IOException("", e);
         }
     }
@@ -87,6 +93,7 @@ public class CopyDirectoryVisitor extends SimpleFileVisitor<Path> {
             return resolver.resolveResourceIfExists(parent, name);
         } catch (ResourceResolverException e) {
             // TODO add message
+            LOGGER.warn("", e);
             throw new IOException("", e);
         }
     }
@@ -96,6 +103,7 @@ public class CopyDirectoryVisitor extends SimpleFileVisitor<Path> {
             return storageService.uploadFile(directoryId, file);
         } catch (FlashSafeStorageException e) {
             // TODO add message
+            LOGGER.warn("", e);
             throw new IOException("", e);
         }
     }
@@ -105,6 +113,7 @@ public class CopyDirectoryVisitor extends SimpleFileVisitor<Path> {
             storageService.createDirectory(parentDirectoryId, name);
         } catch (FlashSafeStorageException e) {
             // TODO add message
+            LOGGER.warn("", e);
             throw new IOException("", e);
         }
     }
@@ -113,6 +122,8 @@ public class CopyDirectoryVisitor extends SimpleFileVisitor<Path> {
         try {
             uploadStatus.waitUntilFinished();
         } catch (InterruptedException e) {
+         // TODO add message
+            LOGGER.warn("", e);
             throw new IOException("", e);
         }
     }

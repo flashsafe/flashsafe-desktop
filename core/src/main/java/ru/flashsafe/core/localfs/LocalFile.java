@@ -3,6 +3,7 @@ package ru.flashsafe.core.localfs;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import ru.flashsafe.core.file.File;
 
@@ -11,7 +12,7 @@ public class LocalFile implements File {
     private final Path filePath;
 
     protected LocalFile(Path filePath) {
-        this.filePath = filePath;
+        this.filePath = Objects.requireNonNull(filePath);
     }
 
     @Override

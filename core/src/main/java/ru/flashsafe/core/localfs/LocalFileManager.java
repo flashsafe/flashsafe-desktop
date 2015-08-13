@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ru.flashsafe.core.file.Directory;
 import ru.flashsafe.core.file.File;
 import ru.flashsafe.core.file.FileManager;
@@ -29,6 +32,8 @@ import ru.flashsafe.core.file.util.AsyncFileTreeWalker;
 //TOD add logging
 public class LocalFileManager implements FileManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocalFileManager.class);
+    
     // TODO return the usage of configuration registry (or properties)
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
@@ -61,6 +66,7 @@ public class LocalFileManager implements FileManager {
             }
             return Collections.unmodifiableList(fileObjects);
         } catch (IOException e) {
+            LOGGER.warn("Error while listing directory " + path, e);
             throw new FileOperationException(e);
         }
     }
@@ -81,6 +87,7 @@ public class LocalFileManager implements FileManager {
             Path newDirectory = Files.createDirectory(Paths.get(path));
             return new LocalDirectory(newDirectory);
         } catch (IOException e) {
+            LOGGER.warn("Error while creating directory " + path, e);
             throw new FileOperationException(e);
         }
     }
