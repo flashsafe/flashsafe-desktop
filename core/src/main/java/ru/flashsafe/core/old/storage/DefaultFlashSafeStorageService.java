@@ -7,10 +7,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.Permission;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.ws.rs.client.Client;
@@ -27,13 +34,10 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.jackson.JacksonFeature;
-import org.glassfish.jersey.media.multipart.BodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.StreamDataBodyPart;
 import org.glassfish.jersey.message.MessageProperties;
-
-import com.sun.rmi.rmid.ExecOptionPermission;
 
 import ru.flashsafe.core.old.storage.rest.ContentTypeFixerFilter;
 import ru.flashsafe.core.old.storage.rest.FlashSafeAuthFeature;
@@ -52,7 +56,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
 
-    /* "http://localhost:8088/hackathon-webapi/api/reviewee-request/" */
     private static final String STORAGE_API_URL = "https://flashsafe-alpha.azurewebsites.net";
     
     private static final int IO_BUFFER_SIZE = 8192;
@@ -75,9 +78,19 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
         clientConfig.register(JacksonFeature.class).register(FlashSafeAuthFeature.class).register(ContentTypeFixerFilter.class)
                 .register(MultiPartFeature.class)
                 .register(ProcessMonitorInputStream.class)
-                //.register(new LoggingFilter(Logger.getLogger(DefaultFlashSafeStorageService.class.getName()), true))
+               // .register(new LoggingFilter(Logger.getLogger(DefaultFlashSafeStorageService.class.getName()), true))
                 .property(HttpUrlConnectorProvider.USE_FIXED_LENGTH_STREAMING, true)
                 .property(ClientProperties.OUTBOUND_CONTENT_LENGTH_BUFFER, 0);
+        HttpUrlConnectorProvider httpUrlConnectorProvider = new HttpUrlConnectorProvider();
+        httpUrlConnectorProvider.connectionFactory(new HttpUrlConnectorProvider.ConnectionFactory() {
+            
+            @Override
+            public HttpURLConnection getConnection(URL url) throws IOException {
+                HttpURLConnection connection = new HttpURLConnectionWrapper((HttpURLConnection) url.openConnection());
+                return connection;
+            }
+        });
+        //clientConfig.connectorProvider(httpUrlConnectorProvider);
         restClient = ClientBuilder.newClient(clientConfig);
         directoryTarget = restClient.target(STORAGE_API_URL).path(DIRECTORY_API_PATH);
     }
@@ -95,6 +108,7 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
 
     @Override
     public FlashSafeStorageDirectory createDirectory(long parentDirectoryId, String name) throws FlashSafeStorageException {
+        Objects.requireNonNull(name);
         Response response = directoryTarget.queryParam(DIRECTORY_ID_PARAMETER, parentDirectoryId)
                 .request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(new Form("create", name)));
         CreateDirectoryResponse createDirectoryRespose = response.readEntity(CreateDirectoryResponse.class);
@@ -121,31 +135,18 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
 
     @Override
     public StorageOperationStatus uploadFile(long directoryId, Path file) throws FlashSafeStorageException {
+        Objects.requireNonNull(file);
         final StorageOperationStatusImpl operationStatus = createOperationStatus(ProcessIDGenerator.nextId(), file);
 
         FormDataMultiPart multiPart = new FormDataMultiPart();
         multiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
         multiPart.field(DIRECTORY_ID_PARAMETER, Long.toString(directoryId));
+        StreamDataBodyPart bp = buildStreamDataBodyPart(file, operationStatus);
+        multiPart.bodyPart(bp);
 
-        long expectedLength = file.toFile().length() + IO_BUFFER_SIZE * 10;
-        try {
-            // TODO fix improve buffer
-            RandomInputStream ris = new RandomInputStream(expectedLength);
-            InputStream fileInStream = new ProcessMonitorInputStream(new BufferedInputStream(new FileInputStream(file.toFile())),
-                    ris, operationStatus);
-            StreamDataBodyPart bp = new StreamDataBodyPart("file", fileInStream, file.toFile().getName());
-            multiPart.bodyPart(bp);
-            
-            
-            StreamDataBodyPart wbp = new StreamDataBodyPart("additionalPayload", ris);
-            multiPart.bodyPart(wbp);
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        
-        directoryTarget.request(MediaType.APPLICATION_JSON_TYPE).header("Content-Length", expectedLength).async()
+        /* Achtung! - black magic was used */
+        long length = calculateContentLength(directoryId, file);
+        directoryTarget.request(MediaType.APPLICATION_JSON_TYPE).header("Content-Length", length).async()
                 .post(Entity.entity(multiPart, multiPart.getMediaType()), new InvocationCallback<Response>() {
 
                     @Override
@@ -185,6 +186,47 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
         operationStatus.setState(OperationState.FINISHED);
         operationStatus.markAsFinished();
     }
+    
+    private static StreamDataBodyPart buildStreamDataBodyPart(Path fileToSend, StorageOperationStatusImpl operationStatus) throws FlashSafeStorageException {
+        try {
+            InputStream fileInStream = new ProcessMonitorInputStream(new BufferedInputStream(new FileInputStream(fileToSend.toFile())), operationStatus);
+            return new StreamDataBodyPart("file", fileInStream, fileToSend.toFile().getName());
+        } catch (FileNotFoundException e) {
+            //TODO add message
+            throw new FlashSafeStorageException("", e);
+        }
+    }
+    
+    /**
+     * Calculates content-length using a lot of calculated guesses..
+     * 
+     * 1. We send FormDataMultiPart which consists of 2 parts:
+     *    - directory Id field,
+     *    - file stream body part.
+     *    295 is a number of bytes produces by Jersey for these 2 parts.
+     *    The we add directoryId length;
+     *    Then we add file name - it can be different...
+     *    Then the file length. 
+     * 
+     * @param directoryId
+     * @param fileToLoad
+     * @return
+     * @throws FlashSafeStorageException 
+     * @throws UnsupportedEncodingException 
+     */
+    private static long calculateContentLength(long directoryId, Path fileToLoad) throws FlashSafeStorageException {
+        Objects.requireNonNull(fileToLoad);
+        long length = 295;
+        length += String.valueOf(directoryId).length();
+        try {
+            length += fileToLoad.toFile().getName().length();
+            length += fileToLoad.toFile().length();
+            return length;
+        } catch (RuntimeException e) {
+            throw new FlashSafeStorageException("", e);
+        }
+
+    }
 
     private static StorageOperationStatusImpl createOperationStatus(long operationId, Path file) throws FlashSafeStorageException {
         try {
@@ -193,44 +235,15 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
             throw new FlashSafeStorageException("Error while calculating file size", e);
         }
     }
-    
-    public class RandomInputStream extends InputStream {
 
-        private final long expectedSize;
-        
-        private long size;
-        
-        private final AtomicLong wasRead = new AtomicLong(0);
-        
-        public RandomInputStream(long expectedSize) {
-            this.expectedSize = expectedSize;
-        }
-        
-        public void setWroteSize(long wroteSize) {
-            size = expectedSize - wroteSize;
-        }
-        
-        @Override
-        public int read() throws IOException {
-            if (size > wasRead.get()) {
-                return -1;
-            }
-            wasRead.incrementAndGet();
-            return 0;
-        }
-    }
-
-    public class ProcessMonitorInputStream extends InputStream {
+    public static class ProcessMonitorInputStream extends InputStream {
 
         private final InputStream inputStream;
 
         private final StorageOperationStatusImpl fileOperationStatus;
-        
-        private final RandomInputStream ris;
 
-        public ProcessMonitorInputStream(InputStream inputStream, RandomInputStream ris, StorageOperationStatusImpl fileOperationStatus) {
+        public ProcessMonitorInputStream(InputStream inputStream, StorageOperationStatusImpl fileOperationStatus) {
             this.inputStream = inputStream;
-            this.ris = ris;
             this.fileOperationStatus = fileOperationStatus;
         }
 
@@ -290,10 +303,147 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
         }
 
         public void close() throws IOException {
-            ris.setWroteSize(fileOperationStatus.getProcessedBytes());
             inputStream.close();
         }
 
+    }
+    
+    public static class HttpURLConnectionWrapper extends HttpURLConnection {
+
+        private HttpURLConnection httpURLConnection;
+        
+        private OutputStream outputStream;
+        
+        private long written;
+        
+        protected HttpURLConnectionWrapper(HttpURLConnection httpURLConnection) {
+            super(null);
+            this.httpURLConnection = httpURLConnection;
+        }
+        
+        @Override
+        public void setDoOutput(boolean value) {
+            httpURLConnection.setDoOutput(value);
+        }
+        
+        @Override
+        public void setDoInput(boolean value) {
+            httpURLConnection.setDoInput(value);
+        }
+
+        public String getHeaderFieldKey (int n) {
+            return httpURLConnection.getHeaderField(n);
+        }
+
+        public void setFixedLengthStreamingMode (int contentLength) {
+            httpURLConnection.setFixedLengthStreamingMode(contentLength);
+        }
+
+        public void setChunkedStreamingMode (int chunklen) {
+            httpURLConnection.setChunkedStreamingMode(chunklen);
+        }
+
+        public String getHeaderField(int n) {
+            return httpURLConnection.getHeaderField(n);
+        }
+        
+         public void setInstanceFollowRedirects(boolean followRedirects) {
+             httpURLConnection.setInstanceFollowRedirects(followRedirects);
+         }
+
+         public boolean getInstanceFollowRedirects() {
+             return httpURLConnection.getInstanceFollowRedirects();
+         }
+
+        
+        public void setRequestMethod(String method) throws ProtocolException {
+            httpURLConnection.setRequestMethod(method);
+        }
+
+        
+        public String getRequestMethod() {
+            return httpURLConnection.getRequestMethod();
+        }
+
+       
+        public int getResponseCode() throws IOException {
+            if (outputStream != null) {
+                long needToWrite = (120583 + 81920) - written;
+                System.out.println("written " + written);
+                byte[] w = new byte[(int) needToWrite];
+                Arrays.fill(w, (byte) '\r');
+                outputStream.write(w);
+            }
+            return httpURLConnection.getResponseCode();
+        }
+
+        public String getResponseMessage() throws IOException {
+            return httpURLConnection.getResponseMessage();
+        }
+
+        public long getHeaderFieldDate(String name, long Default) {
+            return httpURLConnection.getHeaderFieldDate(name, Default);
+        }
+
+        public void disconnect() {
+            httpURLConnection.disconnect();
+        }
+
+        
+        public boolean usingProxy() {
+            return httpURLConnection.usingProxy();
+        }
+
+        public Permission getPermission() throws IOException {
+            return httpURLConnection.getPermission();
+        }
+
+        @Override
+        public InputStream getErrorStream() {
+            return httpURLConnection.getErrorStream();
+        }
+
+        @Override
+        public void connect() throws IOException {
+            httpURLConnection.connect();
+        }
+        
+        @Override
+        public OutputStream getOutputStream() throws IOException {
+            outputStream = httpURLConnection.getOutputStream();
+            return new OutputStream() {
+                
+                @Override
+                public void write(int b) throws IOException {
+                    outputStream.write(b);
+                    written++;
+                }
+                
+                @Override
+                public void write(byte[] b) throws IOException {
+                    outputStream.write(b);
+                    written += b.length;
+                }
+                
+                @Override
+                public void write(byte[] b, int off, int len) throws IOException {
+                    outputStream.write(b, off, len);
+                    written += len;
+                }
+            };
+            
+        }
+        
+        @Override
+        public URL getURL() {
+            return httpURLConnection.getURL();
+        }
+        
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return httpURLConnection.getInputStream();
+        }
+        
     }
 
 }
