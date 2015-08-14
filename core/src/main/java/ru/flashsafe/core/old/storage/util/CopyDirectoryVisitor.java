@@ -49,6 +49,7 @@ public class CopyDirectoryVisitor extends SimpleFileVisitor<Path> {
         String resourcePath = convertToFlashSafeStoragePath(fromPath.relativize(dir));
         FlashSafeStorageFileObject directory = resolveResourceIfExists(toPath, resourcePath);
         if (directory == null) {
+            LOGGER.debug("Creating directory {}/{}", toPath, resourcePath);
             FlashSafeStorageFileObject parentDirectory = toPath;
             int lastElementPosition = resourcePath.lastIndexOf("/");
             if (lastElementPosition > 0) {
@@ -70,6 +71,7 @@ public class CopyDirectoryVisitor extends SimpleFileVisitor<Path> {
                 fileDirectory = resolveResource(toPath, resourcePath);
             }
         }
+        LOGGER.debug("Uploading file {} to {}", file, resourcePath);
         StorageOperationStatus uploadStatus = uploadFile(fileDirectory.getId(), file);
         operationStatus.setActiveOperationStatus(new ToFileOperationStatusAdapter(uploadStatus, FileOperationType.COPY));
         //TODO add to the common status

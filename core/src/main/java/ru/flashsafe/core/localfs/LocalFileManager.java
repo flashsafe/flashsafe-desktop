@@ -95,8 +95,14 @@ public class LocalFileManager implements FileManager {
     @Override
     public FileOperationStatus copy(String fromPath, String toPath) throws FileOperationException {
         Path from = Paths.get(fromPath);
+        Path to;
+        if (Files.isRegularFile(from)) {
+            to = Paths.get(toPath + from.getFileName());
+        } else {
+            to = Paths.get(toPath);
+        }
         FileOperationStatusComposite operationStatus = new FileOperationStatusComposite(FileOperationType.COPY);
-        executorService.execute(new AsyncFileTreeWalker(from, new CopyDirectoryVisitor(from, Paths.get(toPath), operationStatus),
+        executorService.execute(new AsyncFileTreeWalker(from, new CopyDirectoryVisitor(from, to, operationStatus),
                 operationStatus));
         return operationStatus;
     }
@@ -104,8 +110,14 @@ public class LocalFileManager implements FileManager {
     @Override
     public FileOperationStatus move(String fromPath, String toPath) throws FileOperationException {
         Path from = Paths.get(fromPath);
+        Path to;
+        if (Files.isRegularFile(from)) {
+            to = Paths.get(toPath + from.getFileName());
+        } else {
+            to = Paths.get(toPath);
+        }
         FileOperationStatusComposite operationStatus = new FileOperationStatusComposite(FileOperationType.MOVE);
-        executorService.execute(new AsyncFileTreeWalker(from, new MoveDirectoryVisitor(from, Paths.get(toPath), operationStatus),
+        executorService.execute(new AsyncFileTreeWalker(from, new MoveDirectoryVisitor(from, to, operationStatus),
                 operationStatus));
         return operationStatus;
     }

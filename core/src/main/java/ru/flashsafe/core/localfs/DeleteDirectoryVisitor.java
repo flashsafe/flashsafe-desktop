@@ -7,12 +7,21 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import ru.flashsafe.core.file.FileOperationType;
-import ru.flashsafe.core.file.impl.FileOperationStatusComposite;
-import ru.flashsafe.core.file.impl.FileOperationStatusImpl;
-import ru.flashsafe.core.operation.OperationState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import ru.flashsafe.core.file.impl.FileOperationStatusComposite;
+
+/**
+ * 
+ * 
+ * @author Andrey
+ *
+ */
+//TODO add status processing
 public class DeleteDirectoryVisitor extends SimpleFileVisitor<Path> {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteDirectoryVisitor.class);
     
     private final FileOperationStatusComposite operationStatus;
     
@@ -22,25 +31,22 @@ public class DeleteDirectoryVisitor extends SimpleFileVisitor<Path> {
     
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        LOGGER.trace("Deleting file {}", file);
         Files.delete(file);
         return FileVisitResult.CONTINUE;
     }
 
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-        long fileSize = Files.size(file);
-        FileOperationStatusImpl fileOperationStatus = new FileOperationStatusImpl(FileOperationType.MOVE, fileSize);
-        operationStatus.setActiveOperationStatus(fileOperationStatus);
+        LOGGER.trace("Deleting file " + file + " after failed delete operation", exc);
         Files.delete(file);
-        fileOperationStatus.setProcessedBytes(fileSize);
-        fileOperationStatus.setState(OperationState.FINISHED);
-        operationStatus.submitActiveOperationStatusAsFinished();
         return FileVisitResult.CONTINUE;
     }
 
     @Override
     public FileVisitResult postVisitDirectory(Path directory, IOException exc) throws IOException {
         if (exc == null) {
+            LOGGER.trace("Deleting directory {}", directory);
             Files.delete(directory);
             return FileVisitResult.CONTINUE;
         } else {

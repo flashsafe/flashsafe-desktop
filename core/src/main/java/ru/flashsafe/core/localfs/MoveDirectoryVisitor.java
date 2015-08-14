@@ -8,6 +8,9 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ru.flashsafe.core.file.FileOperationType;
 import ru.flashsafe.core.file.impl.FileOperationStatusComposite;
 import ru.flashsafe.core.file.impl.FileOperationStatusImpl;
@@ -15,6 +18,8 @@ import ru.flashsafe.core.operation.OperationState;
 
 public class MoveDirectoryVisitor extends SimpleFileVisitor<Path> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MoveDirectoryVisitor.class);
+    
     private final Path fromPath;
 
     private final Path toPath;
@@ -41,6 +46,7 @@ public class MoveDirectoryVisitor extends SimpleFileVisitor<Path> {
         long fileSize = Files.size(file);
         FileOperationStatusImpl fileOperationStatus = new FileOperationStatusImpl(FileOperationType.MOVE, fileSize);
         operationStatus.setActiveOperationStatus(fileOperationStatus);
+        LOGGER.debug("Moving file {} to {}", file, toPath);
         Files.move(file, toPath.resolve(fromPath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
         fileOperationStatus.setProcessedBytes(fileSize);
         fileOperationStatus.setState(OperationState.FINISHED);
@@ -51,6 +57,7 @@ public class MoveDirectoryVisitor extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult postVisitDirectory(Path directory, IOException exc) throws IOException {
         if (exc == null) {
+            LOGGER.trace("Deleting directory {}", directory);
             Files.delete(directory);
             return FileVisitResult.CONTINUE;
         } else {

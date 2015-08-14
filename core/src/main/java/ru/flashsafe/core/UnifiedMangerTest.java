@@ -1,13 +1,17 @@
 package ru.flashsafe.core;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.flashsafe.core.file.FileManager;
+import ru.flashsafe.core.file.FileObject;
+import ru.flashsafe.core.file.FileOperationStatus;
 import ru.flashsafe.core.file.exception.FileOperationException;
 import ru.flashsafe.core.file.impl.UnifiedFileManager;
+import ru.flashsafe.core.operation.OperationState;
 
 public class UnifiedMangerTest {
 
@@ -23,20 +27,20 @@ public class UnifiedMangerTest {
         LOGGER.info("Start");
         
         FileManager fileManager = new UnifiedFileManager();
-//        fileManager.createDirectory(FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX + "test9");
-//        List<FileObject> fileObjs = fileManager.list(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
+        //fileManager.createDirectory(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX + "test9");
+//        List<FileObject> fileObjs = fileManager.list(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX  + "test9");
 //        long after = System.currentTimeMillis();
 //        for (FileObject fsObject : fileObjs) {
 //            System.out.println("-" + fsObject.getName() + " size " + fsObject.getSize() + " -type");
 //        }
-//        
-//        FileOperationStatus status = fileManager.copy("D:\\TR.pdf", FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX);
-//        
-//        while(status.getState() != OperationState.FINISHED) {
-//            System.out.println("Progress :" + status.getProgress());
-//            Thread.sleep(2000);
-//        }
-//        System.out.println("end");
+        
+        FileOperationStatus status = fileManager.copy("D:\\fromTest\\59014.jpg",  "F:\\5678\\");
+        
+        while(status.getState() != OperationState.FINISHED) {
+            LOGGER.info("Progress :" + status.getProgress());
+            Thread.sleep(2000);
+        }
+        LOGGER.info("end");
         
         System.exit(0);
     }
