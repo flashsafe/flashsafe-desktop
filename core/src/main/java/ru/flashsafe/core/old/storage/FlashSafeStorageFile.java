@@ -37,6 +37,11 @@ public class FlashSafeStorageFile extends FlashSafeStorageFileObject implements 
     public void setCount(int count) {
         this.count = count;
     }
+
+    @Override
+    public String getFileFormat() {
+        return format;
+    }
     
     
 }

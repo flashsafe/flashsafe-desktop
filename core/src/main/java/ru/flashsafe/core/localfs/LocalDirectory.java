@@ -1,15 +1,11 @@
 package ru.flashsafe.core.localfs;
 
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
 
 import ru.flashsafe.core.file.Directory;
+import ru.flashsafe.core.file.util.FileUtils;
 
 //TODO cache the results of getSize() and count() operations
 public class LocalDirectory implements Directory {
@@ -32,15 +28,13 @@ public class LocalDirectory implements Directory {
 
     @Override
     public long getSize() throws IOException {
-        final AtomicLong size = new AtomicLong();
-        Files.walkFileTree(directoryPath, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                size.addAndGet(attrs.size());
-                return FileVisitResult.CONTINUE;
-            }
-        });
-        return size.longValue();
+        return FileUtils.countSizeForPath(directoryPath);
+    }
+
+    //TODO implement!
+    @Override
+    public int getCount() {
+        return -1;
     }
 
 }

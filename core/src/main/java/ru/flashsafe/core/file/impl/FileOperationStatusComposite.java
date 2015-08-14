@@ -43,11 +43,11 @@ public class FileOperationStatusComposite implements FileOperationStatus {
     }
 
     @Override
-    public synchronized OperationState getState() {
+    public OperationState getState() {
         return state;
     }
 
-    public synchronized void setState(OperationState state) {
+    public void setState(OperationState state) {
         this.state = state;
     }
     
@@ -61,7 +61,7 @@ public class FileOperationStatusComposite implements FileOperationStatus {
     }
 
     @Override
-    public synchronized int getProgress() {
+    public int getProgress() {
         long totalProcessed = getProcessedBytes();
         long dividend = totalProcessed * 100;
         return (int) (totalBytesToProcess > 0 ? dividend / totalBytesToProcess : 0);
@@ -73,7 +73,7 @@ public class FileOperationStatusComposite implements FileOperationStatus {
     }
 
     @Override
-    public synchronized long getProcessedBytes() {
+    public long getProcessedBytes() {
         return getTotalProcessedBytes();
     }
 

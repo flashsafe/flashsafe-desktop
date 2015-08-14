@@ -11,7 +11,8 @@ import javax.ws.rs.ext.Provider;
 import static java.net.HttpURLConnection.HTTP_OK;
 
 /**
- * 
+ * This filter fixes the back-end's bug with incorrect content type (the back-end
+ * returns text/plain as a content type, so Jersey wouldn't work).
  * 
  * @author Andrew
  *

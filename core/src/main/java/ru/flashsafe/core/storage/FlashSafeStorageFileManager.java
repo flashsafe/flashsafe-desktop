@@ -49,9 +49,9 @@ public class FlashSafeStorageFileManager implements FileManager {
 
     @Override
     public Directory createDirectory(String path) throws FileOperationException {
-        int lastPathSeparatorIndex = path.lastIndexOf(PATH_SEPARATOR, FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX.length());
-        String parentDirectoryPath = FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX;
-        if (lastPathSeparatorIndex > FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX.length()) {
+        int lastPathSeparatorIndex = path.lastIndexOf(PATH_SEPARATOR, FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX.length());
+        String parentDirectoryPath = FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX;
+        if (lastPathSeparatorIndex > FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX.length()) {
             parentDirectoryPath = path.substring(0, lastPathSeparatorIndex);
         }
         try {

@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.ClientRequestContext;
@@ -17,10 +18,18 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.flashsafe.core.old.storage.rest.data.AuthData;
 import ru.flashsafe.core.old.storage.rest.data.AuthResponse;
 
+/**
+ * Authentication filter which uses FlashSafe device to provide auth data.
+ * 
+ * @author Andrew
+ *
+ */
 @Priority(Priorities.AUTHENTICATION)
 public class FlashSafeAuthClientFilter implements ClientRequestFilter {
 
@@ -29,6 +38,8 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
     private static final String ID_PARAMETER = "id";
 
     private static final String AUTH_URL = "auth.php";
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeAuthClientFilter.class);
 
     private final Client client;
 
@@ -72,9 +83,14 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
 
         Form form = new Form(ID_PARAMETER, "1");
         form.param(ACCESS_TOKEN_PARAMETER, hash);
-        //TODO add try-catch and try again - just temporary workaround
-        AuthResponse authResponse2 = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(form),
-                AuthResponse.class);
+        /* add try-catch and try again - just temporary workaround - back-end do something weird when you request it first time */
+        AuthResponse authResponse2 = null;
+        try {
+            authResponse2 = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(form), AuthResponse.class);
+        } catch (ProcessingException e) {
+            LOGGER.info("Weird thing just happened", e);
+            authResponse2 = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(form), AuthResponse.class);
+        }
         return authResponse2.getAuthData();
 
     }

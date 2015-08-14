@@ -33,7 +33,6 @@ import org.glassfish.jersey.message.MessageProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.flashsafe.core.localfs.LocalFileManager;
 import ru.flashsafe.core.old.storage.rest.ContentTypeFixerFilter;
 import ru.flashsafe.core.old.storage.rest.CustomMultipart;
 import ru.flashsafe.core.old.storage.rest.FlashSafeAuthFeature;
@@ -69,7 +68,7 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
     private final WebTarget directoryTarget;
     
     static {
-        System.setProperty("sun.net.http.allowRestrictedHeaders", String.valueOf(Boolean.TRUE));
+        System.setProperty("sun.net.http.allowRestrictedHeaders", String.valueOf(true));
         System.setProperty(MessageProperties.IO_BUFFER_SIZE, String.valueOf(IO_BUFFER_SIZE));
     }
 
@@ -144,8 +143,8 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
 
                     @Override
                     public void failed(Throwable throwable) {
-                        throwable.printStackTrace();
                         setStatusToFinished(operationStatus, OperationResult.ERROR);
+                        LOGGER.warn("Error while uploading file " + file + " to directory with id " + directoryId, throwable);
                     }
 
                 });

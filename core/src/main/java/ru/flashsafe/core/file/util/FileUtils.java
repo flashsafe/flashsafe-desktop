@@ -1,9 +1,12 @@
 package ru.flashsafe.core.file.util;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 
@@ -20,15 +23,15 @@ public class FileUtils {
         if (Files.isRegularFile(path)) {
             return Files.size(path);
         }
-        long totalBytes = 0;
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path)) {
-            for (Path currentPath : directoryStream) {
-                if (Files.isRegularFile(currentPath)) {
-                    totalBytes += Files.size(currentPath);
-                }
+        final AtomicLong totalBytes = new AtomicLong();
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                totalBytes.addAndGet(attrs.size());
+                return FileVisitResult.CONTINUE;
             }
-            return totalBytes;
-        }
+        });
+        return totalBytes.longValue();
     }
 
 }

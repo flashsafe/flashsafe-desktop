@@ -7,9 +7,13 @@ import ru.flashsafe.core.old.storage.FlashSafeStorageDirectory;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 
+/**
+ * 
+ * 
+ * @author Andrew
+ *
+ */
 public interface FlashSafeStorageService {
-
-    String FLASH_SAFE_STORAGE_PATH_PREFIX = "fls://";
 
     List<FlashSafeStorageFileObject> list(long directoryId) throws FlashSafeStorageException;
 

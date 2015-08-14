@@ -30,4 +30,9 @@ public class LocalFile implements File {
         return Files.size(filePath);
     }
 
+    @Override
+    public String getFileFormat() throws IOException {
+        return Files.probeContentType(filePath);
+    }
+
 }

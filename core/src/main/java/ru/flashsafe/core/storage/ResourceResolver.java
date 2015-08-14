@@ -7,6 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.old.storage.FlashSafeStorageDirectory;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
@@ -22,7 +23,7 @@ public class ResourceResolver {
 
     private static final String PATH_DELIMITER = "/";
     
-    private static final int PATH_OFFSET = FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX.length();
+    private static final int PATH_OFFSET = FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX.length();
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceResolver.class);
     
@@ -61,7 +62,7 @@ public class ResourceResolver {
 
     private FlashSafeStorageFileObject resolveResource(FlashSafeStorageFileObject parent, String resourcePath,
             final boolean exceptionIfNotExists) throws ResourceResolverException {
-        if (resourcePath.startsWith(FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX)) {
+        if (resourcePath.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX)) {
             resourcePath = resourcePath.substring(PATH_OFFSET);
         }
         if (resourcePath.length() == 0) {

@@ -20,6 +20,13 @@ import ru.flashsafe.core.storage.FlashSafeStorageService;
 import ru.flashsafe.core.storage.FlashSafeStorageServiceHelper;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+/**
+ * 
+ * This file manager is able to deal with files located on current computer or FlashSafe storage.
+ * 
+ * @author Andrew
+ *
+ */
 public class UnifiedFileManager implements FileManager {
 
     private final LocalFileManager localFileSystemManager;
@@ -97,17 +104,17 @@ public class UnifiedFileManager implements FileManager {
     }
 
     private static boolean pathsRelateToSameStorage(String firstPath, String secondPath) {
-        boolean firstPathOnRemoteStorage = firstPath.startsWith(FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX);
-        boolean secondPathOnRemoteStorage = secondPath.startsWith(FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX);
+        boolean firstPathOnRemoteStorage = firstPath.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
+        boolean secondPathOnRemoteStorage = secondPath.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
         return firstPathOnRemoteStorage == secondPathOnRemoteStorage;
     }
 
     private FileManager getFileManagerForPath(String path) {
-        return path.startsWith(FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX) ? flashSafeStorageFileManager
+        return path.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX) ? flashSafeStorageFileManager
                 : localFileSystemManager;
     }
     
     private static boolean isRemoteStoragePath(String path) {
-        return path.startsWith(FlashSafeStorageService.FLASH_SAFE_STORAGE_PATH_PREFIX);
+        return path.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
     }
 }
