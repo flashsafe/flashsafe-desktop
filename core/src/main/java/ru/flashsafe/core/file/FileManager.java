@@ -3,6 +3,7 @@ package ru.flashsafe.core.file;
 import java.util.List;
 
 import ru.flashsafe.core.file.exception.FileOperationException;
+import ru.flashsafe.core.storage.util.StorageUtils;
 
 /**
  * An object that provides a set of methods (operations) to work with files and folders. 
@@ -20,7 +21,7 @@ public interface FileManager {
      * Prefix for any FlashSafe storage objects.
      * So the path to file on FlashSafe storage has to be defined as: {@code fls://path/to/resource}
      */
-    String FLASH_SAFE_STORAGE_PATH_PREFIX = "fls://";
+    String FLASH_SAFE_STORAGE_PATH_PREFIX = StorageUtils.STORAGE_PATH_PREFIX;
 
     /**
      * 
@@ -58,7 +59,7 @@ public interface FileManager {
      * @return
      * @throws FileOperationException
      */
-    FileOperationStatus copy(String fromPath, String toPath) throws FileOperationException;
+    FileOperation copy(String fromPath, String toPath) throws FileOperationException;
     
     /**
      * Moves file/directory {@link fromPath} into {@link toPath}.
@@ -69,7 +70,7 @@ public interface FileManager {
      * @return
      * @throws FileOperationException
      */
-    FileOperationStatus move(String fromPath, String toPath) throws FileOperationException;
+    FileOperation move(String fromPath, String toPath) throws FileOperationException;
     
     /**
      * Deletes file/directory in the specified path.
@@ -78,6 +79,6 @@ public interface FileManager {
      * @return 
      * @throws FileOperationException
      */
-    FileOperationStatus delete(String path) throws FileOperationException;
+    FileOperation delete(String path) throws FileOperationException;
     
 }

@@ -1,4 +1,4 @@
-package ru.flashsafe.core.old.storage.util;
+package ru.flashsafe.core.storage.util;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -8,7 +8,8 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 
-public class MoveDirectoryVisitor extends SimpleFileVisitor<Path> {
+//FIXME implement - add storage operations
+public class MoveDirectoryToStorageVisitor extends SimpleFileVisitor<Path> {
 
     private Path fromPath;
 
@@ -16,13 +17,13 @@ public class MoveDirectoryVisitor extends SimpleFileVisitor<Path> {
 
     private StandardCopyOption copyOption;
 
-    public MoveDirectoryVisitor(Path fromPath, Path toPath, StandardCopyOption copyOption) {
+    public MoveDirectoryToStorageVisitor(Path fromPath, Path toPath, StandardCopyOption copyOption) {
         this.fromPath = fromPath;
         this.toPath = toPath;
         this.copyOption = copyOption;
     }
 
-    public MoveDirectoryVisitor(Path fromPath, Path toPath) {
+    public MoveDirectoryToStorageVisitor(Path fromPath, Path toPath) {
         this(fromPath, toPath, StandardCopyOption.REPLACE_EXISTING);
     }
 

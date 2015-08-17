@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,42 +20,47 @@ import ru.flashsafe.core.file.Directory;
 import ru.flashsafe.core.file.File;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.FileObject;
-import ru.flashsafe.core.file.FileOperationStatus;
+import ru.flashsafe.core.file.FileOperation;
 import ru.flashsafe.core.file.FileOperationType;
 import ru.flashsafe.core.file.exception.FileOperationException;
-import ru.flashsafe.core.file.impl.FileOperationStatusComposite;
+import ru.flashsafe.core.file.impl.FileOperationInfo;
 import ru.flashsafe.core.file.util.AsyncFileTreeWalker;
+import ru.flashsafe.core.file.util.CompositeFileOperation;
+import ru.flashsafe.core.operation.OperationIDGenerator;
+import ru.flashsafe.core.operation.OperationResult;
+import ru.flashsafe.core.operation.OperationState;
+
+import com.google.inject.Singleton;
 
 /**
  * 
  * @author Andrew
  * 
  */
-//TOD add logging
+@Singleton
 public class LocalFileManager implements FileManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalFileManager.class);
-    
+
     // TODO return the usage of configuration registry (or properties)
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     public LocalFileManager() {
-//        Runtime.getRuntime().addShutdownHook(new Thread() {
-//            
-//            @Override
-//            public void run() {
-//                executor.shutdownNow();
-//                try {
-//                    executor.awaitTermination(500, TimeUnit.MILLISECONDS);
-//                } catch (InterruptedException e) {
-//                    // TODO Auto-generated catch block
-//                    e.printStackTrace();
-//                }
-//            }
-//            
-//        });
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                LOGGER.debug("Local file manager is shutting down");
+                executorService.shutdownNow();
+                try {
+                    executorService.awaitTermination(500, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    LOGGER.error("Shutdown process finished with an error", e);
+                }
+            }
+        });
     }
-    
+
     @Override
     public List<FileObject> list(String path) throws FileOperationException {
         List<FileObject> fileObjects = new ArrayList<>();
@@ -93,41 +100,48 @@ public class LocalFileManager implements FileManager {
     }
 
     @Override
-    public FileOperationStatus copy(String fromPath, String toPath) throws FileOperationException {
+    public FileOperation copy(String fromPath, String toPath) throws FileOperationException {
         Path from = Paths.get(fromPath);
-        Path to;
-        if (Files.isRegularFile(from)) {
-            to = Paths.get(toPath + from.getFileName());
-        } else {
-            to = Paths.get(toPath);
-        }
-        FileOperationStatusComposite operationStatus = new FileOperationStatusComposite(FileOperationType.COPY);
-        executorService.execute(new AsyncFileTreeWalker(from, new CopyDirectoryVisitor(from, to, operationStatus),
-                operationStatus));
-        return operationStatus;
+        Path to = Paths.get(toPath + from.getFileName());
+
+        FileOperationInfo operationInfo = new FileOperationInfo(fromPath, toPath, from.getFileName().toString());
+        CompositeFileOperation fileOperation = new CompositeFileOperation(OperationIDGenerator.nextId(), FileOperationType.COPY,
+                operationInfo);
+
+        Future<OperationResult> operationFuture = executorService.submit(new AsyncFileTreeWalker(from, new CopyDirectoryVisitor(
+                from, to, fileOperation), fileOperation));
+        fileOperation.setOperationFuture(operationFuture);
+        return fileOperation;
     }
 
     @Override
-    public FileOperationStatus move(String fromPath, String toPath) throws FileOperationException {
+    public FileOperation move(String fromPath, String toPath) throws FileOperationException {
         Path from = Paths.get(fromPath);
-        Path to;
-        if (Files.isRegularFile(from)) {
-            to = Paths.get(toPath + from.getFileName());
-        } else {
-            to = Paths.get(toPath);
-        }
-        FileOperationStatusComposite operationStatus = new FileOperationStatusComposite(FileOperationType.MOVE);
-        executorService.execute(new AsyncFileTreeWalker(from, new MoveDirectoryVisitor(from, to, operationStatus),
-                operationStatus));
-        return operationStatus;
+        Path to = Paths.get(toPath + from.getFileName());
+
+        FileOperationInfo operationInfo = new FileOperationInfo(fromPath, toPath, from.getFileName().toString());
+        CompositeFileOperation fileOperation = new CompositeFileOperation(OperationIDGenerator.nextId(), FileOperationType.MOVE,
+                operationInfo);
+
+        Future<OperationResult> operationFuture = executorService.submit(new AsyncFileTreeWalker(from, new MoveDirectoryVisitor(
+                from, to, fileOperation), fileOperation));
+        fileOperation.setOperationFuture(operationFuture);
+        return fileOperation;
     }
 
     @Override
-    public FileOperationStatus delete(String path) throws FileOperationException {
+    public FileOperation delete(String path) throws FileOperationException {
         Path pathToDelete = Paths.get(path);
-        FileOperationStatusComposite operationStatus = new FileOperationStatusComposite(FileOperationType.DELETE);
-        executorService.execute(new AsyncFileTreeWalker(pathToDelete, new DeleteDirectoryVisitor(operationStatus), operationStatus));
-        return operationStatus;
+        
+        FileOperationInfo operationInfo = new FileOperationInfo(pathToDelete.toString(), null, pathToDelete.getFileName()
+                .toString());
+        CompositeFileOperation fileOperation = new CompositeFileOperation(OperationIDGenerator.nextId(),
+                FileOperationType.DELETE, operationInfo);
+        
+        Future<OperationResult> operationFuture = executorService.submit(new AsyncFileTreeWalker(pathToDelete,
+                new DeleteDirectoryVisitor(fileOperation), fileOperation));
+        fileOperation.setOperationFuture(operationFuture);
+        return fileOperation;
     }
 
 }

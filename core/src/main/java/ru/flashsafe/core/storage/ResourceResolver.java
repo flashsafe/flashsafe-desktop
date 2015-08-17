@@ -1,17 +1,22 @@
 package ru.flashsafe.core.storage;
 
 import static java.util.Objects.requireNonNull;
+import static ru.flashsafe.core.storage.util.StorageUtils.STORAGE_PATH_PREFIX;
+import static ru.flashsafe.core.storage.util.StorageUtils.STORAGE_PATH_SEPARATOR;
 
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.old.storage.FlashSafeStorageDirectory;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
+import ru.flashsafe.core.storage.util.StorageUtils;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * 
@@ -19,13 +24,12 @@ import ru.flashsafe.core.storage.exception.ResourceResolverException;
  * @author Andrew
  *
  */
+@Singleton
 public class ResourceResolver {
 
-    private static final String PATH_DELIMITER = "/";
-    
-    private static final int PATH_OFFSET = FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX.length();
-    
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceResolver.class);
+    
+    private static final int PATH_OFFSET = StorageUtils.STORAGE_PATH_PREFIX.length();
     
     private static final FlashSafeStorageDirectory ROOT_DIRECTORY;
 
@@ -38,8 +42,10 @@ public class ResourceResolver {
         ROOT_DIRECTORY.setName("/");
     }
 
+    @Inject
     public ResourceResolver(FlashSafeStorageService storageService) {
         this.storageService = requireNonNull(storageService);
+        LOGGER.info("ResourceResolver created");
     }
 
     public FlashSafeStorageFileObject resolveResource(FlashSafeStorageFileObject parent, String resourcePath)
@@ -62,19 +68,20 @@ public class ResourceResolver {
 
     private FlashSafeStorageFileObject resolveResource(FlashSafeStorageFileObject parent, String resourcePath,
             final boolean exceptionIfNotExists) throws ResourceResolverException {
-        if (resourcePath.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX)) {
+        if (resourcePath.startsWith(STORAGE_PATH_PREFIX)) {
             resourcePath = resourcePath.substring(PATH_OFFSET);
         }
         if (resourcePath.length() == 0) {
             return parent;
         }
         FlashSafeStorageFileObject currentPathObject = parent;
-        String[] pathElements = resourcePath.split(PATH_DELIMITER);
+        String[] pathElements = resourcePath.split(STORAGE_PATH_SEPARATOR);
         for (String pathElement : pathElements) {
             currentPathObject = findResource(currentPathObject.getId(), pathElement);
             if (currentPathObject == null) {
-                if (exceptionIfNotExists)
+                if (exceptionIfNotExists) {
                     throw new ResourceResolverException("Can't resolve " + resourcePath + ". " + pathElement + " is unknown");
+                }
                 return null;
             }
         }

@@ -1,27 +1,29 @@
 package ru.flashsafe.core.file.util;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
-import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.EnumSet;
-import static java.util.Objects.*;
+import java.util.Collections;
+import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.flashsafe.core.file.impl.FileOperationStatusComposite;
+
+
 import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.operation.OperationState;
 
 /**
- * 
+ * Provides an ability to walk thru File Tree in separate thread.
  * 
  * @author Andrew
  *
  */
-public class AsyncFileTreeWalker implements Runnable {
+public class AsyncFileTreeWalker implements Callable<OperationResult> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncFileTreeWalker.class);
     
@@ -29,26 +31,37 @@ public class AsyncFileTreeWalker implements Runnable {
 
     private final FileVisitor<Path> visitor;
 
-    private final FileOperationStatusComposite operationStatus;
+    private final CompositeFileOperation operation;
 
-    public AsyncFileTreeWalker(Path start, FileVisitor<Path> visitor, FileOperationStatusComposite operationStatus) {
+    /**
+     * 
+     * @param start start point of TreeWalker execution
+     * @param visitor visitor to use
+     * @param operation operation
+     */
+    public AsyncFileTreeWalker(Path start, FileVisitor<Path> visitor, CompositeFileOperation operation) {
         this.start = requireNonNull(start);
         this.visitor = requireNonNull(visitor);
-        this.operationStatus = requireNonNull(operationStatus);
+        this.operation = requireNonNull(operation);
+        operation.setState(OperationState.PLANNED);
     }
 
     @Override
-    public void run() {
+    public OperationResult call() throws Exception {
         try {
-            operationStatus.setTotalBytesToProcess(FileUtils.countSizeForPath(start));
-            operationStatus.setState(OperationState.IN_PROGRESS);
-            Files.walkFileTree(start, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, visitor);
-            operationStatus.setResult(OperationResult.SUCCESS);
+            operation.setState(OperationState.IN_PROGRESS);
+            operation.setTotalBytes(FileUtils.countSizeForPath(start));
+            Files.walkFileTree(start, Collections.emptySet(), Integer.MAX_VALUE, visitor);
+            if (operation.getResult() == OperationResult.UNKNOWN) {
+                operation.setResult(OperationResult.SUCCESS);
+            }
+            return operation.getResult();
         } catch (IOException e) {
-            operationStatus.setResult(OperationResult.ERROR);
+            operation.setResult(OperationResult.ERROR);
             LOGGER.warn("Error while walking file tree with root " + start, e);
+            return OperationResult.ERROR;
         } finally {
-            operationStatus.setState(OperationState.FINISHED);
+            operation.setState(OperationState.FINISHED);
         }
     }
 }

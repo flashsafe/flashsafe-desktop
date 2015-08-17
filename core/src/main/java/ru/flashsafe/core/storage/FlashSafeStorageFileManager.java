@@ -9,12 +9,15 @@ import ru.flashsafe.core.file.Directory;
 import ru.flashsafe.core.file.File;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.FileObject;
-import ru.flashsafe.core.file.FileOperationStatus;
+import ru.flashsafe.core.file.FileOperation;
 import ru.flashsafe.core.file.exception.FileOperationException;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
+import ru.flashsafe.core.operation.OperationRegistry;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import com.google.inject.Inject;
 
 public class FlashSafeStorageFileManager implements FileManager {
     
@@ -22,19 +25,20 @@ public class FlashSafeStorageFileManager implements FileManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeStorageFileManager.class);
     
-    private FlashSafeStorageService storageService;
+    private final FlashSafeStorageService storageService;
 
-    private ResourceResolver resolver;
+    private final ResourceResolver resourceResolver;
 
-    public FlashSafeStorageFileManager(FlashSafeStorageService storageService) {
+    @Inject
+    FlashSafeStorageFileManager(FlashSafeStorageService storageService, ResourceResolver resourceResolver) {
         this.storageService = storageService;
-        resolver = new ResourceResolver(storageService);
+        this.resourceResolver = resourceResolver;
     }
 
     @Override
     public List<FileObject> list(String path) throws FileOperationException {
         try {
-            FlashSafeStorageFileObject resource = resolver.resolveResource(path);
+            FlashSafeStorageFileObject resource = resourceResolver.resolveResource(path);
             return cast(storageService.list(resource.getId()));
         } catch (FlashSafeStorageException | ResourceResolverException e) {
             throw new FileOperationException("Error while listing directory", e);
@@ -55,51 +59,49 @@ public class FlashSafeStorageFileManager implements FileManager {
             parentDirectoryPath = path.substring(0, lastPathSeparatorIndex);
         }
         try {
-            FlashSafeStorageFileObject parentDirectory = resolver.resolveResource(parentDirectoryPath);
+            FlashSafeStorageFileObject parentDirectory = resourceResolver.resolveResource(parentDirectoryPath);
             String newDirectoryName = path.substring(path.lastIndexOf(PATH_SEPARATOR) + 1);
             return storageService.createDirectory(parentDirectory.getId(), newDirectoryName);
         } catch (FlashSafeStorageException | ResourceResolverException e) {
-            throw new FileOperationException("Error while creating directory", e);
+            LOGGER.warn("Error while creating directory " + path, e);
+            throw new FileOperationException("Error while creating directory " + path, e);
         }
     }
 
     @Override
-    public FileOperationStatus copy(String fromPath, String toPath) throws FileOperationException {
+    public FileOperation copy(String fromPath, String toPath) throws FileOperationException {
         try {
-            FlashSafeStorageFileObject resourceToCopy = resolver.resolveResource(fromPath);
-            FlashSafeStorageFileObject targetDirectory = resolver.resolveResource(toPath);
+            FlashSafeStorageFileObject resourceToCopy = resourceResolver.resolveResource(fromPath);
+            FlashSafeStorageFileObject targetDirectory = resourceResolver.resolveResource(toPath);
             storageService.copy(resourceToCopy.getId(), targetDirectory.getId());
             return null;
         } catch (FlashSafeStorageException | ResourceResolverException e) {
-            //TODO fix messages
-            LOGGER.warn("Error while copying directory ", e);
+            LOGGER.warn("Error while copying directory " + fromPath + " to " + toPath, e);
             throw new FileOperationException("Error while copying directory", e);
         }
     }
 
     @Override
-    public FileOperationStatus move(String fromPath, String toPath) throws FileOperationException {
+    public FileOperation move(String fromPath, String toPath) throws FileOperationException {
         try {
-            FlashSafeStorageFileObject resourceToCopy = resolver.resolveResource(fromPath);
-            FlashSafeStorageFileObject targetDirectory = resolver.resolveResource(toPath);
+            FlashSafeStorageFileObject resourceToCopy = resourceResolver.resolveResource(fromPath);
+            FlashSafeStorageFileObject targetDirectory = resourceResolver.resolveResource(toPath);
             storageService.move(resourceToCopy.getId(), targetDirectory.getId());
             return null;
         } catch (FlashSafeStorageException | ResourceResolverException e) {
-          //TODO edit message
-            LOGGER.warn("Error while moving ", e);
+            LOGGER.warn("Error while moving " + fromPath + " to " + toPath, e);
             throw new FileOperationException("Error while moving ", e);
         }
     }
 
     @Override
-    public FileOperationStatus delete(String path) throws FileOperationException {
+    public FileOperation delete(String path) throws FileOperationException {
         try {
-            FlashSafeStorageFileObject resource = resolver.resolveResource(path);
+            FlashSafeStorageFileObject resource = resourceResolver.resolveResource(path);
             storageService.delete(resource.getId());
             return null;
         } catch (FlashSafeStorageException | ResourceResolverException e) {
-            //TODO edit message
-            LOGGER.warn("Error while deleting ", e);
+            LOGGER.warn("Error while deleting " + path, e);
             throw new FileOperationException("Error while deleting ", e);
         }
     }

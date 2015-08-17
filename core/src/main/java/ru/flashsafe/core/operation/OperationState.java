@@ -9,6 +9,11 @@ package ru.flashsafe.core.operation;
 public enum OperationState {
 
     /**
+     * An operation was created
+     */
+    CREATED,
+    
+    /**
      * An operation was planned to do but not executed yet
      */
     PLANNED,
@@ -17,11 +22,6 @@ public enum OperationState {
      * An operation was executed and now processing now
      */
     IN_PROGRESS,
-
-    /**
-     * An operation was executed but the execution process was paused now
-     */
-    PAUSED,
     
     /**
      * An operation execution process was finished 

@@ -1,4 +1,4 @@
-package ru.flashsafe.core.old.storage.util;
+package ru.flashsafe.core.storage.util;
 
 import java.util.Collection;
 import java.util.HashMap;

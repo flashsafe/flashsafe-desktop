@@ -1,24 +1,26 @@
 package ru.flashsafe.core.file.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import static java.util.Objects.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.flashsafe.core.file.Directory;
 import ru.flashsafe.core.file.File;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.FileObject;
-import ru.flashsafe.core.file.FileOperationStatus;
+import ru.flashsafe.core.file.FileOperation;
 import ru.flashsafe.core.file.exception.FileOperationException;
 import ru.flashsafe.core.localfs.LocalFileManager;
-import ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService;
 import ru.flashsafe.core.storage.FlashSafeStorageFileManager;
-import ru.flashsafe.core.storage.FlashSafeStorageService;
 import ru.flashsafe.core.storage.FlashSafeStorageServiceHelper;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * 
@@ -27,24 +29,23 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  * @author Andrew
  *
  */
+@Singleton
 public class UnifiedFileManager implements FileManager {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnifiedFileManager.class);
 
     private final LocalFileManager localFileSystemManager;
 
     private final FlashSafeStorageFileManager flashSafeStorageFileManager;
-
-    private final FlashSafeStorageService flashSafeStorageService;
     
     private final FlashSafeStorageServiceHelper flashSafeStorageServiceHelper;
-    
-    // TODO return the usage of configuration registry (or properties)
-    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-    public UnifiedFileManager() {   
-        localFileSystemManager = new LocalFileManager();
-        flashSafeStorageService = new DefaultFlashSafeStorageService();
-        flashSafeStorageFileManager = new FlashSafeStorageFileManager(flashSafeStorageService);
-        flashSafeStorageServiceHelper = new FlashSafeStorageServiceHelper(flashSafeStorageService, executorService);
+    @Inject
+    UnifiedFileManager(LocalFileManager localFileSystemManager, FlashSafeStorageFileManager flashSafeStorageFileManager,
+            FlashSafeStorageServiceHelper flashSafeStorageServiceHelper) {
+        this.localFileSystemManager = localFileSystemManager;
+        this.flashSafeStorageFileManager = flashSafeStorageFileManager;
+        this.flashSafeStorageServiceHelper = flashSafeStorageServiceHelper;
     }
 
     @Override
@@ -70,7 +71,7 @@ public class UnifiedFileManager implements FileManager {
     }
 
     @Override
-    public FileOperationStatus copy(String fromPath, String toPath) throws FileOperationException {
+    public FileOperation copy(String fromPath, String toPath) throws FileOperationException {
         requireNonNull(fromPath);
         requireNonNull(toPath);
         if (pathsRelateToSameStorage(fromPath, toPath)) {
@@ -86,7 +87,9 @@ public class UnifiedFileManager implements FileManager {
     }
 
     @Override
-    public FileOperationStatus move(String fromPath, String toPath) throws FileOperationException {
+    public FileOperation move(String fromPath, String toPath) throws FileOperationException {
+        requireNonNull(fromPath);
+        requireNonNull(toPath);
         if (pathsRelateToSameStorage(fromPath, toPath)) {
             FileManager fileManager = getFileManagerForPath(fromPath);
             return fileManager.move(fromPath, toPath);
@@ -97,7 +100,7 @@ public class UnifiedFileManager implements FileManager {
     }
 
     @Override
-    public FileOperationStatus delete(String path) throws FileOperationException {
+    public FileOperation delete(String path) throws FileOperationException {
         requireNonNull(path);
         FileManager fileManager = getFileManagerForPath(path);
         return fileManager.delete(path);

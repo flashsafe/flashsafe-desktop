@@ -14,8 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.flashsafe.core.file.FileOperationType;
-import ru.flashsafe.core.file.impl.FileOperationStatusComposite;
-import ru.flashsafe.core.file.impl.FileOperationStatusImpl;
+import ru.flashsafe.core.file.impl.FileOperationInfo;
+import ru.flashsafe.core.file.util.CompositeFileOperation;
+import ru.flashsafe.core.file.util.SingleFileOperation;
+import ru.flashsafe.core.operation.OperationIDGenerator;
+import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.operation.OperationState;
 import ru.flashsafe.core.operation.monitor.ProcessMonitorInputStream;
 
@@ -28,12 +31,12 @@ public class CopyDirectoryVisitor extends SimpleFileVisitor<Path> {
     
     private final Path toPath;
     
-    private final FileOperationStatusComposite operationStatus;
+    private final CompositeFileOperation operation;
     
-    public CopyDirectoryVisitor(Path fromPath, Path toPath, FileOperationStatusComposite operationStatus) {
+    public CopyDirectoryVisitor(Path fromPath, Path toPath, CompositeFileOperation operation) {
         this.fromPath = fromPath;
         this.toPath = toPath;
-        this.operationStatus = operationStatus;
+        this.operation = operation;
     }
 
     @Override
@@ -48,16 +51,29 @@ public class CopyDirectoryVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        FileOperationStatusImpl fileOperationStatus = new FileOperationStatusImpl(FileOperationType.COPY, Files.size(file));
-        operationStatus.setActiveOperationStatus(fileOperationStatus);
+        if (Thread.currentThread().isInterrupted()) {
+            markOperationAsCanceled(operation);
+            LOGGER.debug("Stopping copy operation");
+            return FileVisitResult.TERMINATE;
+        }
+        FileOperationInfo operationInfo = new FileOperationInfo(fromPath.toString(), toPath.toString(), file.getFileName()
+                .toString());
+        SingleFileOperation currentFileOperation = new SingleFileOperation(OperationIDGenerator.nextId(), FileOperationType.COPY,
+                operationInfo, Files.size(file));    
+        operation.setCurrentOperation(currentFileOperation);
         try (FileInputStream fs = new FileInputStream(file.toFile());
-                InputStream monitoredInputStream = new ProcessMonitorInputStream(fs, fileOperationStatus)) {
+                InputStream monitoredInputStream = new ProcessMonitorInputStream(fs, currentFileOperation)) {
             LOGGER.debug("Copying file {} to {}", file, toPath);
             Files.copy(monitoredInputStream, toPath.resolve(fromPath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
         }
-        fileOperationStatus.setState(OperationState.FINISHED);
-        operationStatus.submitActiveOperationStatusAsFinished();
+        currentFileOperation.setState(OperationState.FINISHED);
+        operation.submitCurrentOperationAsFinished();
         LOGGER.trace("File {} was copied to {}", file, toPath);
         return FileVisitResult.CONTINUE;
     }
+    
+    private static void markOperationAsCanceled(CompositeFileOperation operation) {
+        operation.setResult(OperationResult.CANCELED);
+    }
+    
 }

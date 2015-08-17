@@ -2,11 +2,11 @@ package ru.flashsafe.core.operation;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public class ProcessIDGenerator {
+public class OperationIDGenerator {
 
     private static AtomicLong counter = new AtomicLong(0);
 
-    private ProcessIDGenerator() {
+    private OperationIDGenerator() {
     }
 
     public static long nextId() {

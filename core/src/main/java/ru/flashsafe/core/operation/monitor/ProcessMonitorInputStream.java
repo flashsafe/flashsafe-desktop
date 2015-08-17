@@ -3,18 +3,24 @@ package ru.flashsafe.core.operation.monitor;
 import java.io.IOException;
 import java.io.InputStream;
 
-import ru.flashsafe.core.file.impl.FileOperationStatusImpl;
+import ru.flashsafe.core.file.util.SingleFileOperation;
 
+/**
+ * 
+ * 
+ * @author Andrew
+ *
+ */
 //TODO implement mark/reset logic with operation's status progress
 public class ProcessMonitorInputStream extends InputStream {
     
     private final InputStream inputStream;
     
-    private final FileOperationStatusImpl fileOperationStatus;
+    private final SingleFileOperation fileOperation;
     
-    public ProcessMonitorInputStream(InputStream inputStream, FileOperationStatusImpl fileOperationStatus) {
+    public ProcessMonitorInputStream(InputStream inputStream, SingleFileOperation fileOperation) {
         this.inputStream = inputStream;
-        this.fileOperationStatus = fileOperationStatus;
+        this.fileOperation = fileOperation;
     }
     
     @Override
@@ -36,8 +42,8 @@ public class ProcessMonitorInputStream extends InputStream {
     @Override
     public int read() throws IOException {
         int byteData = inputStream.read();
-        long processed = fileOperationStatus.getProcessedBytes() + 1;
-        fileOperationStatus.setProcessedBytes(processed);
+        long processed = fileOperation.getProcessedBytes() + 1;
+        fileOperation.setProcessedBytes(processed);
         return byteData;
     }
     
@@ -45,8 +51,8 @@ public class ProcessMonitorInputStream extends InputStream {
     public int read(byte[] data) throws IOException {
         int byteCount = inputStream.read(data);
         if (byteCount > 0) {
-            long processed = fileOperationStatus.getProcessedBytes() + byteCount;
-            fileOperationStatus.setProcessedBytes(processed);
+            long processed = fileOperation.getProcessedBytes() + byteCount;
+            fileOperation.setProcessedBytes(processed);
         }
         return byteCount;
     }
@@ -55,8 +61,8 @@ public class ProcessMonitorInputStream extends InputStream {
     public int read(byte[] data, int offset, int length) throws IOException {
         int byteCount = inputStream.read(data, offset, length);
         if (byteCount > 0) {
-            long processed = fileOperationStatus.getProcessedBytes() + byteCount;
-            fileOperationStatus.setProcessedBytes(processed);
+            long processed = fileOperation.getProcessedBytes() + byteCount;
+            fileOperation.setProcessedBytes(processed);
         }
         return byteCount;
     }
@@ -70,8 +76,8 @@ public class ProcessMonitorInputStream extends InputStream {
     public long skip(long length) throws IOException {
         long byteCount = inputStream.skip(length);
         if (byteCount > 0) {
-            long processed = fileOperationStatus.getProcessedBytes() + byteCount;
-            fileOperationStatus.setProcessedBytes(processed);
+            long processed = fileOperation.getProcessedBytes() + byteCount;
+            fileOperation.setProcessedBytes(processed);
         }
         return byteCount;
     }

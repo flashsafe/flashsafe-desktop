@@ -16,6 +16,16 @@ public enum OperationResult {
     /**
      * An error occurs while executing an operation
      */
-    ERROR
+    ERROR,
+    
+    /**
+     * 
+     */
+    CANCELED,
+    
+    /**
+     * A result was not defined yet
+     */
+    UNKNOWN,
     
 }

@@ -21,6 +21,7 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.flashsafe.core.FlashSafeRegistry;
 import ru.flashsafe.core.old.storage.rest.data.AuthData;
 import ru.flashsafe.core.old.storage.rest.data.AuthResponse;
 
@@ -49,7 +50,8 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
 
     public FlashSafeAuthClientFilter() {
         client = ClientBuilder.newBuilder().register(JacksonFeature.class).register(ContentTypeFixerFilter.class).build();
-        authTarget = client.target("https://flashsafe-alpha.azurewebsites.net").path(AUTH_URL);
+        String storageAddress = FlashSafeRegistry.getStorageAddress();
+        authTarget = client.target(storageAddress).path(AUTH_URL);
     }
 
     @Override

@@ -19,9 +19,9 @@ public interface FlashSafeStorageService {
 
     FlashSafeStorageDirectory createDirectory(long parentDirectoryId, String name) throws FlashSafeStorageException;
 
-    StorageOperationStatus downloadFile(long fileId, Path directory) throws FlashSafeStorageException;
+    StorageFileOperation downloadFile(long fileId, Path directory) throws FlashSafeStorageException;
 
-    StorageOperationStatus uploadFile(long directoryId, Path file) throws FlashSafeStorageException;
+    StorageFileOperation uploadFile(long directoryId, Path file) throws FlashSafeStorageException;
 
     void copy(long fileObjectId, long destinationDirectoryId) throws FlashSafeStorageException;
 

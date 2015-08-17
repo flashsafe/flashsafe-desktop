@@ -12,8 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.flashsafe.core.file.FileOperationType;
-import ru.flashsafe.core.file.impl.FileOperationStatusComposite;
-import ru.flashsafe.core.file.impl.FileOperationStatusImpl;
+import ru.flashsafe.core.file.impl.FileOperationInfo;
+import ru.flashsafe.core.file.util.CompositeFileOperation;
+import ru.flashsafe.core.file.util.SingleFileOperation;
+import ru.flashsafe.core.operation.OperationIDGenerator;
 import ru.flashsafe.core.operation.OperationState;
 
 public class MoveDirectoryVisitor extends SimpleFileVisitor<Path> {
@@ -24,12 +26,12 @@ public class MoveDirectoryVisitor extends SimpleFileVisitor<Path> {
 
     private final Path toPath;
 
-    private final FileOperationStatusComposite operationStatus;
+    private final CompositeFileOperation operation;
 
-    public MoveDirectoryVisitor(Path fromPath, Path toPath, FileOperationStatusComposite operationStatus) {
+    public MoveDirectoryVisitor(Path fromPath, Path toPath, CompositeFileOperation operation) {
         this.fromPath = fromPath;
         this.toPath = toPath;
-        this.operationStatus = operationStatus;
+        this.operation = operation;
     }
 
     @Override
@@ -44,13 +46,18 @@ public class MoveDirectoryVisitor extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         long fileSize = Files.size(file);
-        FileOperationStatusImpl fileOperationStatus = new FileOperationStatusImpl(FileOperationType.MOVE, fileSize);
-        operationStatus.setActiveOperationStatus(fileOperationStatus);
+        
+        FileOperationInfo operationInfo = new FileOperationInfo(fromPath.toString(), toPath.toString(), file.getFileName()
+                .toString());
+        SingleFileOperation currentFileOperation = new SingleFileOperation(OperationIDGenerator.nextId(), FileOperationType.MOVE,
+                operationInfo, fileSize);    
+        currentFileOperation.setState(OperationState.IN_PROGRESS);
+        operation.setCurrentOperation(currentFileOperation);
         LOGGER.debug("Moving file {} to {}", file, toPath);
         Files.move(file, toPath.resolve(fromPath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
-        fileOperationStatus.setProcessedBytes(fileSize);
-        fileOperationStatus.setState(OperationState.FINISHED);
-        operationStatus.submitActiveOperationStatusAsFinished();
+        currentFileOperation.setProcessedBytes(fileSize);
+        currentFileOperation.setState(OperationState.FINISHED);
+        operation.submitCurrentOperationAsFinished();
         return FileVisitResult.CONTINUE;
     }
 
