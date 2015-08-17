@@ -23,6 +23,7 @@ import ru.flashsafe.core.operation.OperationState;
  * @author Andrew
  *
  */
+//FIXME Runtime exceptions and threads - think about call Future.get() on operation
 public class AsyncFileTreeWalker implements Callable<OperationResult> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncFileTreeWalker.class);

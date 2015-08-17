@@ -7,6 +7,12 @@ import ru.flashsafe.core.file.FileOperationType;
 import ru.flashsafe.core.operation.AbstractOperation;
 import ru.flashsafe.core.operation.OperationState;
 
+/**
+ * Base functionality of a file operation.
+ * 
+ * @author Andrew
+ *
+ */
 public abstract class AbstractFileOperation extends AbstractOperation implements FileOperation {
 
     private final FileOperationType operationType;
@@ -17,12 +23,32 @@ public abstract class AbstractFileOperation extends AbstractOperation implements
     
     private Future<?> operationFuture;
 
+    /**
+     * @param id
+     *            operation id
+     * @param state
+     *            initial state of operation
+     * @param operationType
+     *            type of file operation
+     * @param operationInfo
+     *            operation info. See {@link FileOperationInfo} for details
+     */
     public AbstractFileOperation(long id, OperationState state, FileOperationType operationType, FileOperationInfo operationInfo) {
         super(id, state);
         this.operationType = operationType;
         this.operationInfo = operationInfo;
     }
 
+    /**
+    * Creates {@code AbstractFileOperation} using {@link OperationState.CREATED} as initial state.
+    * 
+    * @param id
+    *            operation id
+    * @param operationType
+    *            type of file operation
+    * @param operationInfo
+    *            operation info. See {@link FileOperationInfo} for details
+    */
     public AbstractFileOperation(long id, FileOperationType operationType, FileOperationInfo operationInfo) {
         super(id);
         this.operationType = operationType;
@@ -53,11 +79,25 @@ public abstract class AbstractFileOperation extends AbstractOperation implements
     public long getProcessedBytes() {
         return processedBytes;
     }
+    
+    /**
+     * This method is not allowed to use with {@link FileOperations} implementations.
+     * The progress for such operations calculated automatically while setting processedBytes value via {@link #setProcessedBytes(long)}
+     */
+    @Override
+    public void setProgress(int progress) {
+        throw new IllegalStateException("Can not set progress value of file operation directly");
+    }
 
+    /**
+     * Sets processedBytes value to operation
+     * 
+     * @param processedBytes processedBytes value
+     */
     public void setProcessedBytes(long processedBytes) {
         this.processedBytes = processedBytes;
         int progress = (int) ((processedBytes * 100) /  getTotalBytes());
-        setProgress(progress);
+        super.setProgress(progress);
     }
     
     public void setOperationFuture(Future<?> operationFuture) {

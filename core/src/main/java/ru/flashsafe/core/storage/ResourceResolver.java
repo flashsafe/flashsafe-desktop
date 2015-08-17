@@ -17,9 +17,10 @@ import ru.flashsafe.core.storage.util.StorageUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.sun.xml.internal.txw2.IllegalSignatureException;
 
 /**
- * 
+ * This object uses to map objects' names (paths) to storage's Ids.
  * 
  * @author Andrew
  *
@@ -45,25 +46,59 @@ public class ResourceResolver {
     @Inject
     public ResourceResolver(FlashSafeStorageService storageService) {
         this.storageService = requireNonNull(storageService);
-        LOGGER.info("ResourceResolver created");
     }
 
+    /**
+     * Resolves resource with path {@code resourcePath} and {@code parent} object.
+     * 
+     * @param parent parent object (directory) of resource
+     * @param resourcePath path of resource
+     * @return storage fileObject
+     * @throws ResourceResolverException if resource does not exist 
+     */
     public FlashSafeStorageFileObject resolveResource(FlashSafeStorageFileObject parent, String resourcePath)
             throws ResourceResolverException {
         return resolveResource(parent, resourcePath, true);
     }
 
+    /**
+     * Resolves resource with path {@code resourcePath}.
+     * 
+     * @param resourcePath path of resource
+     * @return storage fileObject
+     * @throws ResourceResolverException if resource does not exist 
+     */
     public FlashSafeStorageFileObject resolveResource(String resourcePath) throws ResourceResolverException {
         return resolveResource(ROOT_DIRECTORY, resourcePath, true);
     }
 
-    public FlashSafeStorageFileObject resolveResourceIfExists(FlashSafeStorageFileObject parent, String resourcePath)
-            throws ResourceResolverException {
-        return resolveResource(parent, resourcePath, false);
+    /**
+     * Resolves resource with path {@code resourcePath} and {@code parent} object.
+     * 
+     * @param parent parent object (directory) of resource
+     * @param resourcePath path of resource
+     * @return storage fileObject if resource exists, {@code null} otherwise
+     */
+    public FlashSafeStorageFileObject resolveResourceIfExists(FlashSafeStorageFileObject parent, String resourcePath) {
+        try {
+            return resolveResource(parent, resourcePath, false);
+        } catch (ResourceResolverException e) {
+            throw new IllegalSignatureException("Unexpected behaviour", e);
+        }
     }
 
-    public FlashSafeStorageFileObject resolveResourceIfExists(String resourcePath) throws ResourceResolverException {
-        return resolveResource(ROOT_DIRECTORY, resourcePath, false);
+    /**
+     * Resolves resource with path {@code resourcePath}.
+     * 
+     * @param resourcePath path of resource
+     * @return storage fileObject if resource exists, {@code null} otherwise
+     */
+    public FlashSafeStorageFileObject resolveResourceIfExists(String resourcePath) {
+        try {
+            return resolveResource(ROOT_DIRECTORY, resourcePath, false);
+        } catch (ResourceResolverException e) {
+            throw new IllegalSignatureException("Unexpected behaviour", e);
+        }
     }
 
     private FlashSafeStorageFileObject resolveResource(FlashSafeStorageFileObject parent, String resourcePath,
@@ -93,9 +128,8 @@ public class ResourceResolver {
         try {
             content = storageService.list(parentId);
         } catch (FlashSafeStorageException e) {
-            //TODO add message
-            LOGGER.warn("", e);
-            throw new ResourceResolverException("", e);
+            LOGGER.warn("Error while finding resource with id " + parentId, e);
+            throw new ResourceResolverException("Error while finding resource with id " + parentId, e);
         }
         for (FlashSafeStorageFileObject resource : content) {
             if (resourceName.equals(resource.getName())) {

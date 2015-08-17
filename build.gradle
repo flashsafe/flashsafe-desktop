@@ -10,6 +10,12 @@ project(':core') {
     }
 }
 
+project(':core-examples') {
+    dependencies {
+        compile project(':core')
+    }
+}
+
 project(':token') {
 }
 

@@ -2,10 +2,9 @@ package ru.flashsafe.core;
 
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.FileUtility;
-import ru.flashsafe.core.storage.FlashSafeStorageService;
 
 /**
- * 
+ * A facade to all public systems of FlashSafe.
  * 
  * @author Andrew
  *

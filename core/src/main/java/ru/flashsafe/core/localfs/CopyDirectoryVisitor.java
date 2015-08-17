@@ -3,6 +3,7 @@ package ru.flashsafe.core.localfs;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,7 +23,12 @@ import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.operation.OperationState;
 import ru.flashsafe.core.operation.monitor.ProcessMonitorInputStream;
 
-//TODO work with operation's statuses
+/**
+ * FileVisitor used to copy file objects from local to local file system.
+ * 
+ * @author Andrew
+ *
+ */
 public class CopyDirectoryVisitor extends SimpleFileVisitor<Path> {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(CopyDirectoryVisitor.class);
@@ -65,6 +71,11 @@ public class CopyDirectoryVisitor extends SimpleFileVisitor<Path> {
                 InputStream monitoredInputStream = new ProcessMonitorInputStream(fs, currentFileOperation)) {
             LOGGER.debug("Copying file {} to {}", file, toPath);
             Files.copy(monitoredInputStream, toPath.resolve(fromPath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
+        } catch (ClosedByInterruptException e) {
+            currentFileOperation.setResult(OperationResult.CANCELED);
+            markOperationAsCanceled(operation);
+            LOGGER.debug("Stopping copy operation");
+            return FileVisitResult.TERMINATE;
         }
         currentFileOperation.setState(OperationState.FINISHED);
         operation.submitCurrentOperationAsFinished();

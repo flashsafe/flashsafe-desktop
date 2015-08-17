@@ -101,13 +101,7 @@ public class CopyDirectoryToStorageVisitor extends SimpleFileVisitor<Path> {
     }
 
     private FlashSafeStorageFileObject resolveResourceIfExists(FlashSafeStorageFileObject parent, String name) throws IOException {
-        try {
             return resolver.resolveResourceIfExists(parent, name);
-        } catch (ResourceResolverException e) {
-            // TODO fix message
-            LOGGER.warn("Error while resolving resource " + name, e);
-            throw new IOException("Error while resolving resource " + name, e);
-        }
     }
 
     private StorageFileOperation uploadFile(long directoryId, Path file) throws IOException {

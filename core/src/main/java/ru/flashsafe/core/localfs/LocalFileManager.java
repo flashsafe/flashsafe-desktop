@@ -28,11 +28,11 @@ import ru.flashsafe.core.file.util.AsyncFileTreeWalker;
 import ru.flashsafe.core.file.util.CompositeFileOperation;
 import ru.flashsafe.core.operation.OperationIDGenerator;
 import ru.flashsafe.core.operation.OperationResult;
-import ru.flashsafe.core.operation.OperationState;
 
 import com.google.inject.Singleton;
 
 /**
+ * The implementation of {@link FileManager} which is used to work with local file system.
  * 
  * @author Andrew
  * 
@@ -41,6 +41,8 @@ import com.google.inject.Singleton;
 public class LocalFileManager implements FileManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalFileManager.class);
+    
+    private static final String FILE_SEPARATOR = java.io.File.separator;
 
     // TODO return the usage of configuration registry (or properties)
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -102,7 +104,7 @@ public class LocalFileManager implements FileManager {
     @Override
     public FileOperation copy(String fromPath, String toPath) throws FileOperationException {
         Path from = Paths.get(fromPath);
-        Path to = Paths.get(toPath + from.getFileName());
+        Path to = Paths.get(sanitizePath(toPath) + FILE_SEPARATOR + from.getFileName());
 
         FileOperationInfo operationInfo = new FileOperationInfo(fromPath, toPath, from.getFileName().toString());
         CompositeFileOperation fileOperation = new CompositeFileOperation(OperationIDGenerator.nextId(), FileOperationType.COPY,
@@ -117,7 +119,7 @@ public class LocalFileManager implements FileManager {
     @Override
     public FileOperation move(String fromPath, String toPath) throws FileOperationException {
         Path from = Paths.get(fromPath);
-        Path to = Paths.get(toPath + from.getFileName());
+        Path to = Paths.get(sanitizePath(toPath) + FILE_SEPARATOR + from.getFileName());
 
         FileOperationInfo operationInfo = new FileOperationInfo(fromPath, toPath, from.getFileName().toString());
         CompositeFileOperation fileOperation = new CompositeFileOperation(OperationIDGenerator.nextId(), FileOperationType.MOVE,
@@ -142,6 +144,10 @@ public class LocalFileManager implements FileManager {
                 new DeleteDirectoryVisitor(fileOperation), fileOperation));
         fileOperation.setOperationFuture(operationFuture);
         return fileOperation;
+    }
+    
+    private static String sanitizePath(String path) {
+        return path.replaceFirst(FILE_SEPARATOR + "$", "");
     }
 
 }

@@ -9,6 +9,12 @@ import ru.flashsafe.core.file.impl.FileOperationInfo;
 import ru.flashsafe.core.file.util.SingleFileOperation;
 import ru.flashsafe.core.operation.OperationState;
 
+/**
+ * A storage file operation object used to work with single files.
+ * 
+ * @author Andrew
+ *
+ */
 public class SingleFileStorageOperation extends SingleFileOperation implements StorageFileOperation {
 
     private final StorageOperationType storageOperationType;

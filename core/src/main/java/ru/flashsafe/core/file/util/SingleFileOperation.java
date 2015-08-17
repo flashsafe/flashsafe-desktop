@@ -5,7 +5,7 @@ import ru.flashsafe.core.file.impl.AbstractFileOperation;
 import ru.flashsafe.core.file.impl.FileOperationInfo;
 
 /**
- * 
+ * A file operation object used to work with single files.
  * 
  * @author Andrew
  *

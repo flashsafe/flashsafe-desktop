@@ -10,10 +10,23 @@ import ru.flashsafe.core.file.FileOperation;
  */
 public interface StorageFileOperation extends FileOperation {
     
+    /**
+     * @return storage operation type
+     * @see StorageOperationType
+     */
     StorageOperationType getStorageOperationType();
     
+    /**
+     * Marks this operation as finished. Call of this method releases threads
+     * which hang on {@link #waitUntilFinished()}.
+     */
     void markAsFinished();
     
+    /**
+     * This method blocks current thread until {@link #markAsFinished()} execution call.
+     * 
+     * @throws InterruptedException
+     */
     void waitUntilFinished() throws InterruptedException;
 
 }

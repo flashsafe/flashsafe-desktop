@@ -6,7 +6,7 @@ import ru.flashsafe.core.file.impl.AbstractFileOperation;
 import ru.flashsafe.core.file.impl.FileOperationInfo;
 
 /**
- * 
+ * A file operation object used to work with composite file objects (directories).
  * 
  * @author Andrew
  *
@@ -26,6 +26,9 @@ public class CompositeFileOperation extends AbstractFileOperation {
         originalOperationInfo = operationInfo;
     }
     
+    /**
+     * @return the root object's information of this operation.
+     */
     public FileOperationInfo getOriginalOperationInfo() {
         return originalOperationInfo;
     }
@@ -36,7 +39,7 @@ public class CompositeFileOperation extends AbstractFileOperation {
     }
     
     /**
-     * 
+     * Sets totalBytes value.
      * 
      * @param totalBytes number of bytes that have to be processed
      */
@@ -44,6 +47,9 @@ public class CompositeFileOperation extends AbstractFileOperation {
         this.totalBytes = totalBytes;
     }
 
+    /**
+     * @return name of fileObject of current sub-operation.
+     */
     @Override
     public String getFileObjectName() {
         if (currentFileOperation == null) {
@@ -52,6 +58,11 @@ public class CompositeFileOperation extends AbstractFileOperation {
         return currentFileOperation.getFileObjectName();
     }
     
+    /**
+     * Sets current sub-operation.
+     * 
+     * @param operation sub-operation
+     */
     public synchronized void setCurrentOperation(FileOperation operation) {
         if (currentFileOperation != null) {
             throw new IllegalStateException("Previous operation was not submitted"); 
@@ -60,7 +71,13 @@ public class CompositeFileOperation extends AbstractFileOperation {
         previousFileOperationObject = currentFileOperation.getFileObjectName();
     }
     
-    public synchronized void submitCurrentOperationAsFinished() {
+    /**
+     * Submits current sub operation as finished. Call of this method does not affect to sub-operation object.
+     * It only marks current sub-operation as finished for this composite operation and actualize it state.
+     * 
+     * @throws IllegalStateException if there is no active operation to submit
+     */
+    public synchronized void submitCurrentOperationAsFinished() throws IllegalStateException {
         if (currentFileOperation == null) {
             throw new IllegalStateException("No active operation to submit");
         }
