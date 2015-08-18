@@ -22,7 +22,7 @@ public class FlashSafeApplication {
 
     private static final Injector injector;
     
-    private static boolean applicationStarted = false;
+    private static volatile boolean applicationStarted = false;
 
     private static FlashSafeSystem flashSafeSystem;
 
