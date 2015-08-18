@@ -33,8 +33,6 @@ public class CopyObjectToRemoteStorageAndStopProcess {
         }
         
         FlashSafeApplication.stop();
-        
-        System.exit(0);
     }
 
 }

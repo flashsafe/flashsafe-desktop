@@ -3,6 +3,8 @@ package ru.flashsafe.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.flashsafe.core.event.ApplicationStopEvent;
+import ru.flashsafe.core.event.FlashSafeEventService;
 import ru.flashsafe.core.impl.DefaultFlashSafeSystem;
 
 import com.google.inject.Guice;
@@ -68,11 +70,17 @@ public class FlashSafeApplication {
         if (!applicationStarted) {
             throw new IllegalStateException("The application is already stopped");
         }
+        stopApplication();
         applicationStarted = false;
     }
 
     private static FlashSafeSystem lookupFlashSafeSystem() {
         return injector.getInstance(DefaultFlashSafeSystem.class);
+    }
+    
+    private static void stopApplication() {
+        FlashSafeEventService eventService = injector.getInstance(FlashSafeEventService.class);
+        eventService.postEvent(new ApplicationStopEvent());
     }
     
 }

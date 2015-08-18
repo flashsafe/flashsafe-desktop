@@ -134,8 +134,8 @@ public class CopyDirectoryToStorageVisitor extends SimpleFileVisitor<Path> {
             uploadOperation.waitUntilFinished();
             return true;
         } catch (InterruptedException e) {
-            markOperationAsCanceled(operation);
             uploadOperation.stop();
+            markOperationAsCanceled(operation);
             LOGGER.debug("Operation was stopped", e);
             return false;
         }

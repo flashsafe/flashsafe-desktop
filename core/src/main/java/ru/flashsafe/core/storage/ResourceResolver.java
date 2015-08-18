@@ -20,7 +20,7 @@ import com.google.inject.Singleton;
 import com.sun.xml.internal.txw2.IllegalSignatureException;
 
 /**
- * This object uses to map objects' names (paths) to storage's Ids.
+ * This object uses to map objects' names (paths) to storage Ids.
  * 
  * @author Andrew
  *

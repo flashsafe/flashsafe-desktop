@@ -32,8 +32,6 @@ public class CopyObjectToRemoteStorage {
         }
         
         FlashSafeApplication.stop();
-        
-        System.exit(0);
     }
 
 }

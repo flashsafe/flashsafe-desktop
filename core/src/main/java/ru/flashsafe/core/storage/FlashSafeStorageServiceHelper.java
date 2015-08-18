@@ -6,22 +6,26 @@ import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.flashsafe.core.FlashSafeRegistry;
+import ru.flashsafe.core.event.ApplicationStopEvent;
+import ru.flashsafe.core.event.FlashSafeEventService;
 import ru.flashsafe.core.file.FileOperationType;
 import ru.flashsafe.core.file.exception.FileOperationException;
 import ru.flashsafe.core.file.impl.FileOperationInfo;
 import ru.flashsafe.core.file.util.AsyncFileTreeWalker;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.operation.OperationIDGenerator;
-import ru.flashsafe.core.operation.OperationRegistry;
 import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
 import ru.flashsafe.core.storage.util.CopyDirectoryToStorageVisitor;
 
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 
 public class FlashSafeStorageServiceHelper {
@@ -32,13 +36,26 @@ public class FlashSafeStorageServiceHelper {
     
     private final ResourceResolver resolver;
 
-    // TODO return usage of configuration registry (or properties)
-    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
-
+    private final ExecutorService executorService = Executors.newFixedThreadPool(FlashSafeRegistry
+            .readProperty(FlashSafeRegistry.LOCAL_TO_STORAGE_SIMULTANEOUSLY_EXECUTED_OPERATIONS));
+    
     @Inject
-    FlashSafeStorageServiceHelper(FlashSafeStorageService storageService, ResourceResolver resolver) {
+    FlashSafeStorageServiceHelper(FlashSafeStorageService storageService, ResourceResolver resolver,
+            FlashSafeEventService eventService) {
         this.storageService = storageService;
         this.resolver = resolver;
+        eventService.registerSubscriber(this);
+    }
+    
+    @Subscribe
+    public void handleApplicationStopEvent(ApplicationStopEvent event) {
+        LOGGER.info("Handling application stop event");
+        executorService.shutdownNow();
+        try {
+            executorService.awaitTermination(500, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            LOGGER.error("Shutdown process finished with an error", e);
+        }
     }
     
     public StorageFileOperation copyToStorage(String fromPath, String toPath) throws FileOperationException {
@@ -58,9 +75,8 @@ public class FlashSafeStorageServiceHelper {
             storageOperation.setOperationFuture(operationFuture);
             return storageOperation; 
         } catch (ResourceResolverException | FlashSafeStorageException e) {
-            // TODO add message
-            LOGGER.warn("", e);
-            throw new FileOperationException("", e);
+            LOGGER.warn("Error while copying file" + fromPath + " to storage", e);
+            throw new FileOperationException("Error while copying file" + fromPath + " to storage", e);
         }
     }
     

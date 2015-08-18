@@ -1,5 +1,7 @@
 package ru.flashsafe.core;
 
+import ru.flashsafe.core.event.FlashSafeEventService;
+import ru.flashsafe.core.event.FlashSafeEventServiceImpl;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.FileUtility;
 import ru.flashsafe.core.file.impl.DefaultFileUtility;
@@ -22,6 +24,7 @@ public class CoreModule extends AbstractModule {
         bind(FileManager.class).to(UnifiedFileManager.class);
         bind(FileUtility.class).to(DefaultFileUtility.class);
         bind(FlashSafeStorageService.class).to(DefaultFlashSafeStorageService.class);
+        bind(FlashSafeEventService.class).to(FlashSafeEventServiceImpl.class);
     }
 
 }

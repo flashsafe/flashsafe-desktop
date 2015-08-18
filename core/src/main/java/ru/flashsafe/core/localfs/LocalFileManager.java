@@ -16,6 +16,9 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.flashsafe.core.FlashSafeRegistry;
+import ru.flashsafe.core.event.ApplicationStopEvent;
+import ru.flashsafe.core.event.FlashSafeEventService;
 import ru.flashsafe.core.file.Directory;
 import ru.flashsafe.core.file.File;
 import ru.flashsafe.core.file.FileManager;
@@ -29,6 +32,8 @@ import ru.flashsafe.core.file.util.CompositeFileOperation;
 import ru.flashsafe.core.operation.OperationIDGenerator;
 import ru.flashsafe.core.operation.OperationResult;
 
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 /**
@@ -44,23 +49,23 @@ public class LocalFileManager implements FileManager {
     
     private static final String FILE_SEPARATOR = java.io.File.separator;
 
-    // TODO return the usage of configuration registry (or properties)
-    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private final ExecutorService executorService = Executors.newFixedThreadPool(FlashSafeRegistry
+            .readProperty(FlashSafeRegistry.LOCAL_TO_STORAGE_SIMULTANEOUSLY_EXECUTED_OPERATIONS));
 
-    public LocalFileManager() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                LOGGER.debug("Local file manager is shutting down");
-                executorService.shutdownNow();
-                try {
-                    executorService.awaitTermination(500, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e) {
-                    LOGGER.error("Shutdown process finished with an error", e);
-                }
-            }
-        });
+    @Inject
+    public LocalFileManager(FlashSafeEventService eventService) {
+        eventService.registerSubscriber(this);
+    }
+    
+    @Subscribe
+    public void handleApplicationStopEvent(ApplicationStopEvent event) {
+        LOGGER.info("Handling application stop event");
+        executorService.shutdownNow();
+        try {
+            executorService.awaitTermination(500, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            LOGGER.error("Shutdown process finished with an error", e);
+        }
     }
 
     @Override

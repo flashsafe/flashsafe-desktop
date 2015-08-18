@@ -75,8 +75,12 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
         accessTokenParameter += ACCESS_TOKEN_PARAMETER + "=" + token;
         requestContext.setUri(URI.create(requestContext.getUri().toString() + accessTokenParameter));
     }
-
+    
     private AuthData doAuth() {
+        return doAuth(false);
+    }
+
+    private AuthData doAuth(boolean exitOnFail) {
         AuthResponse authResponse = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(
                 Entity.form(new Form(ID_PARAMETER, "1")), AuthResponse.class);
 
@@ -86,14 +90,17 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
         Form form = new Form(ID_PARAMETER, "1");
         form.param(ACCESS_TOKEN_PARAMETER, hash);
         /* add try-catch and try again - just temporary workaround - back-end do something weird when you request it first time */
-        AuthResponse authResponse2 = null;
         try {
-            authResponse2 = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(form), AuthResponse.class);
+            AuthResponse authResponse2 = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(form), AuthResponse.class);
+            return authResponse2.getAuthData();
         } catch (ProcessingException e) {
             LOGGER.info("Weird thing just happened", e);
-            authResponse2 = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(form), AuthResponse.class);
+            if (exitOnFail) {
+                throw e;
+            }
+            /* try one more time */
+            return doAuth(true);
         }
-        return authResponse2.getAuthData();
 
     }
 
