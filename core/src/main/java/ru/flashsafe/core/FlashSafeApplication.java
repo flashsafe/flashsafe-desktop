@@ -35,7 +35,7 @@ public class FlashSafeApplication {
 
     /**
      * Retrieves a {@link FlashSafeSystem} instance from FlashSafeApplication context.
-     * This method can be used only if the application already runs.
+     * This method could be used only if the application already runs.
      * 
      * @return the FlashSafeSystem instance
      * @throws IllegalStateException if the application is not running
