@@ -14,7 +14,7 @@ public class FlashSafeStorageDirectory extends FlashSafeStorageFileObject implem
     private String format;
 
     public FlashSafeStorageDirectory() {
-        setObjectType(FileObjectType.DIRECTORY);
+        setType(FileObjectType.DIRECTORY);
     }
     
     @Override
@@ -38,7 +38,5 @@ public class FlashSafeStorageDirectory extends FlashSafeStorageFileObject implem
     public void setFormat(String format) {
         this.format = format;
     }
-    
-    
 
 }
