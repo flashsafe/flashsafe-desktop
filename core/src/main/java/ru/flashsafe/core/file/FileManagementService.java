@@ -3,7 +3,7 @@ package ru.flashsafe.core.file;
 import ru.flashsafe.core.file.event.FileObjectDuplicationHandler;
 import ru.flashsafe.core.file.event.FileObjectSecurityHandler;
 
-public interface FileManagerService {
+public interface FileManagementService {
 
     FileManager getFileManager();
     
