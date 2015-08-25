@@ -41,13 +41,13 @@ public class ResourceResolverTest {
         STORAGE_TEST_STRUCTURE.put(2L, Collections.<FlashSafeStorageFileObject> singletonList(directory21));
     }
 
-    private FlashSafeStorageService storageService;
+    private FlashSafeStorageServiceOld storageService;
 
     private ResourceResolver resolver;
 
     @Before
     public void init() throws FlashSafeStorageException {
-        storageService = mock(FlashSafeStorageService.class);
+        storageService = mock(FlashSafeStorageServiceOld.class);
         when(storageService.list(anyLong())).thenAnswer(new Answer<List<FlashSafeStorageFileObject>>() {
 
             @Override

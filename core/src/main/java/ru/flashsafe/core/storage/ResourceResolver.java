@@ -33,7 +33,7 @@ public class ResourceResolver {
     
     private static final FlashSafeStorageDirectory ROOT_DIRECTORY;
 
-    private final FlashSafeStorageService storageService;
+    private final FlashSafeStorageServiceOld storageService;
     
     //TODO move out to runtime configuration
     static {
@@ -43,7 +43,7 @@ public class ResourceResolver {
     }
 
     @Inject
-    public ResourceResolver(FlashSafeStorageService storageService) {
+    public ResourceResolver(FlashSafeStorageServiceOld storageService) {
         this.storageService = requireNonNull(storageService);
     }
 

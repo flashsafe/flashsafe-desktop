@@ -10,7 +10,7 @@ import ru.flashsafe.core.file.impl.DefaultFileUtility;
 import ru.flashsafe.core.file.impl.FileManagementServiceImpl;
 import ru.flashsafe.core.file.impl.UnifiedFileManager;
 import ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService;
-import ru.flashsafe.core.storage.FlashSafeStorageService;
+import ru.flashsafe.core.storage.FlashSafeStorageServiceOld;
 
 import com.google.inject.AbstractModule;
 
@@ -26,7 +26,7 @@ public class CoreModule extends AbstractModule {
     protected void configure() {
         bind(FileManager.class).to(UnifiedFileManager.class);
         bind(FileUtility.class).to(DefaultFileUtility.class);
-        bind(FlashSafeStorageService.class).to(DefaultFlashSafeStorageService.class);
+        bind(FlashSafeStorageServiceOld.class).to(DefaultFlashSafeStorageService.class);
         bind(FlashSafeEventService.class).to(FlashSafeEventServiceImpl.class);
         bind(FileManagementService.class).to(FileManagementServiceImpl.class);
         bind(FileManagementEventHandlerProvider.class).to(FileManagementServiceImpl.class);

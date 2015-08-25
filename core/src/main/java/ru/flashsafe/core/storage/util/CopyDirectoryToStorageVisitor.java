@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.storage.CompositeFileStorageOperation;
-import ru.flashsafe.core.storage.FlashSafeStorageService;
+import ru.flashsafe.core.storage.FlashSafeStorageServiceOld;
 import ru.flashsafe.core.storage.ResourceResolver;
 import ru.flashsafe.core.storage.StorageFileOperation;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
@@ -35,13 +35,13 @@ public class CopyDirectoryToStorageVisitor extends SimpleFileVisitor<Path> {
     
     private final FlashSafeStorageFileObject toPath;
     
-    private final FlashSafeStorageService storageService;
+    private final FlashSafeStorageServiceOld storageService;
     
     private final ResourceResolver resolver;
     
     private final CompositeFileStorageOperation operation;
 
-    public CopyDirectoryToStorageVisitor(Path fromPath, FlashSafeStorageFileObject toPath, FlashSafeStorageService storageService,
+    public CopyDirectoryToStorageVisitor(Path fromPath, FlashSafeStorageFileObject toPath, FlashSafeStorageServiceOld storageService,
             CompositeFileStorageOperation operation) {
         this.fromPath = fromPath;
         this.toPath = toPath;

@@ -15,7 +15,7 @@ import ru.flashsafe.core.file.FileObject;
 import ru.flashsafe.core.file.FileOperation;
 import ru.flashsafe.core.file.exception.FileOperationException;
 import ru.flashsafe.core.localfs.LocalFileManager;
-import ru.flashsafe.core.storage.FlashSafeStorageFileManager;
+import ru.flashsafe.core.storage.FlashSafeStorageFileManagerOld;
 import ru.flashsafe.core.storage.FlashSafeStorageServiceHelper;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -36,12 +36,12 @@ public class UnifiedFileManager implements FileManager {
 
     private final LocalFileManager localFileSystemManager;
 
-    private final FlashSafeStorageFileManager flashSafeStorageFileManager;
+    private final FlashSafeStorageFileManagerOld flashSafeStorageFileManager;
     
     private final FlashSafeStorageServiceHelper flashSafeStorageServiceHelper;
 
     @Inject
-    UnifiedFileManager(LocalFileManager localFileSystemManager, FlashSafeStorageFileManager flashSafeStorageFileManager,
+    UnifiedFileManager(LocalFileManager localFileSystemManager, FlashSafeStorageFileManagerOld flashSafeStorageFileManager,
             FlashSafeStorageServiceHelper flashSafeStorageServiceHelper) {
         this.localFileSystemManager = localFileSystemManager;
         this.flashSafeStorageFileManager = flashSafeStorageFileManager;

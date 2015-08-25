@@ -1,7 +1,7 @@
 package ru.flashsafe.core.file.event;
 
 /**
- * 
+ * Result of {@link FileObjectDuplicationHandler}'s work.
  * 
  * @author Andrew
  *
@@ -21,10 +21,16 @@ public class FileObjectDuplicationHandleResult {
         this(result, false);
     }
     
+    /**
+     * @return
+     */
     public ResultType getResult() {
         return result;
     }
 
+    /**
+     * @return 
+     */
     public boolean isApplyToAll() {
         return applyToAll;
     }

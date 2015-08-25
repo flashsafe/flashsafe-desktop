@@ -32,7 +32,7 @@ public class FlashSafeStorageServiceHelper {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeStorageServiceHelper.class);
     
-    private final FlashSafeStorageService storageService;
+    private final FlashSafeStorageServiceOld storageService;
     
     private final ResourceResolver resolver;
 
@@ -40,7 +40,7 @@ public class FlashSafeStorageServiceHelper {
             .readProperty(FlashSafeRegistry.LOCAL_TO_STORAGE_SIMULTANEOUSLY_EXECUTED_OPERATIONS));
     
     @Inject
-    FlashSafeStorageServiceHelper(FlashSafeStorageService storageService, ResourceResolver resolver,
+    FlashSafeStorageServiceHelper(FlashSafeStorageServiceOld storageService, ResourceResolver resolver,
             FlashSafeEventService eventService) {
         this.storageService = storageService;
         this.resolver = resolver;
