@@ -17,7 +17,6 @@ import ru.flashsafe.core.storage.util.StorageUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.sun.xml.internal.txw2.IllegalSignatureException;
 
 /**
  * This object uses to map objects' names (paths) to storage Ids.
@@ -83,7 +82,7 @@ public class ResourceResolver {
         try {
             return resolveResource(parent, resourcePath, false);
         } catch (ResourceResolverException e) {
-            throw new IllegalSignatureException("Unexpected behaviour", e);
+            throw new IllegalStateException("Unexpected behaviour", e);
         }
     }
 
@@ -97,7 +96,7 @@ public class ResourceResolver {
         try {
             return resolveResource(ROOT_DIRECTORY, resourcePath, false);
         } catch (ResourceResolverException e) {
-            throw new IllegalSignatureException("Unexpected behaviour", e);
+            throw new IllegalStateException("Unexpected behaviour", e);
         }
     }
 
