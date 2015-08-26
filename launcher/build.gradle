@@ -1,5 +1,5 @@
 apply plugin: 'java'
-apply plugin: 'launch4j'
+apply plugin: 'edu.sc.seis.launch4j'
 apply plugin: 'edu.sc.seis.macAppBundle'
 
 buildscript {
@@ -12,16 +12,10 @@ buildscript {
     }
 
     dependencies {
-        classpath group: 'edu.sc.seis.gradle', name: 'launch4j', version: '1.0.6'
+        classpath group: 'gradle.plugin.edu.sc.seis.gradle', name: 'launch4j', version: '1.4.1'
         classpath group: 'com.badlogicgames.packr', name: 'packr', version: '1.1'
         classpath group: 'gradle.plugin.edu.sc.seis', name: 'macAppBundle', version: '2.1.1'
     }
-}
-
-launch4j {
-    mainClassName = 'ru.flashsafe.Main'
-    outfile = 'Flashsafe.exe'
-    icon = "$project.projectDir/resources/AppIcon.ico"
 }
 
 macAppBundle {
@@ -30,7 +24,7 @@ macAppBundle {
     appOutputDir = 'launch4mac'
     icon = "$project.projectDir/resources/AppMacIcon.icns"
     bundleJRE = true
-    jreHome = 'D:/Workspaces/FlashSafe/jre_experiments/MacOS/jre1.8.0_51.jre/Contents/Home'
+    jreHome = 'C:/jre1.8.0_60.jre/Contents/Home'
 }
 
 repositories {
@@ -40,6 +34,12 @@ repositories {
 
 dependencies {
     compile group: 'ru.flashsafe', name: 'file-browser', version: '0.1'
+}
+
+launch4j {
+    mainClassName = "ru.flashsafe.Main"
+    outfile = 'Flashsafe.exe'
+    icon = "$project.projectDir/resources/AppIcon.ico"
 }
 
 task copyAppLibs(type: Copy) {

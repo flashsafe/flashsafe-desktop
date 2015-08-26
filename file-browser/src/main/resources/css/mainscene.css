@@ -1,18 +1,31 @@
-@font-face {
-    font-family: 'Ubuntu';
-    src: url('../font/ubuntu_regular.ttf');
+.category {
+    -fx-font-family: MyriadPro;
+    -fx-font-size: 20px;
+    -fx-padding: 0 0 0 20px;
+    -fx-text-fill: #54667E;
 }
 
-.root {
-    -fx-font-family: "Ubuntu";
+.category1 {
+    -fx-background-color: #D2D6D9;
+    -fx-text-fill: #555555;
+}
+
+.category2 {
+    -fx-font-family: MyriadPro;
+    -fx-font-size: 20px;
+    -fx-padding: 0 0 0 20px;
+    -fx-background-color: #D2D6D9;
+    -fx-text-fill: #555555;
 }
 
 #MainPane {
     -fx-background-color: #FFFFFF;
+    -fx-padding: 0;
 }
 
 #TopToolbar {
-    -fx-background-color: #7C7C7C;
+    -fx-background-color: #353F4B;
+    -fx-padding: 0;
 }
 
 #BottomToolbar {
@@ -107,18 +120,30 @@
     -fx-graphic: url("../img/forward.png");
 }
 
+#Flashsafe {
+    -fx-graphic: url("../img/flashsafe.png");
+}
+
 #Settings {
-    -fx-graphic: url("../img/settings.png");
+    -fx-graphic: url("../img/sttngs.png");
+}
+
+#Refresh {
+    -fx-graphic: url("../img/rfrsh.png");
+}
+
+#Exit {
+    -fx-graphic: url("../img/exit.png");
 }
 
 .settins_opened {
     -fx-background-color: #F3F3F3;
-    -fx-graphic: url("../img/settings_opened.png");
+    -fx-graphic: url("../img/sttngs.png");
 }
 
 .settins_closed {
     -fx-background-color: transparent;
-    -fx-graphic: url("../img/settings.png");
+    -fx-graphic: url("../img/sttngs.png");
 }
 
 #Path {
@@ -135,7 +160,6 @@
     -fx-background-color: #A2A2A2;
     -fx-text-fill: #F3F3F3;
     -fx-padding: 0;
-    -fx-font-family: 'Ubuntu';
     -fx-font-size: 18px;
 }
 
@@ -157,14 +181,6 @@
    -fx-background-color: #FFFFFF;
    -fx-graphic: url("../img/arrow_down.png");
    -fx-padding: -6px 55px 0 35px;
-}
-
-.files {
-    -fx-background-color: #FFFFFF;
-}
-
-.files > .label {
-    -fx-padding: 5px;
 }
 
 #PincodeDialog,
@@ -203,7 +219,6 @@
 
 #Path > .label {
     -fx-background-color: transparent;
-    -fx-font-family: 'Ubuntu';
     -fx-font-size: 14px;
     -fx-text-fill: #F3F3F3;
 }
@@ -211,4 +226,28 @@
 #Path > .label:hover {
     -fx-background-color: #59DAFF;
     -fx-opacity: 0.5;
+}
+
+#DisplayChoice {
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-background-color: #ECEFF4;
+}
+
+#DisplayMenu {
+    -fx-background-color: #ECEFF4;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
+
+#DisplayList {
+    -fx-background-insets: 0;
+    -fx-background-color: #ECEFF4;
+}
+
+#DisplaySlider {
+    -fx-padding: 10px 5px 10px 5px;
+}
+
+#DisplayList > .virtual-flow > .clipped-container > .sheet > .cell.indexed-cell.list-cell {
+    -fx-background-color: #ECEFF4;
 }

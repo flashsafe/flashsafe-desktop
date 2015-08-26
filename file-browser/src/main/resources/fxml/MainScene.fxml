@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.scene.web.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.geometry.*?>
@@ -11,126 +12,36 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="MainPane" fx:id="window" prefHeight="675.0" prefWidth="900.0" stylesheets="@../css/mainscene.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.flashsafe.controller.MainSceneController">
+<AnchorPane id="MainPane" fx:id="window" prefHeight="650.0" prefWidth="975.0" stylesheets="@../css/mainscene.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.flashsafe.controller.MainSceneController">
    <children>
-      <ToolBar id="TopToolbar" prefHeight="75.0" prefWidth="900.0">
-         <items>
-            <HBox id="Operations" alignment="CENTER" prefHeight="65.0" prefWidth="210.0">
-               <children>
-                  <Label id="Upload" fx:id="upload_button" alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#onUploadFileClick" prefHeight="65.0" prefWidth="75.0" />
-                  <Label id="Download" fx:id="download_button" alignment="CENTER" contentDisplay="CENTER" prefHeight="65.0" prefWidth="75.0" />
-                  <Label id="CreatePath" fx:id="create_path_button" alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#onCreatePathClick" prefHeight="65.0" prefWidth="75.0" />
-               </children>
-            </HBox>
-            <VBox alignment="CENTER" prefHeight="65.0" prefWidth="465.0">
-               <children>
-                  <HBox id="Path" fx:id="current_path" alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="465.0" />
-               </children>
-            </VBox>
-            <Label id="Back" fx:id="back_button" alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#back" prefHeight="65.0" prefWidth="65.0" />
-            <Label id="Forward" fx:id="forward_button" alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#forward" prefHeight="65.0" prefWidth="65.0" />
-            <Label id="Settings" fx:id="settings" alignment="CENTER" contentDisplay="CENTER" onMousePressed="#toggleSettings" prefHeight="65.0" prefWidth="65.0" />
-         </items></ToolBar>
-      <ToolBar id="BottomToolbar" layoutX="220.0" layoutY="570.0" prefHeight="75.0" prefWidth="675.0">
-         <items>
-            <HBox alignment="CENTER" fillHeight="false" prefHeight="65.0" prefWidth="660.0">
-               <children>
-                  <VBox alignment="CENTER_LEFT" prefHeight="65.0" prefWidth="480.0">
-                     <children>
-                        <Label fx:id="filename" contentDisplay="CENTER" prefHeight="28.0" prefWidth="480.0" text="Название файла" textFill="#7c7c7c">
-                           <font>
-                              <Font name="Ubuntu" size="18.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="filetype" contentDisplay="CENTER" prefHeight="27.0" prefWidth="480.0" text="Тип файла" textFill="#7c7c7c">
-                           <font>
-                              <Font name="Ubuntu" size="18.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </VBox>
-                  <VBox alignment="CENTER_LEFT" prefHeight="65.0" prefWidth="90.0">
-                     <children>
-                        <Label fx:id="filesize" alignment="CENTER" contentDisplay="CENTER" prefHeight="28.0" prefWidth="90.0" text="Размер" textFill="#7c7c7c">
-                           <font>
-                              <Font name="Ubuntu Condensed" size="18.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </VBox>
-                  <Label id="Cloud" fx:id="cloud" alignment="CENTER" contentDisplay="CENTER" prefHeight="65.0" prefWidth="90.0" />
-               </children>
-            </HBox>
-         </items>
-      </ToolBar>
-      <Accordion id="Accordion" layoutY="75.0" prefHeight="590.0" prefWidth="205.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="675.0" AnchorPane.topAnchor="75.0">
-        <panes>
-          <TitledPane id="MyFilesPane" fx:id="mf" animated="true" prefHeight="85.0" prefWidth="205.0" text="Мои файлы" textFill="#f3f3f3">
-            <content>
-              <AnchorPane fx:id="myFilesPane" minHeight="0.0" minWidth="0.0" prefWidth="205.0" />
-            </content>
-               <font>
-                  <Font name="Ubuntu" size="20.0" />
-               </font>
-          </TitledPane>
-          <TitledPane id="DocumentsPane" animated="true" prefHeight="85.0" prefWidth="205.0" text="Документы" textFill="#f3f3f3">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="205.0" />
-            </content>
-                <font>
-                  <Font name="Ubuntu" size="20.0" />
-               </font>
-          </TitledPane>
-            <TitledPane id="PicturesPane" animated="true" layoutX="10.0" layoutY="10.0" prefHeight="85.0" prefWidth="205.0" text="Изображения" textFill="#f3f3f3">
-               <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="205.0" />
-               </content>
-               <font>
-                  <Font name="Ubuntu" size="20.0" />
-               </font>
-            </TitledPane>
-          <TitledPane id="MusicPane" animated="true" prefHeight="85.0" prefWidth="205.0" text="Музыка" textFill="#f3f3f3">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="205.0" />
-            </content>
-                <font>
-                  <Font name="Ubuntu" size="20.0" />
-               </font>
-          </TitledPane>
-            <TitledPane id="FavoritesPane" animated="true" layoutX="10.0" layoutY="35.0" prefHeight="85.0" prefWidth="205.0" text="Избранное" textFill="#f3f3f3">
-               <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="205.0" />
-               </content>
-               <font>
-                  <Font name="Ubuntu" size="20.0" />
-               </font>
-            </TitledPane>
-            <TitledPane id="DownloadsPane" animated="true" layoutX="10.0" layoutY="60.0" prefHeight="85.0" prefWidth="205.0" text="Загрузки" textFill="#f3f3f3">
-               <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="205.0" />
-               </content>
-               <font>
-                  <Font name="Ubuntu" size="20.0" />
-               </font>
-            </TitledPane>
-        </panes>
-      </Accordion>
-      <ScrollPane layoutX="219.0" layoutY="75.0" prefHeight="495.0" prefWidth="676.0">
+      <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="265.0" layoutY="55.0" prefHeight="595.0" prefWidth="710.0" style=": ;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="265.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="55.0">
         <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" style="-fx-background-color: #FFFFFF;">
+          <AnchorPane prefHeight="570.0" prefWidth="748.0" style="-fx-background-color: #FFFFFF;">
                <children>
-                  <TableView fx:id="files" prefHeight="490.0" prefWidth="670.0" styleClass="files">
+                  <TableView fx:id="files" prefHeight="657.0" prefWidth="710.0" style="-fx-background-insets: 0; -fx-padding: 0;" styleClass="files" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <columns>
                       <TableColumn prefWidth="90.0" text="Тип" />
                       <TableColumn prefWidth="319.0" text="Имя" />
                         <TableColumn minWidth="0.0" prefWidth="110.0" text="Размер" />
-                        <TableColumn minWidth="0.0" prefWidth="143.0" text="Дата создания" />
+                        <TableColumn minWidth="0.0" prefWidth="141.0" text="Дата создания" />
                     </columns>
                   </TableView>
                </children>
             </AnchorPane>
         </content>
       </ScrollPane>
+      <Pane id="TopToolbar" fx:id="topPane" maxHeight="55.0" minHeight="55.0" minWidth="975.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <Label id="Flashsafe" fx:id="flashsafe" prefHeight="55.0" prefWidth="55.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <Button id="DisplayChoice" fx:id="display_choice" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="15.0" />
+      <HBox id="DisplayMenu" fx:id="display_menu" alignment="CENTER" maxHeight="185.0" maxWidth="195.0" minHeight="185.0" minWidth="195.0" visible="false" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="15.0">
+         <children>
+            <Slider id="DisplaySlider" fx:id="display_slider" maxHeight="200.0" orientation="VERTICAL" />
+            <ListView id="DisplayList" fx:id="display_list" prefHeight="180.0" prefWidth="200.0" />
+         </children>
+      </HBox>
+      <Label id="Settings" fx:id="settings" alignment="CENTER" contentDisplay="CENTER" onMousePressed="#toggleSettings" prefHeight="55.0" prefWidth="30.0" textAlignment="CENTER" AnchorPane.rightAnchor="60.0" AnchorPane.topAnchor="0.0" />
+      <Label id="Refresh" fx:id="refresh" alignment="CENTER" contentDisplay="CENTER" prefHeight="55.0" prefWidth="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0" />
+      <Label id="Exit" fx:id="exit" alignment="CENTER" contentDisplay="CENTER" onMousePressed="#exit" prefHeight="55.0" prefWidth="30.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <Pane id="Menu" fx:id="menu" layoutX="700.0" layoutY="77.0" prefHeight="172.0" prefWidth="200.0" visible="false">
          <children>
             <Label id="TopTriangle" prefHeight="5.0" prefWidth="200.0" />
@@ -268,5 +179,124 @@
          </children>
       </Pane>
       <ProgressBar id="Progress" fx:id="progress" prefHeight="30.0" prefWidth="500.0" progress="0.0" visible="false" />
+      <Pane layoutY="55.0" minHeight="595.0" minWidth="55.0" style="-fx-background-color: #4CAED1; -fx-background-insets: 0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="55.0">
+         <children>
+            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="15.0" layoutY="30.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/icons/myfiles.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="15.0" layoutY="110.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/icons/docs.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="15.0" layoutY="180.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/icons/photos.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="15.0" layoutY="250.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/icons/sounds.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="15.0" layoutY="320.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/icons/videos.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="15.0" layoutY="390.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/icons/loads.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="15.0" layoutY="460.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/icons/contacts.png" />
+               </image>
+            </ImageView>
+         </children></Pane>
+      <Pane layoutX="55.0" layoutY="55.0" prefHeight="595.0" prefWidth="210.0" style="-fx-background-color: #ECEFF4;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="55.0" AnchorPane.topAnchor="55.0">
+         <children>
+            <Label fx:id="myfiles" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Мои файлы">
+               <font>
+                  <Font name="MyriadPro-Regular" size="1.0" />
+               </font>
+            </Label>
+            <Label fx:id="docs" layoutY="75.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Документы">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="pictures" layoutY="150.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Изображения">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="sounds" layoutY="220.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Музыка">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="videos" layoutY="290.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Видео">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="loads" layoutY="360.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Загрузки">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="contacts" layoutY="430.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Контакты">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+         </children>
+      </Pane>
+      <Pane fx:id="settings_pane" prefHeight="500.0" prefWidth="600.0" style="-fx-background-color: #ECEFF4; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);;" visible="false" AnchorPane.leftAnchor="200.0" AnchorPane.topAnchor="75.0">
+         <children>
+            <Pane prefHeight="500.0" prefWidth="180.0" style="-fx-background-color: #353F4B;">
+               <children>
+                  <Label fx:id="rendering" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="Отображение" />
+                  <Label fx:id="caching" layoutY="50.0" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="Кэширование" />
+                  <Label fx:id="hardware" layoutY="100.0" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="Об устройстве" />
+                  <Label fx:id="software" layoutY="150.0" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="О программе" />
+                  <Pane fx:id="software_pane" layoutX="180.0" prefHeight="500.0" prefWidth="420.0" visible="false">
+                     <children>
+                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="135.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/logo.png" />
+                           </image>
+                        </ImageView>
+                        <Label alignment="CENTER" layoutX="147.0" layoutY="149.0" style="-fx-padding: 0;" styleClass="category" text="Flashsafe 1.0.0" />
+                        <Label layoutX="14.0" layoutY="209.0" styleClass="category" text="Дизайн:" />
+                        <Label layoutX="188.0" layoutY="237.0" prefHeight="30.0" prefWidth="174.0" styleClass="category" text="Алексей Павлов" />
+                        <Label layoutX="14.0" layoutY="265.0" styleClass="category" text="Разработка:" />
+                        <Label layoutX="183.0" layoutY="295.0" styleClass="category" text="Андрей Бурыхин" />
+                        <Label layoutX="236.0" layoutY="325.0" styleClass="category" text="Егор Часов" />
+                        <Label layoutX="14.0" layoutY="355.0" styleClass="category" text="Аппаратная часть: Павел Хивинцев" />
+                        <Label layoutX="14.0" layoutY="385.0" styleClass="category" text="IT-Евангелист:" />
+                        <Label layoutX="161.0" layoutY="209.0" styleClass="category" text="Вячеслав Кузнецов" />
+                        <Label layoutX="164.0" layoutY="265.0" styleClass="category" text="Александр Крысин" />
+                        <Label layoutX="191.0" layoutY="385.0" styleClass="category" text="Алексей Чуркин" />
+                        <Hyperlink fx:id="link" contentDisplay="CENTER" layoutX="126.0" layoutY="466.0" text="http://flashsafe.ru">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Hyperlink>
+                     </children>
+                  </Pane>
+               </children>
+            </Pane>
+            <Label fx:id="settings_close" alignment="CENTER" contentDisplay="CENTER" layoutX="575.0" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #353F4B;" text="X" textFill="#eceff4">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+         </children>
+      </Pane>
    </children>
 </AnchorPane>

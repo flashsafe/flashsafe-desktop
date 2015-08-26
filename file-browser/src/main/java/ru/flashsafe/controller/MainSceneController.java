@@ -5,42 +5,48 @@
  */
 package ru.flashsafe.controller;
 
-import java.awt.image.BufferedImage;
+import java.awt.Desktop;
+import java.awt.Dimension;
+//import ch.randelshofer.quaqua.osx.OSXFile;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.embed.swing.SwingFXUtils;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TableCell;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
-import javafx.scene.control.TreeItem;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -48,6 +54,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
@@ -58,10 +68,8 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.util.Callback;
-
-import javax.swing.Icon;
-import javax.swing.filechooser.FileSystemView;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import ru.flashsafe.Main;
 import ru.flashsafe.http.HttpAPI;
@@ -71,30 +79,30 @@ import ru.flashsafe.model.FSObject;
 //import ru.flashsafe.token.event.BaseEventHandler;
 //import ru.flashsafe.token.exception.TokenServiceInitializationException;
 //import ru.flashsafe.token.generator.FixedValueGenerationStrategy;
-import ru.flashsafe.token.service.impl.RemoteEmulatorTokenService;
-import ch.randelshofer.quaqua.osx.OSXFile;
+//import ru.flashsafe.token.service.impl.RemoteEmulatorTokenService;
 
 /**
  * FXML Controller class
  * @author alex_xpert
  */
 public class MainSceneController implements Initializable, UploadProgressListener {
-    //private static final Logger log = LogManager.getLogger(MainSceneController.class);
-    
-    private final Image cloud_enabled = new Image(getClass().getResourceAsStream("/img/cloud_enabled.png"));
-    private final Image upload_enabled = new Image(getClass().getResourceAsStream("/img/upload_enabled.png"));
-    private final Image download_enabled = new Image(getClass().getResourceAsStream("/img/download_enabled.png"));
-    private final Image create_path_enabled = new Image(getClass().getResourceAsStream("/img/create_folder_enabled.png"));
-    private final Image folderIcon = new Image(getClass().getResourceAsStream("/img/folder.png"));
-    private final Image folderBlackIcon = new Image(getClass().getResourceAsStream("/img/folder_black1.png"));
-    private final Image lockIcon = new Image(getClass().getResourceAsStream("/img/lock.png"));
-    private final Image lockBlackIcon = new Image(getClass().getResourceAsStream("/img/lock_black1.png"));
-    private final Image dividerIcon = new Image(getClass().getResourceAsStream("/img/divider.png"));
-    private final Image fileIcon = new Image(getClass().getResourceAsStream("/img/file.png"));
-    private final Image arrowIcon = new Image(getClass().getResourceAsStream("/img/arrow.png"));
-    
-    private final List<FSObject> PARENT_PATH = new ArrayList<>();
-    private final Map<Integer, List<FSObject>> CHILDRENS = new HashMap<>();
+    private static final Logger log = LogManager.getLogger(MainSceneController.class);
+
+    //private final Image cloud_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/cloud_enabled.png"));
+    //private final Image upload_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/upload_enabled.png"));
+    //private final Image download_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/download_enabled.png"));
+    //private final Image create_path_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/create_folder_enabled.png"));
+    //private final Image folderIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/folder.png"));
+    private final Image folderBlackIcon = new Image(getClass().getResourceAsStream("/img/fs/folder_empty.png"), 24, 24, false, false);
+    //private final Image lockIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/lock.png"));
+    private final Image lockBlackIcon = new Image(getClass().getResourceAsStream("/img/fs/folder_lock.png"), 24, 24, false, false);
+    //private final Image dividerIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/divider.png"));
+    //private final Image fileIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/file.png"));
+    //private final Image arrowIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/arrow.png"));
+    private final Image folderFull = new Image(getClass().getResourceAsStream("/img/fs/folder.png"), 24, 24, false, false);
+
+    private final ArrayList<FSObject> PARENT_PATH = new ArrayList<>();
+    private final HashMap<Integer, ArrayList<FSObject>> CHILDRENS = new HashMap<>();
     private FSObject cur_path = new FSObject(0, "dir", "/", "", 0, false, 0, 0, 0);
     private FSObject current_element = cur_path;
     private FSObject[] content;
@@ -102,28 +110,25 @@ public class MainSceneController implements Initializable, UploadProgressListene
     private boolean menu_opened = false;
     private int path;
     private String pincode = "";
-    private List<ListView<Label>> lists = new ArrayList<>();
-    private final List<FSObject> FORWARD_PATH = new ArrayList<>();
-    public static RemoteEmulatorTokenService rets;
+    private ArrayList<ListView> lists = new ArrayList<>();
+    private final ArrayList<FSObject> FORWARD_PATH = new ArrayList<>();
+    //public static RemoteEmulatorTokenService rets;
     private boolean run = false;
     private TreeView current_tv = null;
-    private final List<TreeView> TREE_VIEW = new ArrayList<>();
-    private final List<TreeView> TREE_VIEW_FORWARD = new ArrayList<>();
-    
+    private final ArrayList<TreeView> TREE_VIEW = new ArrayList<>();
+    private final ArrayList<TreeView> TREE_VIEW_FORWARD = new ArrayList<>();
+    final int[] x = new int[1];
+    final int[] y = new int[1];
+    private String pin = "";
+
     @FXML
-    private AnchorPane window, myFilesPane;
+    private Pane topPane;
     @FXML
-    private Label upload_button, download_button, create_path_button;
+    private AnchorPane window;
     @FXML
-    private Label back_button, forward_button, settings;
+    private Label settings, refresh, exit;
     @FXML
-    private Label filename, filetype, filesize;
-    @FXML
-    private Label cloud;
-    @FXML
-    private Pane menu, network;
-    @FXML
-    private Label status;
+    private Pane menu;
     @FXML
     private Pane pincode_dialog;
     @FXML
@@ -153,11 +158,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     @FXML
     private Button zero;
     @FXML
-    private TableView files;
-    @FXML
-    private HBox current_path;
-    @FXML
-    TitledPane mf;
+    private TableView<TableRow> files;
     @FXML
     private Pane pathname_dialog;
     @FXML
@@ -166,6 +167,22 @@ public class MainSceneController implements Initializable, UploadProgressListene
 //    private Button pathname_submit;
     @FXML
     private ProgressBar progress;
+    @FXML
+    private Label flashsafe, myfiles, docs, pictures, sounds, videos, loads, contacts;
+    @FXML
+    private Pane settings_pane, software_pane;
+    @FXML
+    private Label rendering, caching, hardware, software, settings_close;
+    @FXML
+    private Hyperlink link;
+    @FXML
+    private Button display_choice;
+    @FXML
+    private Slider display_slider;
+    @FXML
+    private ListView<Label> display_list;
+    @FXML
+    private HBox display_menu;
     
     private class ConnectToCloudTask implements Callable<Boolean> {
 
@@ -173,45 +190,22 @@ public class MainSceneController implements Initializable, UploadProgressListene
         public Boolean call() throws Exception {
              return auth();
         }
-        
+
     }
-    
-    private class AddHandlersTask implements Callable<Void> {
+
+    private class AddHandlersTask implements Callable {
 
         @Override
-        public Void call() throws Exception {
+        public Object call() throws Exception {
             Platform.runLater(new Runnable() {
 
                 @Override
-                public void run() { 
-                        cloud.setGraphic(new ImageView(cloud_enabled));
-                        upload_button.setGraphic(new ImageView(upload_enabled));
-                        download_button.setGraphic(new ImageView(download_enabled));
-                        create_path_button.setGraphic(new ImageView(create_path_enabled));
-                        window.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-
-                            @Override
-                            public void handle(MouseEvent event) {
-                                for(ListView l : lists) {
-                                    if(!l.isFocused()) {
-                                        l.setVisible(false);
-                                    }
-                                }
-                                if(!files.isFocused()) {
-                                    for(int i=0;i<files.getItems().size();i++) {
-                                        files.setStyle("-fx-background-color: #FFFFFF");
-                                    }
-                                    filename.setText("");
-                                    filetype.setText("");
-                                    filesize.setText("");
-                                }
-                            }
-                        });
+                public void run() {
                         files.setOnDragDetected(new EventHandler<MouseEvent>() {
                             public void handle(MouseEvent event) {
                                 Dragboard db = files.startDragAndDrop(TransferMode.ANY);
                                 ClipboardContent content = new ClipboardContent();
-                                List<File> list = new ArrayList<>();
+                                ArrayList<File> list = new ArrayList();
                                 list.add(new File("./.mime"));
                                 content.putFiles(list);
                                 db.setContent(content);
@@ -240,56 +234,172 @@ public class MainSceneController implements Initializable, UploadProgressListene
                                 event.consume();
                             }
                         });
+                        backspace.setOnMouseClicked(new EventHandler() {
 
-                }
+                            @Override
+                            public void handle(Event event) {
+                                backspace();
+                            }
+                        });
+                        one.setOnMouseClicked(getOnNumClick(one));
+                        two.setOnMouseClicked(getOnNumClick(two));
+                        three.setOnMouseClicked(getOnNumClick(three));
+                        four.setOnMouseClicked(getOnNumClick(four));
+                        five.setOnMouseClicked(getOnNumClick(five));
+                        six.setOnMouseClicked(getOnNumClick(six));
+                        seven.setOnMouseClicked(getOnNumClick(seven));
+                        eight.setOnMouseClicked(getOnNumClick(eight));
+                        nine.setOnMouseClicked(getOnNumClick(nine));
+                        zero.setOnMouseClicked(getOnNumClick(zero));
+                        ResizeListener listener = new ResizeListener();
+                    	window.setOnMouseMoved(listener);
+                    	window.setOnMousePressed(listener);
+                    	window.setOnMouseDragged(listener);
+                    	topPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+							@Override
+							public void handle(MouseEvent event) {
+                                                                switch(event.getClickCount()) {
+                                                                    case 1:
+                                                                        display_menu.setVisible(!display_menu.isVisible());
+                                                                        break;
+                                                                    case 2:
+                                                                        Main._stage.setFullScreen(!Main._stage.isFullScreen());
+                                                                        break;
+                                                                }
+							}
+
+                    	});
+                    	KeyCombination backCombination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
+                    	Main._stage.addEventFilter(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>(){
+
+							@Override
+							public void handle(KeyEvent event) {
+								if(backCombination.match(event)) {
+									back();
+								}
+							}
+
+                    	});
+                    	refresh.setOnMouseClicked(new EventHandler<MouseEvent>(){
+
+							@Override
+							public void handle(MouseEvent event) {
+								clearContent();
+								loadContent(cur_path.id, "", current_tv);
+							}
+
+                    	});
+                    	settings.setOnMouseClicked(new EventHandler<MouseEvent>(){
+
+							@Override
+							public void handle(MouseEvent event) {
+								settings_pane.setVisible(true);
+							}
+
+                    	});
+                    	settings_close.setOnMouseClicked(new EventHandler<MouseEvent>(){
+
+							@Override
+							public void handle(MouseEvent event) {
+								settings_pane.setVisible(false);
+							}
+
+                    	});
+                    	Label[] settings_categories = {rendering, caching, hardware, software};
+                    	for(Label l : settings_categories) {
+                    		l.setOnMousePressed(getOnSettingsCategoryClickListener(l));
+                    	}
+                    	rendering.setStyle("-fx-text-fill: #555555;");
+                    	rendering.getStyleClass().remove("category");
+                		rendering.getStyleClass().add("category2");
+                		link.setOnAction(new EventHandler<ActionEvent>() {
+
+							@Override
+							public void handle(ActionEvent event) {
+								if (Desktop.isDesktopSupported()) {
+									try {
+								        Desktop.getDesktop().browse(new URI(link.getText()));
+								    } catch (IOException | URISyntaxException e) {
+								    	log.error(e);
+								    }
+								}
+							}
+
+                		});
+                		flashsafe.setOnMouseDragged(new EventHandler<MouseEvent>() {
+                            @Override
+                            public void handle(MouseEvent event) {
+                                Main._stage.setX(Main._stage.getX() + event.getX()-x[0]);
+                                Main._stage.setY(Main._stage.getY() + event.getY()-y[0]);
+
+                            }
+
+                        });
+                		flashsafe.setOnMouseMoved(new EventHandler<MouseEvent>() {
+
+							@Override
+							public void handle(MouseEvent event) {
+								x[0] = (int) (event.getX()-1);
+	                            y[0] = (int) (event.getY()-1);
+							}
+
+                		});
+                		flashsafe.setCursor(Cursor.MOVE);
+                                String[] dlitems = {"xlarge", "large", "medium", "small", "tile", "list", "table"};
+                                String[] dlinames = {"Огромные значки", "Большие значки", "Обычные значки", "Маленькие значки", "Плитка", "Список", "Таблица"};
+                                for(int i=0;i<7;i++) {
+                                    Label l = new Label();
+                                    l.setText(dlinames[i]);
+                                    l.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/" + dlitems[i] + ".png"))));
+                                    l.setStyle("-fx-text-fill: #353F4B ; -fx-font-size: 14px");
+                                    display_list.getItems().add(l);
+                                }
+                                display_slider.setMin(0.0);
+                                display_slider.setMax(0.6);
+                                display_slider.setValue(0.0);
+                                display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/table.png"))));
+                                display_choice.setOnAction(new EventHandler<ActionEvent>() {
+
+                                    @Override
+                                    public void handle(ActionEvent event) {
+                                        display_menu.setVisible(!display_menu.isVisible());
+                                    }
+                                });
+                	}
 
             });
-            backspace.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-                @Override
-                public void handle(MouseEvent event) {
-                    backspace();
-                }
-            });
-            one.setOnMouseClicked(getOnNumClick(one));
-            two.setOnMouseClicked(getOnNumClick(two));
-            three.setOnMouseClicked(getOnNumClick(three));
-            four.setOnMouseClicked(getOnNumClick(four));
-            five.setOnMouseClicked(getOnNumClick(five));
-            six.setOnMouseClicked(getOnNumClick(six));
-            seven.setOnMouseClicked(getOnNumClick(seven));
-            eight.setOnMouseClicked(getOnNumClick(eight));
-            nine.setOnMouseClicked(getOnNumClick(nine));
-            zero.setOnMouseClicked(getOnNumClick(zero));
             return null;
         }
-        
+
     }
-    
+
+
     /**
-     * Получаем системную иконку файла, размером 16x16
+     * Получаем иконку файла, размером 16x16
      * @param filename
-     * @return 
+     * @return
      */
     private Image getFileIcon(String filename) {
         Image image = null;
-        try {
-            String ext = filename.substring(filename.lastIndexOf(".") + 1);
-            File f = File.createTempFile("icon", "." + ext);
-            BufferedImage bimage;
-            String os = System.getProperty("os.name").toLowerCase();
-            if(os.contains("mac")) { // For Mac OS X
-                bimage = OSXFile.getIconImage(f, 16);
-            } else { // For Windows, Linux(?)
-                FileSystemView view = FileSystemView.getFileSystemView();      
-                Icon icon = view.getSystemIcon(f);
-                bimage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-                icon.paintIcon(null, bimage.getGraphics(), 0, 0);
-            }
-            f.delete();
-            image = SwingFXUtils.toFXImage(bimage, null);
-        } catch(IOException ioe) {
-            ioe.printStackTrace();
+        List<String> archives = Arrays.asList("rar", "zip", "gz", "bz", "7z", "bz2", "tar", "deb", "rpm");
+        List<String> documents = Arrays.asList("txt", "rtf", "doc", "xls", "ppt", "docx", "xlsx", "pptx", "odt", "odp", "ods", "odg");
+        List<String> pictures = Arrays.asList("jpeg", "jpe", "jpg", "png", "gif", "tiff", "tif", "bmp", "wlmp", "svg", "eps", "ico", "icns");
+        List<String> sounds = Arrays.asList("mp1", "mp2", "mp3", "wma", "wav", "amr", "aac", "midi", "ogg");
+        List<String> videos = Arrays.asList("3gp", "3gpp", "avi", "flv", "mkv", "mov", "qt", "vob", "wmv");
+        String ext = filename.substring(filename.lastIndexOf(".") + 1);
+        if(archives.contains(ext)) {
+        	image = new Image(getClass().getResourceAsStream("/img/fs/archive.png"), 24, 24, false, false);
+        } else if(documents.contains(ext)) {
+        	image = new Image(getClass().getResourceAsStream("/img/fs/document.png"), 24, 24, false, false);
+        } else if(pictures.contains(ext)) {
+        	image = new Image(getClass().getResourceAsStream("/img/fs/picture.png"), 24, 24, false, false);
+        } else if(sounds.contains(ext)) {
+        	image = new Image(getClass().getResourceAsStream("/img/fs/music.png"), 24, 24, false, false);
+        } else if(videos.contains(ext)) {
+        	image = new Image(getClass().getResourceAsStream("/img/fs/video.png"), 24, 24, false, false);
+        } else {
+        	image = new Image(getClass().getResourceAsStream("/img/fs/binary.png"), 24, 24, false, false);
         }
         return image;
     }
@@ -299,33 +409,86 @@ public class MainSceneController implements Initializable, UploadProgressListene
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+    	Font myriadPro = Font.loadFont(getClass().getResourceAsStream("/font/myriadpro_regular.ttf"), 20);
+    	Label[] categories = {myfiles, docs, pictures, sounds, videos, loads, contacts};
+    	for(Label l : categories) {
+    		l.setFont(myriadPro);
+    		l.setOnMousePressed(getOnCategoryClickListener(l));
+    	}
+    	myfiles.getStyleClass().remove(0);
+		myfiles.getStyleClass().add("category1");
         HttpAPI.getInstance().addListener(this);
-        Main.es.submit(new AddHandlersTask());
         Future connect = Main.es.submit(new ConnectToCloudTask());
         while(!connect.isDone()) {}
         try {
             if ((boolean) connect.get()) {
+                Main.es.submit(new AddHandlersTask());
                 loadContent(cur_path.id, "", current_tv);
-            } else {
-                network.setVisible(true);
             }
         } catch(InterruptedException | ExecutionException e) {
-            //log.error(e);
+            log.error(e);
         }
     }
-    
+
+    public void exit() {
+    	Main._stage.close();
+    }
+
+    private EventHandler<MouseEvent> getOnCategoryClickListener(Label source) {
+    	return new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				Label[] categories = {myfiles, docs, pictures, sounds, videos, loads, contacts};
+				for(Label l : categories) {
+					l.getStyleClass().remove("category1");
+					l.getStyleClass().add("category");
+				}
+				source.getStyleClass().remove("category");
+				source.getStyleClass().add("category1");
+			}
+
+    	};
+    }
+
+    private EventHandler<MouseEvent> getOnSettingsCategoryClickListener(Label source) {
+    	return new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				Label[] categories = {rendering, caching, hardware, software};
+				for(Label l : categories) {
+					l.setStyle("-fx-text-fill: #ECEFF4;");
+					l.getStyleClass().remove("category2");
+					l.getStyleClass().add("category");
+				}
+				source.setStyle("-fx-text-fill: #555555;");
+				source.getStyleClass().remove("category");
+				source.getStyleClass().add("category2");
+				if(source.equals(software)) {
+					software_pane.setVisible(true);
+				} else {
+					software_pane.setVisible(false);
+				}
+			}
+
+    	};
+    }
+
+
     private void backspace() {
         if(!pincode_textfield.getText().isEmpty()) {
             pincode_textfield.setText(pincode_textfield.getText().substring(0, pincode_textfield.getText().length() - 1));
         }
     }
-    
+
     private void pincodeEnter(String num) {
-        pincode_textfield.setText(pincode_textfield.getText() + num);
+    	pin += num;
+        pincode_textfield.setText(pincode_textfield.getText() + "*");
     }
-    
+
     private void resetNums() {
-        List<String> nums = new ArrayList<>();
+        ArrayList<String> nums = new ArrayList();
         nums.add("1");
         nums.add("2");
         nums.add("3");
@@ -344,19 +507,19 @@ public class MainSceneController implements Initializable, UploadProgressListene
             nums.remove(rand);
         }
     }
-    
+
     private EventHandler<MouseEvent> getOnNumClick(Button num) {
-        return new EventHandler<MouseEvent>() {
+        return new EventHandler() {
 
             @Override
-            public void handle(MouseEvent event) {
+            public void handle(Event event) {
                 pincodeEnter(num.getText());
                 resetNums();
             }
-            
+
         };
     }
-    
+
     private EventHandler<MouseEvent> getOnElementClick(Label label) {
         return new EventHandler<MouseEvent>() {
             @Override
@@ -369,19 +532,9 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     }
                     switch(event.getClickCount()) {
                         case 1:
-                            for(int i=0;i<files.getItems().size();i++) {
-                                files.setStyle("-fx-background-color: #FFFFFF");
-                            }
-                            label.setStyle("-fx-background-color: #59DAFF");
-                            filename.setText(current_element.name);
-                            filetype.setText(current_element.type.equals("file") ? current_element.format : "папка");
-                            filesize.setText(String.valueOf(current_element.size / 1024) + " КБ");
                             break;
                         case 2:
                             if(current_element.type.equals("dir")) {
-                                filename.setText("");
-                                filetype.setText("");
-                                filesize.setText("");
                                 if(current_element.pincode) {
                                     path = current_element.id;
                                     pincode_dialog.setVisible(true);
@@ -396,23 +549,25 @@ public class MainSceneController implements Initializable, UploadProgressListene
             }
         };
     }
-    
+
     public void onPincodeSubmit() {
         pincode_dialog.setVisible(false);
-        if(!pincode_textfield.getText().isEmpty()) {
+        if(!pin.isEmpty()) {
             if(back) {
-                loadContent(PARENT_PATH.isEmpty() ? 0 : PARENT_PATH.get(PARENT_PATH.size() - 1).id, pincode_textfield.getText(), current_tv);
+                loadContent(PARENT_PATH.isEmpty() ? 0 : PARENT_PATH.get(PARENT_PATH.size() - 1).id, pin, current_tv);
             } else {
                 clearContent();
-                loadContent(path, pincode_textfield.getText(), current_tv);
+                loadContent(path, pin, current_tv);
             }
+            pin = "";
+            pincode_textfield.setText("");
         }
     }
-    
+
     public void onCreatePathClick() {
         pathname_dialog.setVisible(true);
     }
-    
+
     public void onPathnameSubmit() {
         pathname_dialog.setVisible(false);
         if(!pathname_textfield.getText().isEmpty()) {
@@ -424,6 +579,13 @@ public class MainSceneController implements Initializable, UploadProgressListene
             label.setId(String.valueOf(path.id));
             label.setPrefWidth(340);
             label.setOnMouseClicked(getOnElementClick(label));
+            Tooltip tooltip = new Tooltip("Имя: " + path.name + "\nТип: " + path.type + "\n"
+                    + (path.type.equals("file") ? "Формат: " + path.format + "\n" : "")
+                    + "Размер: " +  String.valueOf(path.size / 1024) + "КБ\n"
+                    + (path.type.equals("dir") ? "Файлов: " + path.count + "\n" : "")
+                    + "Дата создания: " + new Date(path.create_time * 1000).toLocaleString() + "\n"
+                    + "Последнее обновление: " + new Date(path.update_time * 1000).toLocaleString());
+            label.setTooltip(tooltip);
             files.getItems().add(new TableRow("dir", label, "0", new Date().toLocaleString()));
             FSObject[] new_content = new FSObject[content.length + 1];
             for(int i=0;i<content.length;i++) {
@@ -435,7 +597,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
             pathname_dialog.setVisible(true);
         }
     }
-    
+
     public void onUploadFileClick() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Выгрузить файл");
@@ -450,7 +612,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
             uploadFile(selectedFile);
         }
     }
-    
+
     private void uploadFile(File selectedFile) {
         Thread t = new Thread(new Runnable() {
             @Override
@@ -472,16 +634,23 @@ public class MainSceneController implements Initializable, UploadProgressListene
                 FSObject f = new FSObject(id, "file", selectedFile.getName(),
                         selectedFile.getName().split("\\.")[selectedFile.getName().split("\\.").length - 1].toLowerCase(),
                         selectedFile.length(), false, 0, System.currentTimeMillis(), System.currentTimeMillis());
-                Label label = new Label(f.name, new ImageView(fileIcon));
+                Label label = new Label(f.name, new ImageView(getFileIcon(f.name)));
                 label.setFont(new Font("Ubuntu Condensed", 18));
                 label.setTextFill(Paint.valueOf("#7C7C7C"));
                 label.setId(String.valueOf(f.id));
                 label.setPrefWidth(340);
                 label.setOnMouseClicked(getOnElementClick(label));
+                Tooltip tooltip = new Tooltip("Имя: " + f.name + "\nТип: " + f.type + "\n"
+                        + (f.type.equals("file") ? "Формат: " + f.format + "\n" : "")
+                        + "Размер: " +  String.valueOf(f.size / 1024) + "КБ\n"
+                        + (f.type.equals("dir") ? "Файлов: " + f.count + "\n" : "")
+                        + "Дата создания: " + new Date(f.create_time * 1000).toLocaleString() + "\n"
+                        + "Последнее обновление: " + new Date(f.update_time * 1000).toLocaleString());
+                label.setTooltip(tooltip);
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        files.getItems().add(label);
+                        files.getItems().add(new TableRow(f.type.equals("file") ? "Файл" : "Папка", label, String.valueOf(f.size / 1024) + "КБ", new Date(f.create_time * 1000).toLocaleString()));
                     }
                 });
                 FSObject[] new_content = new FSObject[content.length + 1];
@@ -495,19 +664,19 @@ public class MainSceneController implements Initializable, UploadProgressListene
         t.setDaemon(true);
         t.start();
     }
-    
+
     @Override
     public void onUpdateProgress(double percent) {
         progress.setProgress(percent);
     }
-    
+
     public void back() {
         back = true;
         FORWARD_PATH.add(cur_path);
         clearContent();
         loadContent(PARENT_PATH.isEmpty() ? 0 : PARENT_PATH.get(PARENT_PATH.size() - 1).id, "", current_tv);
     }
-    
+
     public void forward() {
         if(!FORWARD_PATH.isEmpty()) {
             clearContent();
@@ -515,89 +684,72 @@ public class MainSceneController implements Initializable, UploadProgressListene
             FORWARD_PATH.remove(FORWARD_PATH.size() - 1);
         }
     }
-    
+
     private boolean auth() {
         return HttpAPI.getInstance().auth();
     }
-    
+
     private void clearContent() {
         files.getItems().clear();
     }
-    
+
     private int loadContent(int path_id, String pin, TreeView tv) {
         Object[] answer = HttpAPI.getInstance().getContent(path_id, pin);
         int code = (int) answer[1];
         switch(code) {
             case 0:
                 content = (FSObject[]) answer[0];
-                List<FSObject> path_childrens = new ArrayList<>();
-                TreeItem<String> root_item = new TreeItem("", new ImageView(dividerIcon));
-                root_item.setExpanded(false);
-                if(tv == null) {
-                    myFilesPane.getChildren().add(new TreeView(root_item));
-                } else {
-                    tv.getRoot().getChildren().add(root_item);
-                }
-                mf.setExpanded(true);
+                ArrayList<FSObject> path_childrens = new ArrayList<>();
                 ((TableColumn) files.getColumns().get(0)).setCellValueFactory(new PropertyValueFactory<TableRow, String>("type"));
-                ((TableColumn) files.getColumns().get(1)).setCellValueFactory(new Callback<CellDataFeatures<TableRow, TableRow>, ObservableValue<TableRow>>() {
+                ((TableColumn) files.getColumns().get(1)).setCellValueFactory(new PropertyValueFactory<TableRow, Label>("name"));
+                ((TableColumn) files.getColumns().get(1)).setComparator(new Comparator<Label>() {
                     @Override
-                    public ObservableValue<TableRow> call(CellDataFeatures<TableRow, TableRow> features) {
-                        return new ReadOnlyObjectWrapper(features.getValue());
+                    public int compare(Label p1, Label p2) {
+                        return java.text.Collator.getInstance().compare(p1.getText(), p2.getText());
                     }
-                  });
-                  ((TableColumn) files.getColumns().get(1)).setComparator(new Comparator<TableRow>() {
-                    @Override
-                    public int compare(TableRow p1, TableRow p2) {
-                      return p1.equals(p2) ? 1 : 0;
-                    }
-                  });
-                ((TableColumn) files.getColumns().get(1)).setCellFactory(new Callback<TableColumn<TableRow, TableRow>, TableCell<TableRow, TableRow>>() {
-                    @Override
-                    public TableCell<TableRow, TableRow> call(TableColumn<TableRow, TableRow> labelCol) {
-                      return new TableCell<TableRow, TableRow>() {
-                        final Label buttonGraphic = new Label();
-                        @Override
-                        public void updateItem(final TableRow person, boolean empty) {
-                          super.updateItem(person, empty);
-                          if (person != null) {
-                            buttonGraphic.setText(person.getName().getText());
-                            buttonGraphic.setGraphic(person.getName().getGraphic());
-                            setGraphic(buttonGraphic);
-                          } else {
-                            setGraphic(null);
-                          }
-                        }
-                      };
-                    }
-                  });
+                });
                 ((TableColumn) files.getColumns().get(2)).setCellValueFactory(new PropertyValueFactory<TableRow, String>("size"));
+                ((TableColumn) files.getColumns().get(2)).setComparator(new Comparator<String>() {
+                    @Override
+                    public int compare(String p1, String p2) {
+                        int one = Integer.parseInt(p1.replace("КБ", ""));
+                        int two = Integer.parseInt(p2.replace("КБ", ""));
+                        return one == two ? 0 : one < two ? -1 : 1;
+                    }
+                });
                 ((TableColumn) files.getColumns().get(3)).setCellValueFactory(new PropertyValueFactory<TableRow, String>("createDate"));
+                ((TableColumn) files.getColumns().get(3)).setComparator(new Comparator<String>() {
+                    @Override
+                    public int compare(String p1, String p2) {
+                        DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                        Date d1 = null, d2 = null;
+                        try {
+                            d1 = df.parse(p1);
+                            d2 = df.parse(p2);
+                        } catch(ParseException pe) {
+                            pe.printStackTrace();
+                        }
+                        return d1.compareTo(d2);
+                    }
+                });
                 for (int i=0;i<content.length;i++) {
                     FSObject fso = content[i];
-                    Label label = new Label(fso.name, new ImageView(fso.type.equals("dir") ? fso.pincode ? lockBlackIcon : folderBlackIcon : /*fileIcon*/getFileIcon(fso.name)));
-                    label.setFont(new Font("Ubuntu Condensed", 18));
-                    label.setTextFill(Paint.valueOf("#7C7C7C"));
+                    Label label = new Label(fso.name, new ImageView(fso.type.equals("dir") ? fso.pincode ? lockBlackIcon : fso.count > 0 ? folderFull : folderBlackIcon :/*fileIcon*/getFileIcon(fso.name)));
+                    label.setFont(new Font("Ubuntu Condensed", 14));
+                    label.setTextFill(Paint.valueOf("#000"));
                     label.setId(String.valueOf(fso.id));
                     label.setPrefWidth(340);
                     label.setOnMouseClicked(getOnElementClick(label));
-                    files.getItems().add(new TableRow(fso.type, label, String.valueOf(fso.size / 1024) + "КБ", new Date(fso.create_time * 1000).toLocaleString()));
+                    Tooltip tooltip = new Tooltip("Имя: " + fso.name + "\nТип: " + fso.type + "\n"
+                            + (fso.type.equals("file") ? "Формат: " + fso.format + "\n" : "")
+                            + "Размер: " +  String.valueOf(fso.size / 1024) + "КБ\n"
+                            + (fso.type.equals("dir") ? "Файлов: " + fso.count + "\n" : "")
+                            + "Дата создания: " + new Date(fso.create_time * 1000).toLocaleString() + "\n"
+                            + "Последнее обновление: " + new Date(fso.update_time * 1000).toLocaleString());
+                    label.setTooltip(tooltip);
+                    files.getItems().add(new TableRow(fso.type.equals("file") ? "Файл" : "Папка", label, String.valueOf(fso.size / 1024) + "КБ", new Date(fso.create_time * 1000).toLocaleString()));
                     if(fso.type.equals("dir")) {
                         path_childrens.add(fso);
-                        if(!back) {
-                            TreeItem<String> item = new TreeItem(fso.name, new ImageView(fso.pincode ? lockIcon : folderIcon));
-                            item.setExpanded(false);
-                            TreeView treeView = new TreeView(item);
-                            treeView.setId(String.valueOf(fso.id));
-                            treeView.setOnMouseClicked(getTreeViewItemClickListener(fso.id));
-                            if(tv == null) {
-                                myFilesPane.getChildren().add(treeView);
-                            } else {
-                                tv.getRoot().getChildren().add(treeView);
-                            }
-                        } else {
-                            
-                        }
                     }
                 }
                 CHILDRENS.put(path_id, path_childrens);
@@ -606,10 +758,6 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     pincode_textfield.setText("");
                 }
                 if(back) {
-                    if(current_path.getChildren().size() > 1) {
-                        current_path.getChildren().remove(current_path.getChildren().size() - 1);
-                        current_path.getChildren().remove(current_path.getChildren().size() - 1);
-                    }
                     if(!PARENT_PATH.isEmpty() && PARENT_PATH.size() > 1) {
                         PARENT_PATH.remove(PARENT_PATH.size() - 1);
                         cur_path = PARENT_PATH.get(PARENT_PATH.size() - 1);
@@ -618,93 +766,17 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     }
                     back = false;
                 } else {
-                    Label cb = new Label();
-                    cb.setPadding(new Insets(0, 0, 0, 5));
-                    cb.setTextFill(Paint.valueOf("#F3F3F3"));
-                    Font font = Font.loadFont(getClass().getResourceAsStream("/font/ubuntu_regular.ttf"), 18);
-                    cb.setFont(font);
-                    cb.setId(String.valueOf(path_id));
-                    cb.setText(current_element.name);
-                    cb.setPrefHeight(30);
-                    Label arrow = new Label();
-                    arrow.setGraphic(new ImageView(arrowIcon));
-                    arrow.setPrefHeight(30);
-                    current_path.getChildren().add(cb);
-                    current_path.getChildren().add(arrow);
-                    cb.setOnMouseEntered(new EventHandler<MouseEvent>() {
-
-                        @Override
-                        public void handle(MouseEvent event) {
-                            arrow.fireEvent(event);
-                        }
-
-                    });
-                    cb.setOnMouseExited(new EventHandler<MouseEvent>() {
-
-                        @Override
-                        public void handle(MouseEvent event) {
-                            arrow.fireEvent(event);
-                        }
-
-                    });
-                    arrow.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-                        @Override
-                        public void handle(MouseEvent event) {
-                            ListView list = new ListView();
-                            double width = 0;
-                            for(FSObject fso : CHILDRENS.get(path_id)) {
-                                Label l = new Label();
-                                l.setTextFill(Paint.valueOf("#7C7C7C"));
-                                Font font = Font.loadFont(getClass().getResourceAsStream("/font/ubuntu_regular.ttf"), 18);
-                                l.setFont(font);
-                                l.setId(String.valueOf(fso.id));
-                                l.setText(fso.name);
-                                l.setMaxHeight(30);
-                                l.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-                                    @Override
-                                    public void handle(MouseEvent event) {
-                                        current_element = fso;
-                                        clearContent();
-                                        int pos = current_path.getChildren().indexOf(fso);
-                                        if(current_path.getChildren().size() > pos + 1) {
-                                            for(int i=pos+1;i<current_path.getChildren().size();i++) {
-                                                current_path.getChildren().remove(i);
-                                            }
-                                        }
-                                        loadContent(fso.id, "", current_tv);
-                                    }
-                                });
-                                list.getItems().add(l);
-                                if(fso.name.length() > width) {
-                                    width = fso.name.length();
-                                }
-                            }
-                            window.getChildren().add(list);
-                            list.setLayoutX(cb.getLayoutX() + 220);
-                            list.setLayoutY(cb.getLayoutY() + 53);
-                            list.setPrefWidth(width * font.getSize() * 0.525);
-                            list.setPrefHeight(list.getItems().size() * 27.25);
-                            lists.add(list);
-                            list.setVisible(true);
-                        }
-                    });
                     PARENT_PATH.add(cur_path);
                     cur_path = current_element;
                 }
                 break;
             case 1:
-                CHILDRENS.put(path_id, new ArrayList<>());
+                CHILDRENS.put(path_id, new ArrayList());
                 if(!pin.equals("")) {
                     pincode = pincode_textfield.getText();
                     pincode_textfield.setText("");
                 }
                 if(back) {
-                    if(current_path.getChildren().size() > 1) {
-                        current_path.getChildren().remove(current_path.getChildren().size() - 1);
-                        current_path.getChildren().remove(current_path.getChildren().size() - 1);
-                    }
                     if(!PARENT_PATH.isEmpty() && PARENT_PATH.size() > 1) {
                         PARENT_PATH.remove(PARENT_PATH.size() - 1);
                         cur_path = PARENT_PATH.get(PARENT_PATH.size() - 1);
@@ -713,98 +785,22 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     }
                     back = false;
                 } else {
-                    Label cb = new Label();
-                    cb.setPadding(new Insets(0, 0, 0, 5));
-                    cb.setTextFill(Paint.valueOf("#F3F3F3"));
-                    Font font = Font.loadFont(getClass().getResourceAsStream("/font/ubuntu_regular.ttf"), 18);
-                    cb.setFont(font);
-                    cb.setId(String.valueOf(path_id));
-                    cb.setText(current_element.name);
-                    cb.setPrefHeight(30);
-                    Label arrow = new Label();
-                    arrow.setGraphic(new ImageView(arrowIcon));
-                    arrow.setPrefHeight(30);
-                    current_path.getChildren().add(cb);
-                    current_path.getChildren().add(arrow);
-                    cb.setOnMouseEntered(new EventHandler<MouseEvent>() {
-
-                        @Override
-                        public void handle(MouseEvent event) {
-                            arrow.fireEvent(event);
-                        }
-
-                    });
-                    cb.setOnMouseExited(new EventHandler<MouseEvent>() {
-
-                        @Override
-                        public void handle(MouseEvent event) {
-                            arrow.fireEvent(event);
-                        }
-
-                    });
-                    arrow.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-                        @Override
-                        public void handle(MouseEvent event) {
-                            ListView list = new ListView();
-                            double width = 0;
-                            for(FSObject fso : CHILDRENS.get(path_id)) {
-                                Label l = new Label();
-                                l.setTextFill(Paint.valueOf("#7C7C7C"));
-                                Font font = Font.loadFont(getClass().getResourceAsStream("/font/ubuntu_regular.ttf"), 18);
-                                l.setFont(font);
-                                l.setId(String.valueOf(fso.id));
-                                l.setText(fso.name);
-                                l.setMaxHeight(30);
-                                l.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-                                    @Override
-                                    public void handle(MouseEvent event) {
-                                        current_element = fso;
-                                        clearContent();
-                                        int pos = current_path.getChildren().indexOf(fso);
-                                        if(current_path.getChildren().size() > pos + 1) {
-                                            for(int i=pos+1;i<current_path.getChildren().size();i++) {
-                                                current_path.getChildren().remove(i);
-                                            }
-                                        }
-                                        loadContent(fso.id, "", current_tv);
-                                    }
-                                });
-                                list.getItems().add(l);
-                                if(fso.name.length() > width) {
-                                    width = fso.name.length();
-                                }
-                            }
-                            window.getChildren().add(list);
-                            list.setLayoutX(cb.getLayoutX() + 220);
-                            list.setLayoutY(cb.getLayoutY() + 53);
-                            list.setPrefWidth(width * font.getSize() * 0.525);
-                            list.setPrefHeight(list.getItems().size() * 27.25);
-                            lists.add(list);
-                            list.setVisible(true);
-                        }
-                    });
                     PARENT_PATH.add(cur_path);
                     cur_path = current_element;
                 }
                 break;
             case 2:
-                status.setText("Oops!");
-                network.setVisible(true);
                 break;
             case 3:
                 path = path_id;
                 pincode_dialog.setVisible(true);
                 break;
             case 4:
-                status.setText("Oops!");
-                network.setVisible(true);
                 break;
         }
         return code;
     }
-    
+
     private EventHandler<MouseEvent> getTreeViewItemClickListener(int path_id) {
         return new EventHandler<MouseEvent>() {
 
@@ -816,49 +812,174 @@ public class MainSceneController implements Initializable, UploadProgressListene
             }
         };
     }
-    
+
     public void toggleSettings() {
-        if(menu_opened) {
+        /*if(menu_opened) {
             settings.setStyle("-fx-background-color: transparent");
-            settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/settings.png"))));
+            settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/ru/flashsafe/img/sttngs.png"))));
             menu.setVisible(false);
             menu_opened = false;
         } else {
             settings.setStyle("-fx-background-color: #F3F3F3");
-            settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/settings_opened.png"))));
+            settings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/ru/flashsafe/img/sttngs.png"))));
             menu.setVisible(true);
             menu_opened = true;
-        }
+        }*/
     }
-    
+
     public class TableRow {
-        public SimpleStringProperty type;
-        public Label name;
-        public SimpleStringProperty size;
-        public SimpleStringProperty createDate;
-        
+        private SimpleStringProperty type;
+        private Label name;
+        private SimpleStringProperty size;
+        private SimpleStringProperty createDate;
+
         public TableRow(String _type, Label _name, String _size, String _create_date) {
             this.type = new SimpleStringProperty(_type);
             this.name = _name;
             this.size = new SimpleStringProperty(_size);
             this.createDate = new SimpleStringProperty(_create_date);
         }
-        
+
         public String getType() {
             return type.get();
         }
-        
+
         public Label getName() {
             return name;
         }
-        
+
         public String getSize() {
             return size.get();
         }
-        
+
         public String getCreateDate() {
             return createDate.get();
         }
     }
-    
+
+    class ResizeListener implements EventHandler<MouseEvent>{
+    	  double dx;
+    	  double dy;
+    	  double deltaX;
+    	  double deltaY;
+    	  double border = 10;
+    	  boolean moveH;
+    	  boolean moveV;
+    	  boolean resizeH = false;
+    	  boolean resizeV = false;
+    	  Dimension minSize = new Dimension((int) Main._scene.getWidth(), (int) Main._scene.getHeight());
+
+    	  @Override
+    	  public void handle(MouseEvent t) {
+    	    if(MouseEvent.MOUSE_MOVED.equals(t.getEventType())){
+    	      if(t.getX() < border && t.getY() < border){
+    	        Main._scene.setCursor(Cursor.NW_RESIZE);
+    	        resizeH = true;
+    	        resizeV = true;
+    	        moveH = true;
+    	        moveV = true;
+    	      }
+    	      else if(t.getX() < border && t.getY() > Main._scene.getHeight() -border){
+    	    	Main._scene.setCursor(Cursor.SW_RESIZE);
+    	        resizeH = true;
+    	        resizeV = true;
+    	        moveH = true;
+    	        moveV = false;
+    	      }
+    	      else if(t.getX() > Main._scene.getWidth() -border && t.getY() < border){
+    	    	Main._scene.setCursor(Cursor.NE_RESIZE);
+    	        resizeH = true;
+    	        resizeV = true;
+    	        moveH = false;
+    	        moveV = true;
+    	      }
+    	      else if(t.getX() > Main._scene.getWidth() -border && t.getY() > Main._scene.getHeight() -border){
+    	    	Main._scene.setCursor(Cursor.SE_RESIZE);
+    	        resizeH = true;
+    	        resizeV = true;
+    	        moveH = false;
+    	        moveV = false;
+    	      }
+    	      else if(t.getX() < border || t.getX() > Main._scene.getWidth() -border){
+    	    	Main._scene.setCursor(Cursor.E_RESIZE);
+    	        resizeH = true;
+    	        resizeV = false;
+    	        moveH = (t.getX() < border);
+    	        moveV = false;
+    	      }
+    	      else if(t.getY() < border || t.getY() > Main._scene.getHeight() -border){
+    	    	Main._scene.setCursor(Cursor.N_RESIZE);
+    	        resizeH = false;
+    	        resizeV = true;
+    	        moveH = false;
+    	        moveV = (t.getY() < border);
+    	      }
+    	      else{
+    	    	Main._scene.setCursor(Cursor.DEFAULT);
+    	        resizeH = false;
+    	        resizeV = false;
+    	        moveH = false;
+    	        moveV = false;
+    	      }
+    	    }
+    	    else if(MouseEvent.MOUSE_PRESSED.equals(t.getEventType())){
+    	      dx = Main._stage.getWidth() - t.getX();
+    	      dy = Main._stage.getHeight() - t.getY();
+    	    }
+    	    else if(MouseEvent.MOUSE_DRAGGED.equals(t.getEventType())){
+    	      if(resizeH){
+    	        if(Main._stage.getWidth() <= minSize.width){
+    	          if(moveH){
+    	            deltaX = Main._stage.getX()-t.getScreenX();
+    	            if(t.getX() < 0){// if new > old, it's permitted
+    	            	Main._stage.setWidth(deltaX+Main._stage.getWidth());
+    	            	Main._stage.setX(t.getScreenX());
+    	            }
+    	          }
+    	          else{
+    	            if(t.getX()+dx - Main._stage.getWidth() > 0){
+    	            	Main._stage.setWidth(t.getX()+dx);
+    	            }
+    	          }
+    	        }
+    	        else if(Main._stage.getWidth() > minSize.width){
+    	          if(moveH){
+    	            deltaX = Main._stage.getX()-t.getScreenX();
+    	            Main._stage.setWidth(deltaX+Main._stage.getWidth());
+    	            Main._stage.setX(t.getScreenX());
+    	          }
+    	          else{
+    	        	Main._stage.setWidth(t.getX()+dx);
+    	          }
+    	        }
+    	      }
+    	      if(resizeV){
+      	        if(Main._stage.getHeight() <= minSize.height){
+      	          if(moveV){
+      	            deltaY = Main._stage.getY()-t.getScreenY();
+      	            if(t.getY() < 0){// if new > old, it's permitted
+      	            	Main._stage.setHeight(deltaY+Main._stage.getHeight());
+      	            	Main._stage.setY(t.getScreenY());
+      	            }
+      	          }
+      	          else{
+      	            if(t.getY()+dy - Main._stage.getHeight() > 0){
+      	            	Main._stage.setHeight(t.getY()+dy);
+      	            }
+      	          }
+      	        }
+      	        else if(Main._stage.getHeight() > minSize.height){
+      	          if(moveV){
+      	            deltaY = Main._stage.getY()-t.getScreenY();
+      	            Main._stage.setHeight(deltaY+Main._stage.getHeight());
+      	            Main._stage.setY(t.getScreenY());
+      	          }
+      	          else{
+      	        	Main._stage.setHeight(t.getY()+dy);
+      	          }
+      	        }
+      	      }
+    	    }
+    	  }
+    	}
 }
