@@ -1,10 +1,9 @@
-package ru.flashsafe.core.storage;
+package ru.flashsafe.core.old.storage;
 
 import java.nio.file.Path;
 import java.util.List;
 
-import ru.flashsafe.core.old.storage.FlashSafeStorageDirectory;
-import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
+import ru.flashsafe.core.storage.StorageFileOperation;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 
 /**
@@ -14,7 +13,7 @@ import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
  * @author Andrew
  *
  */
-public interface FlashSafeStorageServiceOld {
+public interface FlashSafeStorageIdBasedService {
 
     /**
      * Retrieves list of file objects inside specified directory.

@@ -15,7 +15,7 @@ import ru.flashsafe.core.file.FileObject;
 import ru.flashsafe.core.file.FileOperation;
 import ru.flashsafe.core.file.exception.FileOperationException;
 import ru.flashsafe.core.localfs.LocalFileManager;
-import ru.flashsafe.core.storage.FlashSafeStorageFileManagerOld;
+import ru.flashsafe.core.old.storage.FlashSafeStorageFileManagerOld;
 import ru.flashsafe.core.storage.FlashSafeStorageServiceHelper;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 

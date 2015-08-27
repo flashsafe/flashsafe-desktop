@@ -19,6 +19,8 @@ import ru.flashsafe.core.file.exception.FileOperationException;
 import ru.flashsafe.core.file.impl.FileOperationInfo;
 import ru.flashsafe.core.file.util.AsyncFileTreeWalker;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
+import ru.flashsafe.core.old.storage.FlashSafeStorageIdBasedService;
+import ru.flashsafe.core.old.storage.ResourceResolver;
 import ru.flashsafe.core.operation.OperationIDGenerator;
 import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
@@ -32,7 +34,7 @@ public class FlashSafeStorageServiceHelper {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeStorageServiceHelper.class);
     
-    private final FlashSafeStorageServiceOld storageService;
+    private final FlashSafeStorageIdBasedService storageService;
     
     private final ResourceResolver resolver;
 
@@ -40,7 +42,7 @@ public class FlashSafeStorageServiceHelper {
             .readProperty(FlashSafeRegistry.LOCAL_TO_STORAGE_SIMULTANEOUSLY_EXECUTED_OPERATIONS));
     
     @Inject
-    FlashSafeStorageServiceHelper(FlashSafeStorageServiceOld storageService, ResourceResolver resolver,
+    FlashSafeStorageServiceHelper(FlashSafeStorageIdBasedService storageService, ResourceResolver resolver,
             FlashSafeEventService eventService) {
         this.storageService = storageService;
         this.resolver = resolver;

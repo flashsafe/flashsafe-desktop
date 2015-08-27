@@ -49,7 +49,6 @@ import ru.flashsafe.core.operation.OperationIDGenerator;
 import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.operation.OperationState;
 import ru.flashsafe.core.operation.monitor.ProcessMonitorInputStream;
-import ru.flashsafe.core.storage.FlashSafeStorageServiceOld;
 import ru.flashsafe.core.storage.SingleFileStorageOperation;
 import ru.flashsafe.core.storage.StorageFileOperation;
 import ru.flashsafe.core.storage.StorageOperationType;
@@ -65,7 +64,7 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class DefaultFlashSafeStorageService implements FlashSafeStorageServiceOld {
+public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedService {
 
     private static final int IO_BUFFER_SIZE = 8192;
 

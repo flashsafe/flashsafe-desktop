@@ -19,6 +19,8 @@ import org.mockito.stubbing.Answer;
 
 import ru.flashsafe.core.old.storage.FlashSafeStorageDirectory;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
+import ru.flashsafe.core.old.storage.FlashSafeStorageIdBasedService;
+import ru.flashsafe.core.old.storage.ResourceResolver;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
 
@@ -41,13 +43,13 @@ public class ResourceResolverTest {
         STORAGE_TEST_STRUCTURE.put(2L, Collections.<FlashSafeStorageFileObject> singletonList(directory21));
     }
 
-    private FlashSafeStorageServiceOld storageService;
+    private FlashSafeStorageIdBasedService storageService;
 
     private ResourceResolver resolver;
 
     @Before
     public void init() throws FlashSafeStorageException {
-        storageService = mock(FlashSafeStorageServiceOld.class);
+        storageService = mock(FlashSafeStorageIdBasedService.class);
         when(storageService.list(anyLong())).thenAnswer(new Answer<List<FlashSafeStorageFileObject>>() {
 
             @Override

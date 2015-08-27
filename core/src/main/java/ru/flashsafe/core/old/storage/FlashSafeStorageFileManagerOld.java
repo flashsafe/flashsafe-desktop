@@ -1,4 +1,4 @@
-package ru.flashsafe.core.storage;
+package ru.flashsafe.core.old.storage;
 
 import java.util.List;
 
@@ -11,7 +11,6 @@ import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.FileObject;
 import ru.flashsafe.core.file.FileOperation;
 import ru.flashsafe.core.file.exception.FileOperationException;
-import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -24,12 +23,12 @@ public class FlashSafeStorageFileManagerOld implements FileManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeStorageFileManagerOld.class);
     
-    private final FlashSafeStorageServiceOld storageService;
+    private final FlashSafeStorageIdBasedService storageService;
 
     private final ResourceResolver resourceResolver;
 
     @Inject
-    FlashSafeStorageFileManagerOld(FlashSafeStorageServiceOld storageService, ResourceResolver resourceResolver) {
+    FlashSafeStorageFileManagerOld(FlashSafeStorageIdBasedService storageService, ResourceResolver resourceResolver) {
         this.storageService = storageService;
         this.resourceResolver = resourceResolver;
     }

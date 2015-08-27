@@ -1,4 +1,4 @@
-package ru.flashsafe.core.storage;
+package ru.flashsafe.core.old.storage;
 
 import static java.util.Objects.requireNonNull;
 import static ru.flashsafe.core.storage.util.StorageUtils.STORAGE_PATH_PREFIX;
@@ -9,8 +9,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.flashsafe.core.old.storage.FlashSafeStorageDirectory;
-import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
 import ru.flashsafe.core.storage.util.StorageUtils;
@@ -33,7 +31,7 @@ public class ResourceResolver {
     
     private static final FlashSafeStorageDirectory ROOT_DIRECTORY;
 
-    private final FlashSafeStorageServiceOld storageService;
+    private final FlashSafeStorageIdBasedService storageService;
     
     //TODO move out to runtime configuration
     static {
@@ -43,7 +41,7 @@ public class ResourceResolver {
     }
 
     @Inject
-    public ResourceResolver(FlashSafeStorageServiceOld storageService) {
+    public ResourceResolver(FlashSafeStorageIdBasedService storageService) {
         this.storageService = requireNonNull(storageService);
     }
 
