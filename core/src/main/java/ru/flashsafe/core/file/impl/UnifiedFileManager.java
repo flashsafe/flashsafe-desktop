@@ -2,6 +2,7 @@ package ru.flashsafe.core.file.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,8 +16,9 @@ import ru.flashsafe.core.file.FileObject;
 import ru.flashsafe.core.file.FileOperation;
 import ru.flashsafe.core.file.exception.FileOperationException;
 import ru.flashsafe.core.localfs.LocalFileManager;
-import ru.flashsafe.core.old.storage.FlashSafeStorageFileManagerOld;
-import ru.flashsafe.core.storage.FlashSafeStorageServiceHelper;
+import ru.flashsafe.core.storage.FlashSafeStorageFileManager;
+import ru.flashsafe.core.storage.FlashSafeStorageService;
+import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import com.google.inject.Inject;
@@ -36,16 +38,16 @@ public class UnifiedFileManager implements FileManager {
 
     private final LocalFileManager localFileSystemManager;
 
-    private final FlashSafeStorageFileManagerOld flashSafeStorageFileManager;
+    private final FlashSafeStorageFileManager flashSafeStorageFileManager;
     
-    private final FlashSafeStorageServiceHelper flashSafeStorageServiceHelper;
+    private final FlashSafeStorageService flashSafeStorageService;
 
     @Inject
-    UnifiedFileManager(LocalFileManager localFileSystemManager, FlashSafeStorageFileManagerOld flashSafeStorageFileManager,
-            FlashSafeStorageServiceHelper flashSafeStorageServiceHelper) {
+    UnifiedFileManager(LocalFileManager localFileSystemManager, FlashSafeStorageFileManager flashSafeStorageFileManager,
+            FlashSafeStorageService flashSafeStorageService) {
         this.localFileSystemManager = localFileSystemManager;
         this.flashSafeStorageFileManager = flashSafeStorageFileManager;
-        this.flashSafeStorageServiceHelper = flashSafeStorageServiceHelper;
+        this.flashSafeStorageService = flashSafeStorageService;
     }
 
     @Override
@@ -79,7 +81,13 @@ public class UnifiedFileManager implements FileManager {
             return fileManager.copy(fromPath, toPath);
         } else {
             if (isRemoteStoragePath(toPath)) {
-                return flashSafeStorageServiceHelper.copyToStorage(fromPath, toPath);
+                try {
+                    return flashSafeStorageService.upload(Paths.get(fromPath), toPath);
+                } catch (FlashSafeStorageException e) {
+                    LOGGER.warn("Error while copying file" + fromPath + " to storage", e);
+                    throw new FileOperationException("Error while copying file" + fromPath + " to storage", e);
+                }
+                //return flashSafeStorageServiceHelper.copyToStorage(fromPath, toPath);
             } else {
                 throw new NotImplementedException();
             }

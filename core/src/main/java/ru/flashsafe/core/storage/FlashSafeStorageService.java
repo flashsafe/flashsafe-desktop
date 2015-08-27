@@ -28,9 +28,9 @@ public interface FlashSafeStorageService {
      */
     FlashSafeStorageDirectory createDirectory(String path) throws FlashSafeStorageException;
 
-    StorageFileOperation downloadFile(String path, Path directory) throws FlashSafeStorageException;
+    StorageFileOperation download(String remoteObjectPath, Path localDirectoryPath) throws FlashSafeStorageException;
 
-    StorageFileOperation uploadFile(String path, Path file) throws FlashSafeStorageException;
+    StorageFileOperation upload(Path localObjectPath, String remoteDirectoryPath) throws FlashSafeStorageException;
 
     void copy(String fromPath, String toPath) throws FlashSafeStorageException;
 

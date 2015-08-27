@@ -58,6 +58,16 @@ public class CompositeFileOperation extends AbstractFileOperation {
         return currentFileOperation.getFileObjectName();
     }
     
+    @Override
+    public int getProgress() {
+        if (currentFileOperation == null) {
+            return super.getProgress();
+        }
+        long processedBytes = getProcessedBytes() + currentFileOperation.getProcessedBytes();
+        int progress = (int) (( processedBytes * 100) /  getTotalBytes());
+        return progress;
+    }
+    
     /**
      * Sets current sub-operation.
      * 
