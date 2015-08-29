@@ -6,13 +6,17 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 import ru.flashsafe.core.file.File;
+import ru.flashsafe.core.file.FileObjectType;
 
 public class LocalFile implements File {
 
+    private final FileObjectType objectType;
+    
     private final Path filePath;
 
     protected LocalFile(Path filePath) {
         this.filePath = Objects.requireNonNull(filePath);
+        objectType = FileObjectType.FILE;
     }
 
     @Override
@@ -33,6 +37,11 @@ public class LocalFile implements File {
     @Override
     public String getFileFormat() throws IOException {
         return Files.probeContentType(filePath);
+    }
+
+    @Override
+    public FileObjectType getType() {
+        return objectType;
     }
 
 }

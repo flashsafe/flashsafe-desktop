@@ -1,5 +1,6 @@
 package ru.flashsafe.core;
 
+import ru.flashsafe.core.file.FileManagementService;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.FileUtility;
 
@@ -15,6 +16,11 @@ public interface FlashSafeSystem {
      * @return address of FlashSafe storage
      */
     String storageAddress();
+    
+    /**
+     * @return
+     */
+    FileManagementService fileManagementService();
     
     /**
      * @return FileManager instance

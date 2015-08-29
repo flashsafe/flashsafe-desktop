@@ -1,5 +1,11 @@
 package ru.flashsafe.core.event;
 
-public class ApplicationStopEvent {
+/**
+ * Represents stop event.
+ * 
+ * @author Andrew
+ *
+ */
+public final class ApplicationStopEvent {
 
 }

@@ -14,13 +14,7 @@ public class FlashSafeStorageDirectory extends FlashSafeStorageFileObject implem
     private String format;
 
     public FlashSafeStorageDirectory() {
-        setObjectType(FileObjectType.DIRECTORY);
-    }
-    
-    @Override
-    public String getAbsolutePath() {
-        // TODO Auto-generated method stub
-        return null;
+        setType(FileObjectType.DIRECTORY);
     }
 
     public int getCount() {
@@ -38,7 +32,5 @@ public class FlashSafeStorageDirectory extends FlashSafeStorageFileObject implem
     public void setFormat(String format) {
         this.format = format;
     }
-    
-    
 
 }

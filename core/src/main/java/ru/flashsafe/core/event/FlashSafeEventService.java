@@ -12,6 +12,11 @@ public interface FlashSafeEventService {
     
     void unRegisterSubscriber(Object subscriber);
  
+    /**
+     * Posts event.
+     * 
+     * @param event
+     */
     void postEvent(Object event);
     
 }

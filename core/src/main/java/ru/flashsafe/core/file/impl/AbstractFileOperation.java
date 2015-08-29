@@ -103,6 +103,10 @@ public abstract class AbstractFileOperation extends AbstractOperation implements
     public void setOperationFuture(Future<?> operationFuture) {
         this.operationFuture = operationFuture;
     }
+    
+    public Future<?> getOperationFuture() {
+        return operationFuture;
+    }
 
     @Override
     public void stop() {

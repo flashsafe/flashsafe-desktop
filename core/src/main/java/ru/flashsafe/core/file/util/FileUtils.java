@@ -9,7 +9,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 
+ * Set of utilities to work with fileObjects.
  * 
  * @author Andrew
  *
@@ -19,6 +19,13 @@ public class FileUtils {
     private FileUtils() {
     }
 
+    /**
+     * Counts size of {@code path}. This method works for files and directories.
+     * 
+     * @param path path of an object
+     * @return size in bytes
+     * @throws IOException
+     */
     public static long countSizeForPath(Path path) throws IOException {
         if (Files.isRegularFile(path)) {
             return Files.size(path);

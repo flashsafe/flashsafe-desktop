@@ -14,7 +14,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -26,6 +29,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.jackson.JacksonFeature;
@@ -37,10 +41,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.flashsafe.core.FlashSafeRegistry;
+import ru.flashsafe.core.event.ApplicationStopEvent;
+import ru.flashsafe.core.event.FlashSafeEventService;
 import ru.flashsafe.core.file.impl.FileOperationInfo;
 import ru.flashsafe.core.old.storage.rest.ContentTypeFixerFilter;
 import ru.flashsafe.core.old.storage.rest.CustomMultipart;
-import ru.flashsafe.core.old.storage.rest.FlashSafeAuthFeature;
+import ru.flashsafe.core.old.storage.rest.ExternalExecutorProvider;
+import ru.flashsafe.core.old.storage.rest.FlashSafeAuthClientFilter;
 import ru.flashsafe.core.old.storage.rest.data.CreateDirectoryResponse;
 import ru.flashsafe.core.old.storage.rest.data.CreateDirectoryResponse.CreateDirectoryResponseMeta;
 import ru.flashsafe.core.old.storage.rest.data.DirectoryListResponse;
@@ -49,13 +56,14 @@ import ru.flashsafe.core.operation.OperationIDGenerator;
 import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.operation.OperationState;
 import ru.flashsafe.core.operation.monitor.ProcessMonitorInputStream;
-import ru.flashsafe.core.storage.FlashSafeStorageService;
 import ru.flashsafe.core.storage.SingleFileStorageOperation;
 import ru.flashsafe.core.storage.StorageFileOperation;
 import ru.flashsafe.core.storage.StorageOperationType;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 /**
@@ -65,28 +73,34 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
+public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedService {
 
     private static final int IO_BUFFER_SIZE = 8192;
 
     private static final String DIRECTORY_API_PATH = "dir.php";
 
     private static final String DIRECTORY_ID_PARAMETER = "dir_id";
+    
+    private static final String PINCODE_PARAMETER = "pincode";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFlashSafeStorageService.class);
     
     private final Client restClient;
 
     private final WebTarget directoryTarget;
+    
+    private final ExecutorService executorService = Executors.newFixedThreadPool(FlashSafeRegistry
+            .readProperty(FlashSafeRegistry.LOCAL_TO_STORAGE_SIMULTANEOUSLY_EXECUTED_OPERATIONS));
 
     static {
         System.setProperty("sun.net.http.allowRestrictedHeaders", String.valueOf(true));
         System.setProperty(MessageProperties.IO_BUFFER_SIZE, String.valueOf(IO_BUFFER_SIZE));
     }
 
-    DefaultFlashSafeStorageService() {
+    @Inject
+    DefaultFlashSafeStorageService(FlashSafeEventService eventService, FlashSafeAuthClientFilter authFilter) {
         ClientConfig clientConfig = new ClientConfig();
-        clientConfig.register(JacksonFeature.class).register(FlashSafeAuthFeature.class).register(ContentTypeFixerFilter.class)
+        clientConfig.register(JacksonFeature.class).register(authFilter).register(ContentTypeFixerFilter.class).register(new ExternalExecutorProvider(executorService))
                 .register(MultiPartFeature.class).register(CustomMultipart.class).register(ProcessMonitorInputStream.class)
                 // .register(new
                 // LoggingFilter(Logger.getLogger(DefaultFlashSafeStorageService.class.getName()),
@@ -95,11 +109,40 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
         restClient = ClientBuilder.newClient(clientConfig);
         String storageAddress = FlashSafeRegistry.getStorageAddress();
         directoryTarget = restClient.target(storageAddress).path(DIRECTORY_API_PATH);
+        eventService.registerSubscriber(this);
+    }
+    
+    @Subscribe
+    public void handleApplicationStopEvent(ApplicationStopEvent event) {
+        LOGGER.info("Handling application stop event");
+        restClient.close();
+        executorService.shutdownNow();
+        try {
+            executorService.awaitTermination(500, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            LOGGER.error("Shutdown process finished with an error", e);
+        }
     }
 
     @Override
     public List<FlashSafeStorageFileObject> list(long directoryId) throws FlashSafeStorageException {
-        DirectoryListResponse listResponse = directoryTarget.queryParam(DIRECTORY_ID_PARAMETER, directoryId)
+        return doList(directoryId, null);
+    }
+    
+    @Override
+    public List<FlashSafeStorageFileObject> list(long directoryId, String pincode) throws FlashSafeStorageException {    
+        if (StringUtils.isBlank(pincode)) {
+            throw new IllegalStateException("The pincode should not be null");
+        }
+        return doList(directoryId, pincode);
+     }
+    
+    private List<FlashSafeStorageFileObject> doList(long directoryId, String pincode) throws FlashSafeStorageException {    
+        WebTarget listDirectoryTarger = directoryTarget.queryParam(DIRECTORY_ID_PARAMETER, directoryId);
+        if (StringUtils.isNoneBlank(pincode)) {
+            listDirectoryTarger = listDirectoryTarger.queryParam(PINCODE_PARAMETER, pincode);
+        }
+        DirectoryListResponse listResponse = listDirectoryTarger
                 .request(MediaType.APPLICATION_JSON_TYPE).get(DirectoryListResponse.class);
         ResponseMeta responseMeta = listResponse.getResponseMeta();
         if (responseMeta.getResponseCode() == HTTP_OK) {
@@ -152,6 +195,7 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageService {
 
                     @Override
                     public void completed(Response response) {
+                        response.close();
                         setStatusToFinished(operation, OperationResult.SUCCESS);
                     }
 

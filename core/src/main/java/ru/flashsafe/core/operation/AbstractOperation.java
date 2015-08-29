@@ -14,7 +14,7 @@ public abstract class AbstractOperation implements Operation {
     
     private OperationResult result = OperationResult.UNKNOWN;
     
-    private int progress;
+    private volatile int progress;
     
     /**
      * @param id operation id

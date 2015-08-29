@@ -26,5 +26,10 @@ public interface FileObject {
      * @throws IOException
      */
     long getSize() throws IOException;
+    
+    /**
+     * @return the exact type of this fileObject 
+     */
+    FileObjectType getType();
 
 }
