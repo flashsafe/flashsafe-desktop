@@ -87,6 +87,7 @@ public abstract class FlashSafeStorageFileObject implements FileObject {
         this.objectType = objectType;
     }
     
+    @Override
     public String getAbsolutePath() {
         return absolutePath;
     }

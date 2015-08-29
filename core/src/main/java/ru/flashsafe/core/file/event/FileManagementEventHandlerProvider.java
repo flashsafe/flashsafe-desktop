@@ -1,7 +1,8 @@
 package ru.flashsafe.core.file.event;
 
 /**
- * This object 
+ * This object provides methods for getting event handlers related to file
+ * manager.
  * 
  * @author Andrew
  *
@@ -9,7 +10,7 @@ package ru.flashsafe.core.file.event;
 public interface FileManagementEventHandlerProvider {
 
     FileObjectDuplicationHandler getFileObjectDuplicationHandler();
-    
+
     FileObjectSecurityHandler getFileObjectSecurityHandler();
-    
+
 }

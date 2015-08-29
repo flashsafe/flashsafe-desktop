@@ -10,6 +10,10 @@ public class FlashSafeStorageException extends Exception {
     public FlashSafeStorageException(String message, Throwable cause) {
         super(message, cause);
     }
+    
+    public FlashSafeStorageException(String message) {
+        super(message);
+    }
 
     public FlashSafeStorageException(Throwable cause) {
         super(cause);

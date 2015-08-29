@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import ru.flashsafe.core.file.event.FileManagementEventHandlerProvider;
 import ru.flashsafe.core.old.storage.FlashSafeStorageDirectory;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.old.storage.FlashSafeStorageIdBasedService;
@@ -58,7 +59,7 @@ public class ResourceResolverTest {
                 return STORAGE_TEST_STRUCTURE.get((Long) args[0]);
             }
         });
-        resolver = new ResourceResolver(storageService);
+        resolver = new ResourceResolver(storageService, mock(FileManagementEventHandlerProvider.class));
     }
 
     @Test

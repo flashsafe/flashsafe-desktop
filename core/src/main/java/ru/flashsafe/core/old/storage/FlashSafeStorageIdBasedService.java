@@ -25,6 +25,16 @@ public interface FlashSafeStorageIdBasedService {
     List<FlashSafeStorageFileObject> list(long directoryId) throws FlashSafeStorageException;
 
     /**
+     * Retrieves list of file objects inside specified directory.
+     * 
+     * @param directoryId directory Id
+     * @param pincode access code
+     * @return list of fileObjects in this directory
+     * @throws FlashSafeStorageException
+     */
+    List<FlashSafeStorageFileObject> list(long directoryId, String pincode) throws FlashSafeStorageException;
+    
+    /**
      * Creates directory with specified name in parent directory.
      * 
      * @param parentDirectoryId parent directory Id

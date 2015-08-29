@@ -16,6 +16,11 @@ import ru.flashsafe.core.event.ApplicationStopEvent;
 import ru.flashsafe.core.event.FlashSafeEventService;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.FileOperationType;
+import ru.flashsafe.core.file.event.FileManagementEventHandlerProvider;
+import ru.flashsafe.core.file.event.FileObjectSecurityEvent;
+import ru.flashsafe.core.file.event.FileObjectSecurityEventResult;
+import ru.flashsafe.core.file.event.FileObjectSecurityEventResult.ResultType;
+import ru.flashsafe.core.file.event.FileObjectSecurityHandler;
 import ru.flashsafe.core.file.impl.FileOperationInfo;
 import ru.flashsafe.core.file.util.AsyncFileTreeWalker;
 import ru.flashsafe.core.operation.OperationIDGenerator;
@@ -44,14 +49,17 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
 
     private final FlashSafeStorageIdBasedService storageService;
 
+    private final FileManagementEventHandlerProvider handlerProvider;
+
     private final ExecutorService executorService = Executors.newFixedThreadPool(FlashSafeRegistry
             .readProperty(FlashSafeRegistry.LOCAL_TO_STORAGE_SIMULTANEOUSLY_EXECUTED_OPERATIONS));
 
     @Inject
     FlashSafeStorageServiceImpl(FlashSafeStorageIdBasedService storageService, ResourceResolver resourceResolver,
-            FlashSafeEventService eventService) {
+            FlashSafeEventService eventService, FileManagementEventHandlerProvider handlerProvider) {
         this.storageService = storageService;
         this.resourceResolver = resourceResolver;
+        this.handlerProvider = handlerProvider;
         eventService.registerSubscriber(this);
     }
 
@@ -70,7 +78,17 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
     public List<FlashSafeStorageFileObject> list(String path) throws FlashSafeStorageException {
         try {
             FlashSafeStorageFileObject resource = resourceResolver.resolveResource(path);
-            return storageService.list(resource.getId());
+            if (resource.isNeedPassword()) {
+                FileObjectSecurityHandler handler = handlerProvider.getFileObjectSecurityHandler();
+                FileObjectSecurityEventResult eventResult = handler.handle(new FileObjectSecurityEvent(resource));
+                if (eventResult.getResult() == ResultType.CONTINUE) {
+                    return storageService.list(resource.getId(), eventResult.getCode());
+                }
+                //FIXME add specific exception
+                throw new FlashSafeStorageException("Security code request was canceled");
+            } else {
+                return storageService.list(resource.getId());
+            }
         } catch (ResourceResolverException e) {
             throw new FlashSafeStorageException("Error while listing directory", e);
         }
@@ -114,7 +132,7 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
                     FileOperationType.COPY, StorageOperationType.UPLOAD, operationInfo);
 
             Future<OperationResult> operationFuture = executorService.submit(new AsyncFileTreeWalker(localObjectPath,
-                    new CopyDirectoryToStorageVisitor(localObjectPath, toPathResource, storageService, storageOperation),
+                    new CopyDirectoryToStorageVisitor(localObjectPath, toPathResource, storageService, resourceResolver, storageOperation),
                     storageOperation));
             storageOperation.setOperationFuture(operationFuture);
             return storageOperation;

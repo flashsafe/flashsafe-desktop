@@ -2,18 +2,18 @@ package ru.flashsafe.core.file.impl;
 
 import java.util.Objects;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import ru.flashsafe.core.file.FileManagementService;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.event.FileManagementEventHandlerProvider;
 import ru.flashsafe.core.file.event.FileObjectDuplicationEvent;
-import ru.flashsafe.core.file.event.FileObjectDuplicationHandleResult;
-import ru.flashsafe.core.file.event.FileObjectDuplicationHandleResult.ResultType;
+import ru.flashsafe.core.file.event.FileObjectDuplicationEventResult;
 import ru.flashsafe.core.file.event.FileObjectDuplicationHandler;
 import ru.flashsafe.core.file.event.FileObjectSecurityEvent;
+import ru.flashsafe.core.file.event.FileObjectSecurityEventResult;
 import ru.flashsafe.core.file.event.FileObjectSecurityHandler;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public class FileManagementServiceImpl implements FileManagementService, FileManagementEventHandlerProvider {
@@ -59,16 +59,16 @@ public class FileManagementServiceImpl implements FileManagementService, FileMan
     private static final class DefaultFileObjectDuplicationHandler implements FileObjectDuplicationHandler {
 
         @Override
-        public FileObjectDuplicationHandleResult handle(FileObjectDuplicationEvent event) {
-            return new FileObjectDuplicationHandleResult(ResultType.COPY_AND_REWRITE, true);
+        public FileObjectDuplicationEventResult handle(FileObjectDuplicationEvent event) {
+            return new FileObjectDuplicationEventResult(FileObjectDuplicationEventResult.ResultType.COPY_AND_REWRITE, true);
         }
     }
 
     private static final class DefaultFileObjectSecurityHandler implements FileObjectSecurityHandler {
 
         @Override
-        public void handle(FileObjectSecurityEvent event) {
-
+        public FileObjectSecurityEventResult handle(FileObjectSecurityEvent event) {
+            return new FileObjectSecurityEventResult(FileObjectSecurityEventResult.ResultType.CANCEL, null);
         }
     }
 

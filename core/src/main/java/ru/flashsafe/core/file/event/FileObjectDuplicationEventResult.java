@@ -6,18 +6,18 @@ package ru.flashsafe.core.file.event;
  * @author Andrew
  *
  */
-public class FileObjectDuplicationHandleResult {
+public class FileObjectDuplicationEventResult {
     
     private final ResultType result;
     
     private final boolean applyToAll;
     
-    public FileObjectDuplicationHandleResult(ResultType result, boolean applyToAll) {
+    public FileObjectDuplicationEventResult(ResultType result, boolean applyToAll) {
         this.result = result;
         this.applyToAll = applyToAll;
     }
     
-    public FileObjectDuplicationHandleResult(ResultType result) {
+    public FileObjectDuplicationEventResult(ResultType result) {
         this(result, false);
     }
     

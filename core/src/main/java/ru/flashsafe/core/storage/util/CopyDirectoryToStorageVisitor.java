@@ -42,12 +42,12 @@ public class CopyDirectoryToStorageVisitor extends SimpleFileVisitor<Path> {
     private final CompositeFileStorageOperation operation;
 
     public CopyDirectoryToStorageVisitor(Path fromPath, FlashSafeStorageFileObject toPath, FlashSafeStorageIdBasedService storageService,
-            CompositeFileStorageOperation operation) {
+            ResourceResolver resourceResolver, CompositeFileStorageOperation operation) {
         this.fromPath = fromPath;
         this.toPath = toPath;
         this.storageService = storageService;
         this.operation = operation;
-        resolver = new ResourceResolver(storageService);
+        resolver = resourceResolver;
     }
 
     @Override

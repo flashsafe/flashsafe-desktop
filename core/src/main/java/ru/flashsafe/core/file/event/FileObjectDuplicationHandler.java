@@ -14,6 +14,6 @@ public interface FileObjectDuplicationHandler {
      * @param event fileObject duplication event
      * @return result of handle
      */
-    FileObjectDuplicationHandleResult handle(FileObjectDuplicationEvent event);
+    FileObjectDuplicationEventResult handle(FileObjectDuplicationEvent event);
     
 }
