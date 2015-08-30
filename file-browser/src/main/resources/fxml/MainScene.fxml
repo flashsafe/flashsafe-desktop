@@ -20,10 +20,10 @@
                <children>
                   <TableView fx:id="files" prefHeight="657.0" prefWidth="710.0" style="-fx-background-insets: 0; -fx-padding: 0;" styleClass="files" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <columns>
-                      <TableColumn prefWidth="90.0" text="Тип" />
-                      <TableColumn prefWidth="319.0" text="Имя" />
-                        <TableColumn minWidth="0.0" prefWidth="110.0" text="Размер" />
-                        <TableColumn minWidth="0.0" prefWidth="141.0" text="Дата создания" />
+                      <TableColumn prefWidth="90.0" text="%type" />
+                      <TableColumn prefWidth="319.0" text="%name" />
+                        <TableColumn minWidth="0.0" prefWidth="110.0" text="%size" />
+                        <TableColumn minWidth="0.0" prefWidth="141.0" text="%creation_date" />
                     </columns>
                   </TableView>
                </children>
@@ -45,22 +45,22 @@
       <Pane id="Menu" fx:id="menu" layoutX="700.0" layoutY="77.0" prefHeight="172.0" prefWidth="200.0" visible="false">
          <children>
             <Label id="TopTriangle" prefHeight="5.0" prefWidth="200.0" />
-            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="12.0" prefHeight="40.0" prefWidth="200.0" text="Настройки" textFill="#7c7c7c">
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="12.0" prefHeight="40.0" prefWidth="200.0" text="%settings" textFill="#7c7c7c">
                <font>
                   <Font name="Ubuntu" size="18.0" />
                </font>
             </Label>
-            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="52.0" prefHeight="40.0" prefWidth="200.0" text="Настройки" textFill="#7c7c7c">
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="52.0" prefHeight="40.0" prefWidth="200.0" text="%settings" textFill="#7c7c7c">
                <font>
                   <Font name="Ubuntu" size="18.0" />
                </font>
             </Label>
-            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="92.0" prefHeight="40.0" prefWidth="200.0" text="Настройки" textFill="#7c7c7c">
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="92.0" prefHeight="40.0" prefWidth="200.0" text="%settings" textFill="#7c7c7c">
                <font>
                   <Font name="Ubuntu" size="18.0" />
                </font>
             </Label>
-            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="132.0" prefHeight="40.0" prefWidth="200.0" text="Настройки" textFill="#7c7c7c">
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="132.0" prefHeight="40.0" prefWidth="200.0" text="%settings" textFill="#7c7c7c">
                <font>
                   <Font name="Ubuntu" size="18.0" />
                </font>
@@ -79,7 +79,7 @@
       </Pane>
       <Pane id="PincodeDialog" fx:id="pincode_dialog" layoutX="288.0" layoutY="150.0" prefHeight="150.0" prefWidth="300.0" visible="false">
          <children>
-            <Label id="PincodeTitle" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="300.0" text="Введите пин-код" textFill="#7c7c7c">
+            <Label id="PincodeTitle" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="300.0" text="%enter_pin_code" textFill="#7c7c7c">
                <font>
                   <Font name="Ubuntu Condensed" size="18.0" />
                </font>
@@ -157,7 +157,7 @@
       </Pane>
       <Pane id="CreatePathDialog" fx:id="pathname_dialog" layoutX="288.0" layoutY="263.0" prefHeight="150.0" prefWidth="325.0" visible="false">
          <children>
-            <Label id="CreatePathTitle" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="325.0" text="Имя папки" textFill="#7c7c7c">
+            <Label id="CreatePathTitle" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="325.0" text="%folder_name" textFill="#7c7c7c">
                <font>
                   <Font name="Ubuntu Condensed" size="18.0" />
                </font>
@@ -219,37 +219,37 @@
          </children></Pane>
       <Pane layoutX="55.0" layoutY="55.0" prefHeight="595.0" prefWidth="210.0" style="-fx-background-color: #ECEFF4;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="55.0" AnchorPane.topAnchor="55.0">
          <children>
-            <Label fx:id="myfiles" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Мои файлы">
+            <Label fx:id="myfiles" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="%my_files">
                <font>
                   <Font name="MyriadPro-Regular" size="1.0" />
                </font>
             </Label>
-            <Label fx:id="docs" layoutY="75.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Документы">
+            <Label fx:id="docs" layoutY="75.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="%documents">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
-            <Label fx:id="pictures" layoutY="150.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Изображения">
+            <Label fx:id="pictures" layoutY="150.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="%images">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
-            <Label fx:id="sounds" layoutY="220.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Музыка">
+            <Label fx:id="sounds" layoutY="220.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="%music">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
-            <Label fx:id="videos" layoutY="290.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Видео">
+            <Label fx:id="videos" layoutY="290.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="%video">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
-            <Label fx:id="loads" layoutY="360.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Загрузки">
+            <Label fx:id="loads" layoutY="360.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="%downloads">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
-            <Label fx:id="contacts" layoutY="430.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="Контакты">
+            <Label fx:id="contacts" layoutY="430.0" prefHeight="95.0" prefWidth="210.0" styleClass="category" text="%contacts">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
@@ -260,10 +260,10 @@
          <children>
             <Pane prefHeight="500.0" prefWidth="180.0" style="-fx-background-color: #353F4B;">
                <children>
-                  <Label fx:id="rendering" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="Отображение" />
-                  <Label fx:id="caching" layoutY="50.0" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="Кэширование" />
-                  <Label fx:id="hardware" layoutY="100.0" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="Об устройстве" />
-                  <Label fx:id="software" layoutY="150.0" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="О программе" />
+                  <Label fx:id="rendering" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="%view" />
+                  <Label fx:id="caching" layoutY="50.0" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="%caching" />
+                  <Label fx:id="hardware" layoutY="100.0" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="%about_device" />
+                  <Label fx:id="software" layoutY="150.0" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="%about" />
                   <Pane fx:id="software_pane" layoutX="180.0" prefHeight="500.0" prefWidth="420.0" visible="false">
                      <children>
                         <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="135.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
@@ -273,16 +273,7 @@
                         </ImageView>
                         <Label alignment="CENTER" layoutX="147.0" layoutY="149.0" style="-fx-padding: 0;" styleClass="category" text="Flashsafe 1.0.0" />
                         <!--
-                        <Label layoutX="14.0" layoutY="209.0" styleClass="category" text="Дизайн:" />
-                        <Label layoutX="188.0" layoutY="237.0" prefHeight="30.0" prefWidth="174.0" styleClass="category" text="Алексей Павлов" />
-                        <Label layoutX="14.0" layoutY="265.0" styleClass="category" text="Разработка:" />
-                        <Label layoutX="183.0" layoutY="295.0" styleClass="category" text="Андрей Бурыхин" />
-                        <Label layoutX="236.0" layoutY="325.0" styleClass="category" text="Егор Часов" />
-                        <Label layoutX="14.0" layoutY="355.0" styleClass="category" text="Аппаратная часть: Павел Хивинцев" />
-                        <Label layoutX="14.0" layoutY="385.0" styleClass="category" text="IT-Евангелист:" />
-                        <Label layoutX="161.0" layoutY="209.0" styleClass="category" text="Вячеслав Кузнецов" />
-                        <Label layoutX="164.0" layoutY="265.0" styleClass="category" text="Александр Крысин" />
-                        <Label layoutX="191.0" layoutY="385.0" styleClass="category" text="Алексей Чуркин" />
+                            Removed
                         -->
                         <Hyperlink fx:id="link" contentDisplay="CENTER" layoutX="126.0" layoutY="466.0" text="http://flashsafe.ru">
                            <font>

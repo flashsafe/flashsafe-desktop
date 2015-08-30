@@ -138,6 +138,8 @@ public class MainSceneController implements Initializable, UploadProgressListene
 
     private ObservableList<TableRow> currentDirectoryEntries = FXCollections.observableArrayList();
 
+    private ResourceBundle resourceBundle;
+
     @FXML
     private Pane topPane;
     @FXML
@@ -245,6 +247,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
 
                     });
 
+                    // FIXME use column name not index
                     ((TableColumn) files.getColumns().get(0)).setCellValueFactory(new PropertyValueFactory<TableRow, String>(
                             "type"));
                     TableColumn<TableRow, Label> nameColumn = (TableColumn<TableRow, Label>) files.getColumns().get(1);
@@ -298,17 +301,14 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     eight.setOnMouseClicked(getOnNumClick(eight));
                     nine.setOnMouseClicked(getOnNumClick(nine));
                     zero.setOnMouseClicked(getOnNumClick(zero));
-                    ResizeHandler listener = new ResizeHandler(Main._scene, Main._stage);
-                    window.setOnMouseMoved(listener);
-                    window.setOnMousePressed(listener);
-                    window.setOnMouseDragged(listener);
+                    ResizeHandler handler = new ResizeHandler(Main._scene, Main._stage);
+                    window.setOnMouseMoved(handler);
+                    window.setOnMousePressed(handler);
+                    window.setOnMouseDragged(handler);
                     topPane.setOnMouseClicked(event -> {
                         switch (event.getClickCount()) {
-                        case 1:
-                            display_menu.setVisible(!display_menu.isVisible());
-                            break;
                         case 2:
-                            Main._stage.setFullScreen(!Main._stage.isFullScreen());
+                            Main._stage.setMaximized(!Main._stage.isMaximized());
                             break;
                         }
 
@@ -400,7 +400,8 @@ public class MainSceneController implements Initializable, UploadProgressListene
      * Initializes the controller class.
      */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.resourceBundle = resourceBundle;
         Font myriadPro = Font.loadFont(getClass().getResourceAsStream("/font/myriadpro_regular.ttf"), 20);
         Label[] categories = { myfiles, docs, pictures, sounds, videos, loads, contacts };
         for (Label l : categories) {
@@ -588,12 +589,14 @@ public class MainSceneController implements Initializable, UploadProgressListene
 
     public void onUploadFileClick() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Выгрузить файл");
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Text Files", "*.txt", "*.rtf", "*.doc", "*.docx"),
-                new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.tiff", "*.ico"),
-                new ExtensionFilter("Audio Files", "*.wav", "*.mp3", "*.aac", "*.wma", "*.amr"),
-                new ExtensionFilter("Video Files", "*.wmv", "*.mp4", "*.avi", "*.mov", "*.flv", "*.3gp", "*.3gpp"),
-                new ExtensionFilter("All Files", "*.*"));
+        fileChooser.setTitle(resourceBundle.getString("upload_file"));
+        fileChooser.getExtensionFilters().addAll(
+                new ExtensionFilter(resourceBundle.getString("text_files"), "*.txt", "*.rtf", "*.doc", "*.docx"),
+                new ExtensionFilter(resourceBundle.getString("image_files"), "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp",
+                        "*.tiff", "*.ico"),
+                new ExtensionFilter(resourceBundle.getString("audio_files"), "*.wav", "*.mp3", "*.aac", "*.wma", "*.amr"),
+                new ExtensionFilter(resourceBundle.getString("video_files"), "*.wmv", "*.mp4", "*.avi", "*.mov", "*.flv",
+                        "*.3gp", "*.3gpp"), new ExtensionFilter(resourceBundle.getString("all_types"), "*.*"));
         File selectedFile = fileChooser.showOpenDialog(Main._stage);
         if (selectedFile != null) {
             uploadFile(selectedFile);
@@ -632,7 +635,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        currentDirectoryEntries.add(TableRow.fromFSObject(f, label));
+                        currentDirectoryEntries.add(TableRow.fromFSObject(f, label, resourceBundle));
                     }
                 });
                 FSObject[] new_content = new FSObject[content.length + 1];
@@ -675,16 +678,29 @@ public class MainSceneController implements Initializable, UploadProgressListene
         files.getItems().clear();
     }
 
-    private static Tooltip createTooltipFor(FSObject fsObject) {
+    private Tooltip createTooltipFor(FSObject fsObject) {
         StringBuilder tooltipString = new StringBuilder();
-        tooltipString.append("Имя: ").append(fsObject.name).append(System.lineSeparator()).append("Тип: ").append(fsObject.type)
-                .append(System.lineSeparator()).append("file".equals(fsObject.type) ? "Формат: " + fsObject.format : "")
-                .append(System.lineSeparator()).append("Размер: ").append(String.valueOf(fsObject.size / 1024)).append("КБ")
-                .append(System.lineSeparator()).append("dir".equals(fsObject.type) ? "Файлов: " + fsObject.count + "" : "")
-                .append(System.lineSeparator()).append("Дата создания: ")
+        tooltipString
+                .append(resourceBundle.getString("name"))
+                .append(": ")
+                .append(fsObject.name)
+                .append(System.lineSeparator())
+                .append(resourceBundle.getString("type"))
+                .append(": ")
+                .append(fsObject.type)
+                .append(System.lineSeparator())
+                .append("file".equals(fsObject.type) ? resourceBundle.getString("file_format") + ": " + fsObject.format : "")
+                .append(System.lineSeparator())
+                .append(resourceBundle.getString("size"))
+                .append(": ")
+                .append(String.valueOf(fsObject.size / 1024))
+                .append(" КБ")
+                .append(System.lineSeparator())
+                .append("dir".equals(fsObject.type) ? resourceBundle.getString("number_of_files") + ": " + fsObject.count + ""
+                        : "").append(System.lineSeparator()).append(resourceBundle.getString("creation_date")).append(": ")
                 .append(new Date(fsObject.create_time * 1000).toLocaleString()).append(System.lineSeparator())
-                .append("Последнее обновление: ").append(new Date(fsObject.update_time * 1000).toLocaleString())
-                .append(System.lineSeparator());
+                .append(resourceBundle.getString("last_update")).append(": ")
+                .append(new Date(fsObject.update_time * 1000).toLocaleString()).append(System.lineSeparator());
         return new Tooltip(tooltipString.toString());
     }
 
@@ -707,7 +723,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                 label.setOnMouseClicked(getOnElementClick(label));
                 Tooltip tooltip = createTooltipFor(fso);
                 label.setTooltip(tooltip);
-                currentDirectoryEntries.add(TableRow.fromFSObject(fso, label));
+                currentDirectoryEntries.add(TableRow.fromFSObject(fso, label, resourceBundle));
                 if (fso.type.equals("dir")) {
                     path_childrens.add(fso);
                 }
@@ -790,25 +806,25 @@ public class MainSceneController implements Initializable, UploadProgressListene
     }
 
     public static class TableRow {
-        
+
         private SimpleStringProperty type;
-        
+
         private Label name;
-        
+
         private SimpleStringProperty size;
-        
+
         private SimpleStringProperty createDate;
 
-        public TableRow(String _type, Label _name, String _size, String _create_date) {
+        private TableRow(String _type, Label _name, String _size, String _create_date) {
             this.type = new SimpleStringProperty(_type);
             this.name = _name;
             this.size = new SimpleStringProperty(_size);
             this.createDate = new SimpleStringProperty(_create_date);
         }
 
-        public static TableRow fromFSObject(FSObject fsObject, Label label) {
-            return new TableRow(fsObject.type.equals("file") ? "Файл" : "Папка", label, String.valueOf(fsObject.size / 1024)
-                    + "КБ", new Date(fsObject.create_time * 1000).toLocaleString());
+        public static TableRow fromFSObject(FSObject fsObject, Label label, ResourceBundle bundle) {
+            return new TableRow(fsObject.type.equals("file") ? bundle.getString("file") : bundle.getString("folder"), label,
+                    String.valueOf(fsObject.size / 1024) + " КБ", new Date(fsObject.create_time * 1000).toLocaleString());
         }
 
         public String getType() {

@@ -1,5 +1,7 @@
 package ru.flashsafe;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,6 +26,10 @@ public class Main extends Application {
 
     private static final Logger log = LogManager.getLogger(Main.class);
 
+    private static Locale currentLocale;
+
+    private static ResourceBundle currentResourceBundle;
+
     public static Stage _stage;
 
     public static Scene _scene;
@@ -42,7 +48,9 @@ public class Main extends Application {
                         stage.setMinWidth(975);
                         stage.setMinHeight(650);
                         try {
-                            Parent root = FXMLLoader.load(getClass().getResource("/fxml/MainScene.fxml"));
+                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/MainScene.fxml"));
+                            fxmlLoader.setResources(currentResourceBundle);
+                            Parent root = fxmlLoader.load();
                             Scene scene = new Scene(root);
                             _scene = scene;
                             stage.setScene(scene);
@@ -57,8 +65,9 @@ public class Main extends Application {
                 });
             }
         });
-
-        SystemTrayUtil.addToSystemTray();
+        
+        SystemTrayUtil.addToSystemTray(currentResourceBundle.getString("connection_established"),
+                currentResourceBundle.getString("flashsafe_ready_to_use"));
     }
 
     @Override
@@ -72,6 +81,8 @@ public class Main extends Application {
      *            the command line arguments
      */
     public static void main(String[] args) {
+        currentLocale = Locale.getDefault();
+        currentResourceBundle = ResourceBundle.getBundle("bundles.interface", currentLocale);
         launch(args);
     }
 

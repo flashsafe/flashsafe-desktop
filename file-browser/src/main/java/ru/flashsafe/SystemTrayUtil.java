@@ -26,13 +26,12 @@ public class SystemTrayUtil {
     private SystemTrayUtil() {
     }
 
-    public static void addToSystemTray() {
+    public static void addToSystemTray(String caption, String text) {
         if (tray != null) {
             try {
                 trayIcon = new TrayIcon(new ImageIcon(SystemTrayUtil.class.getResource("/img/logo1.png")).getImage(), "Flashsafe");
                 tray.add(trayIcon);
-                trayIcon.displayMessage("Соединение установлено",
-                        "Успешно установлено соединение с облаком. Ваша флешка готова к работе.", TrayIcon.MessageType.INFO);
+                trayIcon.displayMessage(caption, text, TrayIcon.MessageType.INFO);
             } catch (AWTException e) {
                 logger.warn("Error while adding FlashSafe to tray", e);
             }

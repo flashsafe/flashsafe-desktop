@@ -8,6 +8,12 @@ import java.util.Map.Entry;
 
 import javafx.scene.image.Image;
 
+/**
+ * 
+ * 
+ * @author Andrew
+ *
+ */
 public class IconUtil {
 
     private static final Map<String, Image> extensionToIconMap = new HashMap<>();
