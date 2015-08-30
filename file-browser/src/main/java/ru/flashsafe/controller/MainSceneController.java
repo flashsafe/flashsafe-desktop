@@ -17,20 +17,19 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -68,9 +67,11 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import ru.flashsafe.IconUtil;
 import ru.flashsafe.Main;
 import ru.flashsafe.http.HttpAPI;
 import ru.flashsafe.http.UploadProgressListener;
@@ -86,7 +87,8 @@ import ru.flashsafe.model.FSObject;
  * @author alex_xpert
  */
 public class MainSceneController implements Initializable, UploadProgressListener {
-    private static final Logger log = LogManager.getLogger(MainSceneController.class);
+    
+    private static final Logger logger = LogManager.getLogger(MainSceneController.class);
 
     //private final Image cloud_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/cloud_enabled.png"));
     //private final Image upload_enabled = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/upload_enabled.png"));
@@ -101,8 +103,8 @@ public class MainSceneController implements Initializable, UploadProgressListene
     //private final Image arrowIcon = new Image(getClass().getResourceAsStream("/ru/flashsafe/img/arrow.png"));
     private final Image folderFull = new Image(getClass().getResourceAsStream("/img/fs/folder.png"), 24, 24, false, false);
 
-    private final ArrayList<FSObject> PARENT_PATH = new ArrayList<>();
-    private final HashMap<Integer, ArrayList<FSObject>> CHILDRENS = new HashMap<>();
+    private final List<FSObject> PARENT_PATH = new ArrayList<>();
+    private final Map<Integer, List<FSObject>> CHILDRENS = new HashMap<>();
     private FSObject cur_path = new FSObject(0, "dir", "/", "", 0, false, 0, 0, 0);
     private FSObject current_element = cur_path;
     private FSObject[] content;
@@ -110,13 +112,13 @@ public class MainSceneController implements Initializable, UploadProgressListene
     private boolean menu_opened = false;
     private int path;
     private String pincode = "";
-    private ArrayList<ListView> lists = new ArrayList<>();
+    private List<ListView> lists = new ArrayList<>();
     private final ArrayList<FSObject> FORWARD_PATH = new ArrayList<>();
     //public static RemoteEmulatorTokenService rets;
     private boolean run = false;
     private TreeView current_tv = null;
-    private final ArrayList<TreeView> TREE_VIEW = new ArrayList<>();
-    private final ArrayList<TreeView> TREE_VIEW_FORWARD = new ArrayList<>();
+    private final List<TreeView> TREE_VIEW = new ArrayList<>();
+    private final List<TreeView> TREE_VIEW_FORWARD = new ArrayList<>();
     final int[] x = new int[1];
     final int[] y = new int[1];
     private String pin = "";
@@ -193,10 +195,10 @@ public class MainSceneController implements Initializable, UploadProgressListene
 
     }
 
-    private class AddHandlersTask implements Callable {
+    private class AddHandlersTask implements Callable<Void> {
 
         @Override
-        public Object call() throws Exception {
+        public Void call() throws Exception {
             Platform.runLater(new Runnable() {
 
                 @Override
@@ -205,7 +207,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                             public void handle(MouseEvent event) {
                                 Dragboard db = files.startDragAndDrop(TransferMode.ANY);
                                 ClipboardContent content = new ClipboardContent();
-                                ArrayList<File> list = new ArrayList();
+                                List<File> list = new ArrayList<>();
                                 list.add(new File("./.mime"));
                                 content.putFiles(list);
                                 db.setContent(content);
@@ -234,10 +236,10 @@ public class MainSceneController implements Initializable, UploadProgressListene
                                 event.consume();
                             }
                         });
-                        backspace.setOnMouseClicked(new EventHandler() {
+                        backspace.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
                             @Override
-                            public void handle(Event event) {
+                            public void handle(MouseEvent event) {
                                 backspace();
                             }
                         });
@@ -321,7 +323,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
 									try {
 								        Desktop.getDesktop().browse(new URI(link.getText()));
 								    } catch (IOException | URISyntaxException e) {
-								    	log.error(e);
+								    	logger.error(e);
 								    }
 								}
 							}
@@ -376,32 +378,13 @@ public class MainSceneController implements Initializable, UploadProgressListene
 
 
     /**
-     * Получаем иконку файла, размером 16x16
+     * Получаем иконку файла, размером 24x24
+     * 
      * @param filename
      * @return
      */
     private Image getFileIcon(String filename) {
-        Image image = null;
-        List<String> archives = Arrays.asList("rar", "zip", "gz", "bz", "7z", "bz2", "tar", "deb", "rpm");
-        List<String> documents = Arrays.asList("txt", "rtf", "doc", "xls", "ppt", "docx", "xlsx", "pptx", "odt", "odp", "ods", "odg");
-        List<String> pictures = Arrays.asList("jpeg", "jpe", "jpg", "png", "gif", "tiff", "tif", "bmp", "wlmp", "svg", "eps", "ico", "icns");
-        List<String> sounds = Arrays.asList("mp1", "mp2", "mp3", "wma", "wav", "amr", "aac", "midi", "ogg");
-        List<String> videos = Arrays.asList("3gp", "3gpp", "avi", "flv", "mkv", "mov", "qt", "vob", "wmv");
-        String ext = filename.substring(filename.lastIndexOf(".") + 1);
-        if(archives.contains(ext)) {
-        	image = new Image(getClass().getResourceAsStream("/img/fs/archive.png"), 24, 24, false, false);
-        } else if(documents.contains(ext)) {
-        	image = new Image(getClass().getResourceAsStream("/img/fs/document.png"), 24, 24, false, false);
-        } else if(pictures.contains(ext)) {
-        	image = new Image(getClass().getResourceAsStream("/img/fs/picture.png"), 24, 24, false, false);
-        } else if(sounds.contains(ext)) {
-        	image = new Image(getClass().getResourceAsStream("/img/fs/music.png"), 24, 24, false, false);
-        } else if(videos.contains(ext)) {
-        	image = new Image(getClass().getResourceAsStream("/img/fs/video.png"), 24, 24, false, false);
-        } else {
-        	image = new Image(getClass().getResourceAsStream("/img/fs/binary.png"), 24, 24, false, false);
-        }
-        return image;
+        return IconUtil.getFileIcon(filename);
     }
 
     /**
@@ -426,7 +409,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                 loadContent(cur_path.id, "", current_tv);
             }
         } catch(InterruptedException | ExecutionException e) {
-            log.error(e);
+            logger.error(e);
         }
     }
 
@@ -488,7 +471,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     }
 
     private void resetNums() {
-        ArrayList<String> nums = new ArrayList();
+        List<String> nums = new ArrayList<>();
         nums.add("1");
         nums.add("2");
         nums.add("3");
@@ -699,7 +682,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
         switch(code) {
             case 0:
                 content = (FSObject[]) answer[0];
-                ArrayList<FSObject> path_childrens = new ArrayList<>();
+                List<FSObject> path_childrens = new ArrayList<>();
                 ((TableColumn) files.getColumns().get(0)).setCellValueFactory(new PropertyValueFactory<TableRow, String>("type"));
                 ((TableColumn) files.getColumns().get(1)).setCellValueFactory(new PropertyValueFactory<TableRow, Label>("name"));
                 ((TableColumn) files.getColumns().get(1)).setComparator(new Comparator<Label>() {
@@ -771,7 +754,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                 }
                 break;
             case 1:
-                CHILDRENS.put(path_id, new ArrayList());
+                CHILDRENS.put(path_id, new ArrayList<>());
                 if(!pin.equals("")) {
                     pincode = pincode_textfield.getText();
                     pincode_textfield.setText("");
