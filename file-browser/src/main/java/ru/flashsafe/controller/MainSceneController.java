@@ -12,11 +12,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +28,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -124,7 +122,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     private int path;
     private String pincode = "";
     private List<ListView> lists = new ArrayList<>();
-    private final ArrayList<FSObject> FORWARD_PATH = new ArrayList<>();
+    private final List<FSObject> FORWARD_PATH = new ArrayList<>();
     // public static RemoteEmulatorTokenService rets;
     private boolean run = false;
     private TreeView current_tv = null;
@@ -237,9 +235,9 @@ public class MainSceneController implements Initializable, UploadProgressListene
                         event.consume();
                     });
                     files.setOnDragDropped(event -> {
-                        Dragboard db = event.getDragboard();
-                        if (db.hasFiles()) {
-                            final File f = db.getFiles().get(0);
+                        Dragboard dragboard = event.getDragboard();
+                        if (dragboard.hasFiles()) {
+                            final File f = dragboard.getFiles().get(0);
                             uploadFile(f);
                         }
                         event.setDropCompleted(true);
@@ -248,46 +246,21 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     });
 
                     // FIXME use column name not index
-                    ((TableColumn) files.getColumns().get(0)).setCellValueFactory(new PropertyValueFactory<TableRow, String>(
-                            "type"));
-                    TableColumn<TableRow, Label> nameColumn = (TableColumn<TableRow, Label>) files.getColumns().get(1);
+                    TableColumn<TableRow, Label> nameColumn = (TableColumn<TableRow, Label>) files.getColumns().get(0);
                     nameColumn.setCellValueFactory(new PropertyValueFactory<TableRow, Label>("name"));
-                    nameColumn.setComparator(new Comparator<Label>() {
-                        @Override
-                        public int compare(Label p1, Label p2) {
-                            return java.text.Collator.getInstance().compare(p1.getText(), p2.getText());
-                        }
-                    });
 
-                    TableColumn<TableRow, String> sizeColumn = (TableColumn<TableRow, String>) files.getColumns().get(2);
-                    sizeColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("size"));
-                    sizeColumn.setComparator(new Comparator<String>() {
-                        @Override
-                        public int compare(String p1, String p2) {
-                            int one = Integer.parseInt(p1.replace("КБ", ""));
-                            int two = Integer.parseInt(p2.replace("КБ", ""));
-                            return one == two ? 0 : one < two ? -1 : 1;
-                        }
-                    });
-
-                    TableColumn<TableRow, String> createDateColumn = (TableColumn<TableRow, String>) files.getColumns().get(3);
+                    TableColumn<TableRow, String> createDateColumn = (TableColumn<TableRow, String>) files.getColumns().get(1);
                     createDateColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("createDate"));
-                    createDateColumn.setComparator(new Comparator<String>() {
-                        @Override
-                        public int compare(String p1, String p2) {
-                            DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                            Date d1 = null, d2 = null;
-                            try {
-                                d1 = df.parse(p1);
-                                d2 = df.parse(p2);
-                            } catch (ParseException pe) {
-                                pe.printStackTrace();
-                            }
-                            return d1.compareTo(d2);
-                        }
-                    });
-
-                    files.setItems(currentDirectoryEntries);
+                    
+                    ((TableColumn) files.getColumns().get(2)).setCellValueFactory(new PropertyValueFactory<TableRow, String>(
+                            "type"));
+                    
+                    TableColumn<TableRow, String> sizeColumn = (TableColumn<TableRow, String>) files.getColumns().get(3);
+                    sizeColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("size"));
+                    
+                    SortedList<TableRow> sortedFiles = new SortedList<>(currentDirectoryEntries);
+                    files.setItems(sortedFiles);
+                    sortedFiles.comparatorProperty().bind(files.comparatorProperty());
 
                     backspace.setOnMouseClicked(event -> backspace());
 
@@ -307,6 +280,9 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     window.setOnMouseDragged(handler);
                     topPane.setOnMouseClicked(event -> {
                         switch (event.getClickCount()) {
+                        case 1:
+                            //FIXME
+                            break;
                         case 2:
                             Main._stage.setMaximized(!Main._stage.isMaximized());
                             break;
@@ -575,11 +551,9 @@ public class MainSceneController implements Initializable, UploadProgressListene
             label.setOnMouseClicked(getOnElementClick(label));
             Tooltip tooltip = createTooltipFor(path);
             label.setTooltip(tooltip);
-            files.getItems().add(new TableRow("dir", label, "0", new Date().toLocaleString()));
-            FSObject[] new_content = new FSObject[content.length + 1];
-            for (int i = 0; i < content.length; i++) {
-                new_content[i] = content[i];
-            }
+            currentDirectoryEntries.add(new TableRow("dir", label, "0", new Date().toLocaleString()));
+            
+            FSObject[] new_content = Arrays.copyOf(content, content.length + 1);
             new_content[content.length] = path;
             content = new_content;
         } else {
@@ -638,10 +612,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                         currentDirectoryEntries.add(TableRow.fromFSObject(f, label, resourceBundle));
                     }
                 });
-                FSObject[] new_content = new FSObject[content.length + 1];
-                for (int i = 0; i < content.length; i++) {
-                    new_content[i] = content[i];
-                }
+                FSObject[] new_content = Arrays.copyOf(content, content.length + 1);
                 new_content[content.length] = f;
                 content = new_content;
             }
@@ -675,7 +646,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     }
 
     private void clearContent() {
-        files.getItems().clear();
+        currentDirectoryEntries.clear();
     }
 
     private Tooltip createTooltipFor(FSObject fsObject) {
@@ -711,21 +682,21 @@ public class MainSceneController implements Initializable, UploadProgressListene
         case 0:
             content = (FSObject[]) answer[0];
             List<FSObject> path_childrens = new ArrayList<>();
-            for (int i = 0; i < content.length; i++) {
-                FSObject fso = content[i];
-                ImageView icon = new ImageView(fso.type.equals("dir") ? fso.pincode ? lockBlackIcon : fso.count > 0 ? folderFull
-                        : folderBlackIcon : /* fileIcon */getFileIcon(fso.name));
-                Label label = new Label(fso.name, icon);
+            for (FSObject currentFSObject : content) {
+                ImageView icon = new ImageView(currentFSObject.type.equals("dir") ? currentFSObject.pincode ? lockBlackIcon
+                        : currentFSObject.count > 0 ? folderFull : folderBlackIcon
+                        : /* fileIcon */getFileIcon(currentFSObject.name));
+                Label label = new Label(currentFSObject.name, icon);
                 label.setFont(new Font("Ubuntu Condensed", 14));
                 label.setTextFill(Paint.valueOf("#000"));
-                label.setId(String.valueOf(fso.id));
+                label.setId(String.valueOf(currentFSObject.id));
                 label.setPrefWidth(340);
                 label.setOnMouseClicked(getOnElementClick(label));
-                Tooltip tooltip = createTooltipFor(fso);
+                Tooltip tooltip = createTooltipFor(currentFSObject);
                 label.setTooltip(tooltip);
-                currentDirectoryEntries.add(TableRow.fromFSObject(fso, label, resourceBundle));
-                if (fso.type.equals("dir")) {
-                    path_childrens.add(fso);
+                currentDirectoryEntries.add(TableRow.fromFSObject(currentFSObject, label, resourceBundle));
+                if (currentFSObject.type.equals("dir")) {
+                    path_childrens.add(currentFSObject);
                 }
             }
             CHILDRENS.put(path_id, path_childrens);

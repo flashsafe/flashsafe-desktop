@@ -81,7 +81,8 @@ public class Main extends Application {
      *            the command line arguments
      */
     public static void main(String[] args) {
-        currentLocale = Locale.getDefault();
+        //currentLocale = Locale.getDefault();
+        currentLocale = Locale.ENGLISH;
         currentResourceBundle = ResourceBundle.getBundle("bundles.interface", currentLocale);
         launch(args);
     }
