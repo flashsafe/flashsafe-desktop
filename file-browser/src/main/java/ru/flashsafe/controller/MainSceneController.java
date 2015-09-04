@@ -5,8 +5,9 @@
  */
 package ru.flashsafe.controller;
 
+import static ru.flashsafe.IconUtil.ICON_SIZE;
+
 import java.awt.Desktop;
-//import ch.randelshofer.quaqua.osx.OSXFile;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -29,6 +30,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -73,12 +75,8 @@ import ru.flashsafe.Main;
 import ru.flashsafe.http.HttpAPI;
 import ru.flashsafe.http.UploadProgressListener;
 import ru.flashsafe.model.FSObject;
-//import ru.flashsafe.token.FlashSafeToken;
-//import ru.flashsafe.token.event.BaseEventHandler;
-//import ru.flashsafe.token.exception.TokenServiceInitializationException;
-//import ru.flashsafe.token.generator.FixedValueGenerationStrategy;
-//import ru.flashsafe.token.service.impl.RemoteEmulatorTokenService;
-import ru.flashsafe.util.ResizeHandler;
+import ru.flashsafe.util.FontUtil;
+import ru.flashsafe.util.FontUtil.FontType;
 
 /**
  * FXML Controller class
@@ -99,18 +97,20 @@ public class MainSceneController implements Initializable, UploadProgressListene
     // Image(getClass().getResourceAsStream("/ru/flashsafe/img/create_folder_enabled.png"));
     // private final Image folderIcon = new
     // Image(getClass().getResourceAsStream("/ru/flashsafe/img/folder.png"));
-    private final Image folderBlackIcon = new Image(getClass().getResourceAsStream("/img/fs/folder_empty.png"), 24, 24, false,
-            false);
+    private final Image folderBlackIcon = new Image(getClass().getResourceAsStream("/img/fs/folder_empty.png"), ICON_SIZE,
+            ICON_SIZE, false, false);
     // private final Image lockIcon = new
     // Image(getClass().getResourceAsStream("/ru/flashsafe/img/lock.png"));
-    private final Image lockBlackIcon = new Image(getClass().getResourceAsStream("/img/fs/folder_lock.png"), 24, 24, false, false);
+    private final Image lockBlackIcon = new Image(getClass().getResourceAsStream("/img/fs/folder_lock.png"), ICON_SIZE,
+            ICON_SIZE, false, false);
     // private final Image dividerIcon = new
     // Image(getClass().getResourceAsStream("/ru/flashsafe/img/divider.png"));
     // private final Image fileIcon = new
     // Image(getClass().getResourceAsStream("/ru/flashsafe/img/file.png"));
     // private final Image arrowIcon = new
     // Image(getClass().getResourceAsStream("/ru/flashsafe/img/arrow.png"));
-    private final Image folderFull = new Image(getClass().getResourceAsStream("/img/fs/folder.png"), 24, 24, false, false);
+    private final Image folderFull = new Image(getClass().getResourceAsStream("/img/fs/folder.png"), ICON_SIZE, ICON_SIZE, false,
+            false);
 
     private final List<FSObject> PARENT_PATH = new ArrayList<>();
     private final Map<Integer, List<FSObject>> CHILDRENS = new HashMap<>();
@@ -251,13 +251,13 @@ public class MainSceneController implements Initializable, UploadProgressListene
 
                     TableColumn<TableRow, String> createDateColumn = (TableColumn<TableRow, String>) files.getColumns().get(1);
                     createDateColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("createDate"));
-                    
+
                     ((TableColumn) files.getColumns().get(2)).setCellValueFactory(new PropertyValueFactory<TableRow, String>(
                             "type"));
-                    
+
                     TableColumn<TableRow, String> sizeColumn = (TableColumn<TableRow, String>) files.getColumns().get(3);
                     sizeColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("size"));
-                    
+
                     SortedList<TableRow> sortedFiles = new SortedList<>(currentDirectoryEntries);
                     files.setItems(sortedFiles);
                     sortedFiles.comparatorProperty().bind(files.comparatorProperty());
@@ -274,14 +274,11 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     eight.setOnMouseClicked(getOnNumClick(eight));
                     nine.setOnMouseClicked(getOnNumClick(nine));
                     zero.setOnMouseClicked(getOnNumClick(zero));
-                    ResizeHandler handler = new ResizeHandler(Main._scene, Main._stage);
-                    window.setOnMouseMoved(handler);
-                    window.setOnMousePressed(handler);
-                    window.setOnMouseDragged(handler);
+
                     topPane.setOnMouseClicked(event -> {
                         switch (event.getClickCount()) {
                         case 1:
-                            //FIXME
+                            // FIXME
                             break;
                         case 2:
                             Main._stage.setMaximized(!Main._stage.isMaximized());
@@ -329,21 +326,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     flashsafe.setCursor(Cursor.MOVE);
                     attachWindowDragControlToElement(topPane);
 
-                    String[] dlitems = { "xlarge", "large", "medium", "small", "tile", "list", "table" };
-                    String[] dlinames = { "Огромные значки", "Большие значки", "Обычные значки", "Маленькие значки", "Плитка",
-                            "Список", "Таблица" };
-                    for (int i = 0; i < dlinames.length; i++) {
-                        Label l = new Label();
-                        l.setText(dlinames[i]);
-                        l.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/" + dlitems[i] + ".png"))));
-                        l.setStyle("-fx-text-fill: #353F4B ; -fx-font-size: 14px");
-                        display_list.getItems().add(l);
-                    }
-                    display_slider.setMin(0.0);
-                    display_slider.setMax(0.6);
-                    display_slider.setValue(0.0);
-                    display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/table.png"))));
-                    display_choice.setOnAction(event -> display_menu.setVisible(!display_menu.isVisible()));
+                    buildSelectViewControl();
                 }
 
             });
@@ -360,6 +343,24 @@ public class MainSceneController implements Initializable, UploadProgressListene
             windowXPosition = event.getSceneX();
             windowYPosition = event.getSceneY();
         });
+    }
+    
+    private void buildSelectViewControl() {
+        String[] dlitems = { "xlarge", "large", "medium", "small", "tile", "list", "table" };
+        String[] dlinames = { "Огромные значки", "Большие значки", "Обычные значки", "Маленькие значки", "Плитка",
+                "Список", "Таблица" };
+        for (int i = 0; i < dlinames.length; i++) {
+            Label itemLabel = new Label();
+            itemLabel.setText(dlinames[i]);
+            itemLabel.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/" + dlitems[i] + ".png"))));
+            itemLabel.setStyle("-fx-text-fill: #353F4B ; -fx-font-size: 14px");
+            display_list.getItems().add(itemLabel);
+        }
+        display_slider.setMin(0.0);
+        display_slider.setMax(0.6);
+        display_slider.setValue(0.0);
+        display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/table.png"))));
+        display_choice.setOnAction(event -> display_menu.setVisible(!display_menu.isVisible()));
     }
 
     /**
@@ -378,11 +379,11 @@ public class MainSceneController implements Initializable, UploadProgressListene
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
-        Font myriadPro = Font.loadFont(getClass().getResourceAsStream("/font/myriadpro_regular.ttf"), 20);
-        Label[] categories = { myfiles, docs, pictures, sounds, videos, loads, contacts };
-        for (Label l : categories) {
-            l.setFont(myriadPro);
-            l.setOnMousePressed(getOnCategoryClickListener(l));
+        Font leftMenuFont = FontUtil.instance().font(FontType.LEFT_MENU);
+        Label[] leftMenuCategories = { myfiles, docs, pictures, sounds, videos, loads, contacts };
+        for (Label categoryLabel : leftMenuCategories) {
+            categoryLabel.setFont(leftMenuFont);
+            categoryLabel.setOnMousePressed(getOnCategoryClickListener(categoryLabel));
         }
         myfiles.getStyleClass().remove(0);
         myfiles.getStyleClass().add("category1");
@@ -405,43 +406,43 @@ public class MainSceneController implements Initializable, UploadProgressListene
     }
 
     private EventHandler<MouseEvent> getOnCategoryClickListener(Label source) {
-        return new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                Label[] categories = { myfiles, docs, pictures, sounds, videos, loads, contacts };
-                for (Label l : categories) {
-                    l.getStyleClass().remove("category1");
-                    l.getStyleClass().add("category");
-                }
-                source.getStyleClass().remove("category");
-                source.getStyleClass().add("category1");
+        return event -> {
+            Label[] categories = { myfiles, docs, pictures, sounds, videos, loads, contacts };
+            for (Label category : categories) {
+                removeSelection(category);
             }
-
+            applySelection(source);
         };
     }
 
+    // FIXME - rename styles
+    private static void applySelection(Label label) {
+        label.getStyleClass().remove("category");
+        label.getStyleClass().add("category1");
+    }
+
+    // FIXME - rename styles
+    private static void removeSelection(Label label) {
+        label.getStyleClass().remove("category1");
+        label.getStyleClass().add("category");
+    }
+
     private EventHandler<MouseEvent> getOnSettingsCategoryClickListener(Label source) {
-        return new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                Label[] categories = { rendering, caching, hardware, software };
-                for (Label l : categories) {
-                    l.setStyle("-fx-text-fill: #ECEFF4;");
-                    l.getStyleClass().remove("category2");
-                    l.getStyleClass().add("category");
-                }
-                source.setStyle("-fx-text-fill: #555555;");
-                source.getStyleClass().remove("category");
-                source.getStyleClass().add("category2");
-                if (source.equals(software)) {
-                    software_pane.setVisible(true);
-                } else {
-                    software_pane.setVisible(false);
-                }
+        return event -> {
+            Label[] categories = { rendering, caching, hardware, software };
+            for (Label l : categories) {
+                l.setStyle("-fx-text-fill: #ECEFF4;");
+                l.getStyleClass().remove("category2");
+                l.getStyleClass().add("category");
             }
-
+            source.setStyle("-fx-text-fill: #555555;");
+            source.getStyleClass().remove("category");
+            source.getStyleClass().add("category2");
+            if (source.equals(software)) {
+                software_pane.setVisible(true);
+            } else {
+                software_pane.setVisible(false);
+            }
         };
     }
 
@@ -544,7 +545,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
             FSObject path = new FSObject(id, "dir", pathname_textfield.getText(), "", 0, false, 0, System.currentTimeMillis(),
                     System.currentTimeMillis());
             Label label = new Label(path.name, new ImageView(folderBlackIcon));
-            label.setFont(new Font("Ubuntu Condensed", 18));
+            label.setFont(FontUtil.instance().font(FontType.FILE_TABLE_CONTENT));
             label.setTextFill(Paint.valueOf("#7C7C7C"));
             label.setId(String.valueOf(path.id));
             label.setPrefWidth(340);
@@ -552,7 +553,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
             Tooltip tooltip = createTooltipFor(path);
             label.setTooltip(tooltip);
             currentDirectoryEntries.add(new TableRow("dir", label, "0", new Date().toLocaleString()));
-            
+
             FSObject[] new_content = Arrays.copyOf(content, content.length + 1);
             new_content[content.length] = path;
             content = new_content;
@@ -599,7 +600,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                         .getName().split("\\.").length - 1].toLowerCase(), selectedFile.length(), false, 0,
                         System.currentTimeMillis(), System.currentTimeMillis());
                 Label label = new Label(f.name, new ImageView(getFileIcon(f.name)));
-                label.setFont(new Font("Ubuntu Condensed", 18));
+                label.setFont(FontUtil.instance().font(FontType.FILE_TABLE_CONTENT));
                 label.setTextFill(Paint.valueOf("#7C7C7C"));
                 label.setId(String.valueOf(f.id));
                 label.setPrefWidth(340);
@@ -659,16 +660,22 @@ public class MainSceneController implements Initializable, UploadProgressListene
                 .append(resourceBundle.getString("type"))
                 .append(": ")
                 .append(fsObject.type)
-                .append(System.lineSeparator())
-                .append("file".equals(fsObject.type) ? resourceBundle.getString("file_format") + ": " + fsObject.format : "")
-                .append(System.lineSeparator())
+                .append(System.lineSeparator());
+        if ("file".equals(fsObject.type)) {
+            tooltipString.append(resourceBundle.getString("file_format")).append(": ").append(fsObject.format)
+                    .append(System.lineSeparator());
+        }
+        tooltipString
                 .append(resourceBundle.getString("size"))
                 .append(": ")
                 .append(String.valueOf(fsObject.size / 1024))
                 .append(" КБ")
-                .append(System.lineSeparator())
-                .append("dir".equals(fsObject.type) ? resourceBundle.getString("number_of_files") + ": " + fsObject.count + ""
-                        : "").append(System.lineSeparator()).append(resourceBundle.getString("creation_date")).append(": ")
+                .append(System.lineSeparator());
+        if ("dir".equals(fsObject.type)) {
+            tooltipString.append(resourceBundle.getString("number_of_files")).append(": ").append(fsObject.count)
+                    .append(System.lineSeparator());
+        }
+        tooltipString.append(resourceBundle.getString("creation_date")).append(": ")
                 .append(new Date(fsObject.create_time * 1000).toLocaleString()).append(System.lineSeparator())
                 .append(resourceBundle.getString("last_update")).append(": ")
                 .append(new Date(fsObject.update_time * 1000).toLocaleString()).append(System.lineSeparator());
@@ -687,7 +694,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                         : currentFSObject.count > 0 ? folderFull : folderBlackIcon
                         : /* fileIcon */getFileIcon(currentFSObject.name));
                 Label label = new Label(currentFSObject.name, icon);
-                label.setFont(new Font("Ubuntu Condensed", 14));
+                label.setFont(FontUtil.instance().font(FontType.FILE_TABLE_CONTENT));
                 label.setTextFill(Paint.valueOf("#000"));
                 label.setId(String.valueOf(currentFSObject.id));
                 label.setPrefWidth(340);

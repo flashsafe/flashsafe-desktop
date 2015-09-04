@@ -15,6 +15,8 @@ import javafx.scene.image.Image;
  *
  */
 public class IconUtil {
+    
+    public static final int ICON_SIZE = 25;
 
     private static final Map<String, Image> extensionToIconMap = new HashMap<>();
 
@@ -78,16 +80,16 @@ public class IconUtil {
 
     private static Map<IconType, Image> loadIcons() {
         Map<IconType, Image> typeToImage = new HashMap<>();
-        typeToImage.put(IconType.ARCHIVE, new Image(IconUtil.class.getResourceAsStream("/img/fs/archive.png"), 24, 24, false,
+        typeToImage.put(IconType.ARCHIVE, new Image(IconUtil.class.getResourceAsStream("/img/fs/archive.png"), ICON_SIZE, ICON_SIZE, false,
                 false));
-        typeToImage.put(IconType.DOCUMENT, new Image(IconUtil.class.getResourceAsStream("/img/fs/document.png"), 24, 24, false,
+        typeToImage.put(IconType.DOCUMENT, new Image(IconUtil.class.getResourceAsStream("/img/fs/document.png"), ICON_SIZE, ICON_SIZE, false,
                 false));
-        typeToImage.put(IconType.PICTURE, new Image(IconUtil.class.getResourceAsStream("/img/fs/picture.png"), 24, 24, false,
+        typeToImage.put(IconType.PICTURE, new Image(IconUtil.class.getResourceAsStream("/img/fs/picture.png"), ICON_SIZE, ICON_SIZE, false,
                 false));
-        typeToImage.put(IconType.MUSIC, new Image(IconUtil.class.getResourceAsStream("/img/fs/music.png"), 24, 24, false, false));
-        typeToImage.put(IconType.VIDEO, new Image(IconUtil.class.getResourceAsStream("/img/fs/video.png"), 24, 24, false, false));
+        typeToImage.put(IconType.MUSIC, new Image(IconUtil.class.getResourceAsStream("/img/fs/music.png"), ICON_SIZE, ICON_SIZE, false, false));
+        typeToImage.put(IconType.VIDEO, new Image(IconUtil.class.getResourceAsStream("/img/fs/video.png"), ICON_SIZE, ICON_SIZE, false, false));
         typeToImage.put(IconType.BINARY,
-                new Image(IconUtil.class.getResourceAsStream("/img/fs/binary.png"), 24, 24, false, false));
+                new Image(IconUtil.class.getResourceAsStream("/img/fs/binary.png"), ICON_SIZE, ICON_SIZE, false, false));
         return typeToImage;
     }
 

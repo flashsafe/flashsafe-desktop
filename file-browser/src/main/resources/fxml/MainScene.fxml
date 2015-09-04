@@ -18,7 +18,7 @@
         <content>
           <AnchorPane prefHeight="570.0" prefWidth="748.0" style="-fx-background-color: #FFFFFF;">
                <children>
-                  <TableView fx:id="files" prefHeight="657.0" prefWidth="710.0" style="-fx-background-insets: 0; -fx-padding: 0;" styleClass="files" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <TableView fx:id="files" prefHeight="657.0" prefWidth="710.0" style="-fx-background-insets: 0; -fx-padding: 0;" styleClass="files" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
                     <columns>
                       <TableColumn prefWidth="319.0" text="%name" />
                       <TableColumn minWidth="0.0" prefWidth="141.0" text="%creation_date" />
@@ -30,7 +30,7 @@
             </AnchorPane>
         </content>
       </ScrollPane>
-      <Pane id="TopToolbar" fx:id="topPane" maxHeight="55.0" minHeight="55.0" minWidth="975.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <Pane id="TopToolbar" fx:id="topPane" maxHeight="55.0" minHeight="55.0" minWidth="975.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <Label id="Flashsafe" fx:id="flashsafe" prefHeight="55.0" prefWidth="55.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <Button id="DisplayChoice" fx:id="display_choice" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="15.0" />
       <HBox id="DisplayMenu" fx:id="display_menu" alignment="CENTER" maxHeight="185.0" maxWidth="195.0" minHeight="185.0" minWidth="195.0" visible="false" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="15.0">

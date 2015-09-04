@@ -17,6 +17,8 @@ import javafx.stage.StageStyle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import ru.flashsafe.util.ResizeHelper;
+
 /**
  * Main class of a FlashSafe Desktop Client
  * 
@@ -54,6 +56,7 @@ public class Main extends Application {
                             Scene scene = new Scene(root);
                             _scene = scene;
                             stage.setScene(scene);
+                            ResizeHelper.addResizeListener(stage);
                         } catch (Exception e) {
                             log.error(e);
                             e.printStackTrace();
@@ -81,8 +84,7 @@ public class Main extends Application {
      *            the command line arguments
      */
     public static void main(String[] args) {
-        //currentLocale = Locale.getDefault();
-        currentLocale = Locale.ENGLISH;
+        currentLocale = Locale.getDefault();
         currentResourceBundle = ResourceBundle.getBundle("bundles.interface", currentLocale);
         launch(args);
     }
