@@ -5,17 +5,16 @@
  */
 package ru.flashsafe.controller;
 
+import static ru.flashsafe.IconUtil.ICON_SIZE;
+
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +31,8 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -80,12 +81,8 @@ import ru.flashsafe.Main;
 import ru.flashsafe.http.HttpAPI;
 import ru.flashsafe.http.UploadProgressListener;
 import ru.flashsafe.model.FSObject;
-//import ru.flashsafe.token.FlashSafeToken;
-//import ru.flashsafe.token.event.BaseEventHandler;
-//import ru.flashsafe.token.exception.TokenServiceInitializationException;
-//import ru.flashsafe.token.generator.FixedValueGenerationStrategy;
-//import ru.flashsafe.token.service.impl.RemoteEmulatorTokenService;
-import ru.flashsafe.util.ResizeHandler;
+import ru.flashsafe.util.FontUtil;
+import ru.flashsafe.util.FontUtil.FontType;
 
 /**
  * FXML Controller class
@@ -329,7 +326,115 @@ public class MainSceneController implements Initializable, UploadProgressListene
                                 d2 = df.parse(p2);
                             } catch (ParseException pe) {
                                 pe.printStackTrace();
+                    files.setOnDragDetected(event -> {
+                        Dragboard db = files.startDragAndDrop(TransferMode.ANY);
+                        ClipboardContent content = new ClipboardContent();
+                        List<File> list = new ArrayList<>();
+                        list.add(new File("./.mime"));
+                        content.putFiles(list);
+                        db.setContent(content);
+                        event.consume();
+
+                    });
+                    files.setOnDragOver(event -> {
+                        if (event.getGestureSource() != files && event.getDragboard().hasFiles()) {
+                            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                        }
+                        event.consume();
+                    });
+                    files.setOnDragDropped(event -> {
+                        Dragboard dragboard = event.getDragboard();
+                        if (dragboard.hasFiles()) {
+                            final File f = dragboard.getFiles().get(0);
+                            uploadFile(f);
+                        }
+                        event.setDropCompleted(true);
+                        event.consume();
+
+                    });
+
+                    // FIXME use column name not index
+                    TableColumn<TableRow, Label> nameColumn = (TableColumn<TableRow, Label>) files.getColumns().get(0);
+                    nameColumn.setCellValueFactory(new PropertyValueFactory<TableRow, Label>("name"));
+
+                    TableColumn<TableRow, String> createDateColumn = (TableColumn<TableRow, String>) files.getColumns().get(1);
+                    createDateColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("createDate"));
+
+                    ((TableColumn) files.getColumns().get(2)).setCellValueFactory(new PropertyValueFactory<TableRow, String>(
+                            "type"));
+
+                    TableColumn<TableRow, String> sizeColumn = (TableColumn<TableRow, String>) files.getColumns().get(3);
+                    sizeColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("size"));
+
+                    SortedList<TableRow> sortedFiles = new SortedList<>(currentDirectoryEntries);
+                    files.setItems(sortedFiles);
+                    sortedFiles.comparatorProperty().bind(files.comparatorProperty());
+
+                    backspace.setOnMouseClicked(event -> backspace());
+
+                    one.setOnMouseClicked(getOnNumClick(one));
+                    two.setOnMouseClicked(getOnNumClick(two));
+                    three.setOnMouseClicked(getOnNumClick(three));
+                    four.setOnMouseClicked(getOnNumClick(four));
+                    five.setOnMouseClicked(getOnNumClick(five));
+                    six.setOnMouseClicked(getOnNumClick(six));
+                    seven.setOnMouseClicked(getOnNumClick(seven));
+                    eight.setOnMouseClicked(getOnNumClick(eight));
+                    nine.setOnMouseClicked(getOnNumClick(nine));
+                    zero.setOnMouseClicked(getOnNumClick(zero));
+
+                    topPane.setOnMouseClicked(event -> {
+                        switch (event.getClickCount()) {
+                        case 1:
+                            // FIXME
+                            break;
+                        case 2:
+                            Main._stage.setMaximized(!Main._stage.isMaximized());
+                            break;
+                        }
+
+                    });
+                    KeyCombination backCombination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
+                    Main._stage.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
+                        if (backCombination.match(event)) {
+                            back();
+                        }
+
+                    });
+                    refresh.setOnMouseClicked(event -> {
+                        clearContent();
+                        loadContent(cur_path.id, "", current_tv);
+
+                    });
+                    settings.setOnMouseClicked(event -> {
+                        settings_pane.setVisible(true);
+
+                    });
+                    settings_close.setOnMouseClicked(event -> settings_pane.setVisible(false));
+
+                    Label[] settings_categories = { rendering, caching, hardware, software };
+                    for (Label l : settings_categories) {
+                        l.setOnMousePressed(getOnSettingsCategoryClickListener(l));
+                    }
+                    rendering.setStyle("-fx-text-fill: #555555;");
+                    rendering.getStyleClass().remove("category");
+                    rendering.getStyleClass().add("category2");
+                    link.setOnAction(event -> {
+                        if (Desktop.isDesktopSupported()) {
+                            try {
+                                Desktop.getDesktop().browse(new URI(link.getText()));
+                            } catch (IOException | URISyntaxException e) {
+                                logger.error(e);
                             }
+                        }
+
+                    });
+
+                    attachWindowDragControlToElement(flashsafe);
+                    flashsafe.setCursor(Cursor.MOVE);
+                    attachWindowDragControlToElement(topPane);
+
+                    buildSelectViewControl();
                             return d1.compareTo(d2);
                         }
                     });
@@ -524,6 +629,24 @@ public class MainSceneController implements Initializable, UploadProgressListene
             windowYPosition = event.getSceneY();
         });
     }
+    
+    private void buildSelectViewControl() {
+        String[] dlitems = { "xlarge", "large", "medium", "small", "tile", "list", "table" };
+        String[] dlinames = { "Огромные значки", "Большие значки", "Обычные значки", "Маленькие значки", "Плитка",
+                "Список", "Таблица" };
+        for (int i = 0; i < dlinames.length; i++) {
+            Label itemLabel = new Label();
+            itemLabel.setText(dlinames[i]);
+            itemLabel.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/" + dlitems[i] + ".png"))));
+            itemLabel.setStyle("-fx-text-fill: #353F4B ; -fx-font-size: 14px");
+            display_list.getItems().add(itemLabel);
+        }
+        display_slider.setMin(0.0);
+        display_slider.setMax(0.6);
+        display_slider.setValue(0.0);
+        display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/table.png"))));
+        display_choice.setOnAction(event -> display_menu.setVisible(!display_menu.isVisible()));
+    }
 
     /**
      * Получаем иконку файла
@@ -541,10 +664,14 @@ public class MainSceneController implements Initializable, UploadProgressListene
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
-        startTasks();
-    }
-    
-    public void startTasks() {
+        Font leftMenuFont = FontUtil.instance().font(FontType.LEFT_MENU);
+        Label[] leftMenuCategories = { myfiles, docs, pictures, sounds, videos, loads, contacts };
+        for (Label categoryLabel : leftMenuCategories) {
+            categoryLabel.setFont(leftMenuFont);
+            categoryLabel.setOnMousePressed(getOnCategoryClickListener(categoryLabel));
+        }
+        myfiles.getStyleClass().remove(0);
+        myfiles.getStyleClass().add("category1");
         HttpAPI.getInstance().addListener(this);
         Future<Boolean> connect = Main.es.submit(new ConnectToCloudTask());
         while (!connect.isDone()) {
@@ -570,43 +697,43 @@ public class MainSceneController implements Initializable, UploadProgressListene
     }
 
     private EventHandler<MouseEvent> getOnCategoryClickListener(Label source) {
-        return new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                Label[] categories = { myfiles, docs, pictures, sounds, videos, loads, contacts };
-                for (Label l : categories) {
-                    l.getStyleClass().remove("category1");
-                    l.getStyleClass().add("category");
-                }
-                source.getStyleClass().remove("category");
-                source.getStyleClass().add("category1");
+        return event -> {
+            Label[] categories = { myfiles, docs, pictures, sounds, videos, loads, contacts };
+            for (Label category : categories) {
+                removeSelection(category);
             }
-
+            applySelection(source);
         };
     }
 
+    // FIXME - rename styles
+    private static void applySelection(Label label) {
+        label.getStyleClass().remove("category");
+        label.getStyleClass().add("category1");
+    }
+
+    // FIXME - rename styles
+    private static void removeSelection(Label label) {
+        label.getStyleClass().remove("category1");
+        label.getStyleClass().add("category");
+    }
+
     private EventHandler<MouseEvent> getOnSettingsCategoryClickListener(Label source) {
-        return new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                Label[] categories = { rendering, caching, hardware, software };
-                for (Label l : categories) {
-                    l.setStyle("-fx-text-fill: #ECEFF4;");
-                    l.getStyleClass().remove("category2");
-                    l.getStyleClass().add("category");
-                }
-                source.setStyle("-fx-text-fill: #555555;");
-                source.getStyleClass().remove("category");
-                source.getStyleClass().add("category2");
-                if (source.equals(software)) {
-                    software_pane.setVisible(true);
-                } else {
-                    software_pane.setVisible(false);
-                }
+        return event -> {
+            Label[] categories = { rendering, caching, hardware, software };
+            for (Label l : categories) {
+                l.setStyle("-fx-text-fill: #ECEFF4;");
+                l.getStyleClass().remove("category2");
+                l.getStyleClass().add("category");
             }
-
+            source.setStyle("-fx-text-fill: #555555;");
+            source.getStyleClass().remove("category");
+            source.getStyleClass().add("category2");
+            if (source.equals(software)) {
+                software_pane.setVisible(true);
+            } else {
+                software_pane.setVisible(false);
+            }
         };
     }
 
@@ -917,10 +1044,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                         }
                     }
                 });
-                FSObject[] new_content = new FSObject[content.length + 1];
-                for (int i = 0; i < content.length; i++) {
-                    new_content[i] = content[i];
-                }
+                FSObject[] new_content = Arrays.copyOf(content, content.length + 1);
                 new_content[content.length] = f;
                 content = new_content;
             }
@@ -945,7 +1069,39 @@ public class MainSceneController implements Initializable, UploadProgressListene
     }
 
     private void clearContent() {
-        files.getItems().clear();
+        currentDirectoryEntries.clear();
+    }
+
+    private Tooltip createTooltipFor(FSObject fsObject) {
+        StringBuilder tooltipString = new StringBuilder();
+        tooltipString
+                .append(resourceBundle.getString("name"))
+                .append(": ")
+                .append(fsObject.name)
+                .append(System.lineSeparator())
+                .append(resourceBundle.getString("type"))
+                .append(": ")
+                .append(fsObject.type)
+                .append(System.lineSeparator());
+        if ("file".equals(fsObject.type)) {
+            tooltipString.append(resourceBundle.getString("file_format")).append(": ").append(fsObject.format)
+                    .append(System.lineSeparator());
+        }
+        tooltipString
+                .append(resourceBundle.getString("size"))
+                .append(": ")
+                .append(String.valueOf(fsObject.size / 1024))
+                .append(" КБ")
+                .append(System.lineSeparator());
+        if ("dir".equals(fsObject.type)) {
+            tooltipString.append(resourceBundle.getString("number_of_files")).append(": ").append(fsObject.count)
+                    .append(System.lineSeparator());
+        }
+        tooltipString.append(resourceBundle.getString("creation_date")).append(": ")
+                .append(new Date(fsObject.create_time * 1000).toLocaleString()).append(System.lineSeparator())
+                .append(resourceBundle.getString("last_update")).append(": ")
+                .append(new Date(fsObject.update_time * 1000).toLocaleString()).append(System.lineSeparator());
+        return new Tooltip(tooltipString.toString());
     }
 
     private Tooltip createTooltipFor(FSObject fsObject) {
@@ -1098,9 +1254,6 @@ public class MainSceneController implements Initializable, UploadProgressListene
                         label.setOnMouseClicked(getOnElementClick(label));
                         currentDirectoryEntries.add(TableRow.fromFSObject(fso, label, resourceBundle));
                         break;
-                }
-                if (fso.type.equals("dir")) {
-                    path_childrens.add(fso);
                 }
             }
             CHILDRENS.put(path_id, path_childrens);

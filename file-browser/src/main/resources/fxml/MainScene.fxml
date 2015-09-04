@@ -18,12 +18,12 @@
         <content>
           <AnchorPane fx:id="files_area" prefHeight="570.0" prefWidth="748.0" style="-fx-background-color: #FFFFFF;">
                <children>
-                  <TableView fx:id="files" prefHeight="657.0" prefWidth="710.0" style="-fx-background-insets: 0; -fx-padding: 0;" styleClass="files" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <TableView fx:id="files" prefHeight="657.0" prefWidth="710.0" style="-fx-background-insets: 0; -fx-padding: 0;" styleClass="files" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
                     <columns>
-                      <TableColumn prefWidth="90.0" text="%type" />
                       <TableColumn prefWidth="319.0" text="%name" />
-                        <TableColumn minWidth="0.0" prefWidth="110.0" text="%size" />
-                        <TableColumn minWidth="0.0" prefWidth="141.0" text="%creation_date" />
+                      <TableColumn minWidth="0.0" prefWidth="141.0" text="%creation_date" />
+                      <TableColumn prefWidth="90.0" text="%type" />
+                      <TableColumn minWidth="0.0" prefWidth="110.0" text="%size" />
                     </columns>
                   </TableView>
                   <GridPane fx:id="gfiles" prefHeight="589.0" prefWidth="702.0" visible="false">
