@@ -5,15 +5,19 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 import ru.flashsafe.core.file.Directory;
+import ru.flashsafe.core.file.FileObjectType;
 import ru.flashsafe.core.file.util.FileUtils;
 
 //TODO cache the results of getSize() and count() operations
 public class LocalDirectory implements Directory {
 
+    private final FileObjectType objectType;
+    
     private final Path directoryPath;
 
     protected LocalDirectory(Path directoryPath) {
         this.directoryPath = Objects.requireNonNull(directoryPath);
+        objectType = FileObjectType.DIRECTORY;
     }
 
     @Override
@@ -35,6 +39,11 @@ public class LocalDirectory implements Directory {
     @Override
     public int getCount() {
         return -1;
+    }
+
+    @Override
+    public FileObjectType getType() {
+        return objectType;
     }
 
 }

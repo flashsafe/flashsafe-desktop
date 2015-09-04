@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import ru.flashsafe.core.FlashSafeRegistry;
 import ru.flashsafe.core.FlashSafeSystem;
+import ru.flashsafe.core.file.FileManagementService;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.FileUtility;
 
@@ -14,13 +15,13 @@ public class DefaultFlashSafeSystem implements FlashSafeSystem {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFlashSafeSystem.class);
 
-    private final FileManager fileManager;
+    private final FileManagementService fileManagementService;
 
     private final FileUtility fileUtility;
     
     @Inject
-    public DefaultFlashSafeSystem(FileManager fileManager, FileUtility fileUtility) {
-        this.fileManager = fileManager;
+    public DefaultFlashSafeSystem(FileManagementService fileManagementService, FileUtility fileUtility) {
+        this.fileManagementService = fileManagementService;
         this.fileUtility = fileUtility;
         LOGGER.info("Using {} as an implementation of {}", DefaultFlashSafeSystem.class, FlashSafeSystem.class);
     }
@@ -31,8 +32,13 @@ public class DefaultFlashSafeSystem implements FlashSafeSystem {
     }
 
     @Override
+    public FileManagementService fileManagementService() {
+        return fileManagementService;
+    }
+    
+    @Override
     public FileManager fileManager() {
-        return fileManager;
+        return fileManagementService.getFileManager();
     }
 
     @Override

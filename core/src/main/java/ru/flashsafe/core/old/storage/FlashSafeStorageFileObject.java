@@ -79,14 +79,15 @@ public abstract class FlashSafeStorageFileObject implements FileObject {
         this.needPassword = needPassword;
     }
 
-    public FileObjectType getObjectType() {
+    public FileObjectType getType() {
         return objectType;
     }
 
-    public void setObjectType(FileObjectType objectType) {
+    public void setType(FileObjectType objectType) {
         this.objectType = objectType;
     }
     
+    @Override
     public String getAbsolutePath() {
         return absolutePath;
     }

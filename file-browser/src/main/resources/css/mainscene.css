@@ -251,3 +251,12 @@
 #DisplayList > .virtual-flow > .clipped-container > .sheet > .cell.indexed-cell.list-cell {
     -fx-background-color: #ECEFF4;
 }
+
+#SearchPane {
+    -fx-background-color: #55657F;
+}
+
+#SearchField {
+    -fx-text-fill: #ECEFF4;
+    -fx-background-color: transparent;
+}

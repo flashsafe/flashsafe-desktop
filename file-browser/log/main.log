@@ -1,0 +1,14 @@
+19:41:01,789 [ERROR] (MainSceneController.java:435) - java.util.concurrent.ExecutionException: com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_OBJECT but was BEGIN_ARRAY
+19:54:25,792 [ERROR] (Main.java:58) - javafx.fxml.LoadException: 
+/C:/Users/aless/git/dev/file-browser/build/resources/main/fxml/MainScene.fxml:15
+
+21:18:08,572 [ERROR] (Main.java:67) - javafx.fxml.LoadException: Error resolving onMousePressed='#toggleSettings', either the event handler is not in the Namespace or there is an error in the script.
+/C:/Users/aless/git/dev/file-browser/build/resources/main/fxml/MainScene.fxml:42
+
+21:23:09,382 [ERROR] (Main.java:67) - javafx.fxml.LoadException: Error resolving onMousePressed='#toggleSettings', either the event handler is not in the Namespace or there is an error in the script.
+/C:/Users/aless/git/dev/file-browser/build/resources/main/fxml/MainScene.fxml:42
+
+15:30:47,482 [ERROR] (MainSceneController.java:426) - java.util.concurrent.ExecutionException: com.google.gson.JsonSyntaxException: java.lang.IllegalStateException: Expected BEGIN_OBJECT but was BEGIN_ARRAY
+01:28:27,925 [ERROR] (Main.java:59) - javafx.fxml.LoadException: No resources specified.
+/Users/alex_xpert/Documents/dev/file-browser/build/resources/main/fxml/MainScene.fxml:23
+

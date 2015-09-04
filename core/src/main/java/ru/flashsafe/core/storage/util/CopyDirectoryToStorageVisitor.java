@@ -13,10 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
+import ru.flashsafe.core.old.storage.FlashSafeStorageIdBasedService;
+import ru.flashsafe.core.old.storage.ResourceResolver;
 import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.storage.CompositeFileStorageOperation;
-import ru.flashsafe.core.storage.FlashSafeStorageService;
-import ru.flashsafe.core.storage.ResourceResolver;
 import ru.flashsafe.core.storage.StorageFileOperation;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
@@ -35,19 +35,19 @@ public class CopyDirectoryToStorageVisitor extends SimpleFileVisitor<Path> {
     
     private final FlashSafeStorageFileObject toPath;
     
-    private final FlashSafeStorageService storageService;
+    private final FlashSafeStorageIdBasedService storageService;
     
     private final ResourceResolver resolver;
     
     private final CompositeFileStorageOperation operation;
 
-    public CopyDirectoryToStorageVisitor(Path fromPath, FlashSafeStorageFileObject toPath, FlashSafeStorageService storageService,
-            CompositeFileStorageOperation operation) {
+    public CopyDirectoryToStorageVisitor(Path fromPath, FlashSafeStorageFileObject toPath, FlashSafeStorageIdBasedService storageService,
+            ResourceResolver resourceResolver, CompositeFileStorageOperation operation) {
         this.fromPath = fromPath;
         this.toPath = toPath;
         this.storageService = storageService;
         this.operation = operation;
-        resolver = new ResourceResolver(storageService);
+        resolver = resourceResolver;
     }
 
     @Override

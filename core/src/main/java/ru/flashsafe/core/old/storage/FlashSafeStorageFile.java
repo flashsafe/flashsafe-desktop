@@ -14,7 +14,7 @@ public class FlashSafeStorageFile extends FlashSafeStorageFileObject implements 
     private int count;
     
     public FlashSafeStorageFile() {
-        setObjectType(FileObjectType.FILE);
+        setType(FileObjectType.FILE);
     }
     
     @Override

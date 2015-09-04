@@ -19,7 +19,7 @@ public class ListRemoteDirectory {
         FlashSafeApplication.run();
         
         FileManager fileManager = FlashSafeApplication.flashSafeSystem().fileManager();
-        List<FileObject> test96List = fileManager.list(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX  + "test9/Test96");
+        List<FileObject> test96List = fileManager.list(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX  + "");
         test96List.forEach(fileObject -> System.out.println(" - name: " + fileObject.getName()));
         
         FlashSafeApplication.stop();

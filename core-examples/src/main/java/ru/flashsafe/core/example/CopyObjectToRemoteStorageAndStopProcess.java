@@ -19,8 +19,8 @@ public class CopyObjectToRemoteStorageAndStopProcess {
         FlashSafeApplication.run();
 
         FileManager fileManager = FlashSafeApplication.flashSafeSystem().fileManager();
-        FileOperation copyOperation = fileManager.copy("{PUT_LOCAL_FILE_OBJECT_PATH}", FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX
-                + "{PUT_EXISTING_REMOTE_DIRECTORY}");
+        FileOperation copyOperation = fileManager.copy("D:\\magheli.pdf", FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX
+                + "");
         
         /* wait until finish */
         while(copyOperation.getState() != OperationState.FINISHED) {

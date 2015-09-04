@@ -21,7 +21,12 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
+
 import ru.flashsafe.core.FlashSafeRegistry;
+import ru.flashsafe.core.event.ApplicationStopEvent;
+import ru.flashsafe.core.event.FlashSafeEventService;
 import ru.flashsafe.core.old.storage.rest.data.AuthData;
 import ru.flashsafe.core.old.storage.rest.data.AuthResponse;
 
@@ -48,10 +53,18 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
 
     private AuthData currentAuthData;
 
-    public FlashSafeAuthClientFilter() {
+    @Inject
+    public FlashSafeAuthClientFilter(FlashSafeEventService eventService) {
         client = ClientBuilder.newBuilder().register(JacksonFeature.class).register(ContentTypeFixerFilter.class).build();
         String storageAddress = FlashSafeRegistry.getStorageAddress();
         authTarget = client.target(storageAddress).path(AUTH_URL);
+        eventService.registerSubscriber(this);
+    }
+    
+    @Subscribe
+    public void handleApplicationStopEvent(ApplicationStopEvent event) {
+        LOGGER.info("Handling application stop event");
+        client.close();
     }
 
     @Override

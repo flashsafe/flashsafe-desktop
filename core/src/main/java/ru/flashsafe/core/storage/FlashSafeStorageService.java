@@ -7,13 +7,6 @@ import ru.flashsafe.core.old.storage.FlashSafeStorageDirectory;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 
-/**
- * An object that represents a service to work with remote FlashSafe storage.
- * This object operate with objects' Ids, not names. Use {@link ResourceResolver} to map names to storage's Ids.
- * 
- * @author Andrew
- *
- */
 public interface FlashSafeStorageService {
 
     /**
@@ -23,7 +16,7 @@ public interface FlashSafeStorageService {
      * @return list of fileObjects in this directory
      * @throws FlashSafeStorageException
      */
-    List<FlashSafeStorageFileObject> list(long directoryId) throws FlashSafeStorageException;
+    List<FlashSafeStorageFileObject> list(String path) throws FlashSafeStorageException;
 
     /**
      * Creates directory with specified name in parent directory.
@@ -33,16 +26,16 @@ public interface FlashSafeStorageService {
      * @return created {@link FlashSafeStorageDirectory} instance
      * @throws FlashSafeStorageException
      */
-    FlashSafeStorageDirectory createDirectory(long parentDirectoryId, String name) throws FlashSafeStorageException;
+    FlashSafeStorageDirectory createDirectory(String path) throws FlashSafeStorageException;
 
-    StorageFileOperation downloadFile(long fileId, Path directory) throws FlashSafeStorageException;
+    StorageFileOperation download(String remoteObjectPath, Path localDirectoryPath) throws FlashSafeStorageException;
 
-    StorageFileOperation uploadFile(long directoryId, Path file) throws FlashSafeStorageException;
+    StorageFileOperation upload(Path localObjectPath, String remoteDirectoryPath) throws FlashSafeStorageException;
 
-    void copy(long fileObjectId, long destinationDirectoryId) throws FlashSafeStorageException;
+    void copy(String fromPath, String toPath) throws FlashSafeStorageException;
 
-    void move(long fileObjectId, long destinationDirectoryId) throws FlashSafeStorageException;
+    void move(String fromPath, String toPath) throws FlashSafeStorageException;
 
-    void delete(long fileObjectId) throws FlashSafeStorageException;
+    void delete(String path) throws FlashSafeStorageException;
     
 }

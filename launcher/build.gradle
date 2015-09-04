@@ -24,7 +24,7 @@ macAppBundle {
     appOutputDir = 'launch4mac'
     icon = "$project.projectDir/resources/AppMacIcon.icns"
     bundleJRE = true
-    jreHome = 'C:/jre1.8.0_60.jre/Contents/Home'
+    //jreHome = '/Users/alex_xpert/Downloads/jre1.8.0_60.jre'
 }
 
 repositories {
@@ -40,6 +40,7 @@ launch4j {
     mainClassName = "ru.flashsafe.Main"
     outfile = 'Flashsafe.exe'
     icon = "$project.projectDir/resources/AppIcon.ico"
+    bundledJrePath = "C:/jre1.8.0_60"
 }
 
 task copyAppLibs(type: Copy) {

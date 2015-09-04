@@ -52,10 +52,22 @@ public class CompositeFileOperation extends AbstractFileOperation {
      */
     @Override
     public String getFileObjectName() {
-        if (currentFileOperation == null) {
+        FileOperation currentFileOperationLocal = currentFileOperation;
+        if (currentFileOperationLocal == null) {
             return previousFileOperationObject == null ? super.getFileObjectName() : previousFileOperationObject;
         }
-        return currentFileOperation.getFileObjectName();
+        return currentFileOperationLocal.getFileObjectName();
+    }
+    
+    @Override
+    public int getProgress() {
+        FileOperation currentFileOperationLocal = currentFileOperation;
+        if (currentFileOperationLocal == null) {
+            return super.getProgress();
+        }
+        long processedBytes = getProcessedBytes() + currentFileOperationLocal.getProcessedBytes();
+        int progress = (int) (( processedBytes * 100) /  getTotalBytes());
+        return progress;
     }
     
     /**
