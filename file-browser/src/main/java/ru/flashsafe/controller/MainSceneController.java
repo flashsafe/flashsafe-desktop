@@ -5,8 +5,6 @@
  */
 package ru.flashsafe.controller;
 
-import static ru.flashsafe.IconUtil.ICON_SIZE;
-
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +30,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -83,6 +80,7 @@ import ru.flashsafe.http.UploadProgressListener;
 import ru.flashsafe.model.FSObject;
 import ru.flashsafe.util.FontUtil;
 import ru.flashsafe.util.FontUtil.FontType;
+import ru.flashsafe.util.ResizeHandler;
 
 /**
  * FXML Controller class
@@ -290,69 +288,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                         event.consume();
 
                     });
-
-                    // FIXME use column name not index
-                    ((TableColumn) files.getColumns().get(0)).setCellValueFactory(new PropertyValueFactory<TableRow, String>(
-                            "type"));
-                    TableColumn<TableRow, Label> nameColumn = (TableColumn<TableRow, Label>) files.getColumns().get(1);
-                    nameColumn.setCellValueFactory(new PropertyValueFactory<TableRow, Label>("name"));
-                    nameColumn.setComparator(new Comparator<Label>() {
-                        @Override
-                        public int compare(Label p1, Label p2) {
-                            return java.text.Collator.getInstance().compare(p1.getText(), p2.getText());
-                        }
-                    });
-
-                    TableColumn<TableRow, String> sizeColumn = (TableColumn<TableRow, String>) files.getColumns().get(2);
-                    sizeColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("size"));
-                    sizeColumn.setComparator(new Comparator<String>() {
-                        @Override
-                        public int compare(String p1, String p2) {
-                            int one = Integer.parseInt(p1.replace("КБ", ""));
-                            int two = Integer.parseInt(p2.replace("КБ", ""));
-                            return one == two ? 0 : one < two ? -1 : 1;
-                        }
-                    });
-
-                    TableColumn<TableRow, String> createDateColumn = (TableColumn<TableRow, String>) files.getColumns().get(3);
-                    createDateColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("createDate"));
-                    createDateColumn.setComparator(new Comparator<String>() {
-                        @Override
-                        public int compare(String p1, String p2) {
-                            DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                            Date d1 = null, d2 = null;
-                            try {
-                                d1 = df.parse(p1);
-                                d2 = df.parse(p2);
-                            } catch (ParseException pe) {
-                                pe.printStackTrace();
-                    files.setOnDragDetected(event -> {
-                        Dragboard db = files.startDragAndDrop(TransferMode.ANY);
-                        ClipboardContent content = new ClipboardContent();
-                        List<File> list = new ArrayList<>();
-                        list.add(new File("./.mime"));
-                        content.putFiles(list);
-                        db.setContent(content);
-                        event.consume();
-
-                    });
-                    files.setOnDragOver(event -> {
-                        if (event.getGestureSource() != files && event.getDragboard().hasFiles()) {
-                            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                        }
-                        event.consume();
-                    });
-                    files.setOnDragDropped(event -> {
-                        Dragboard dragboard = event.getDragboard();
-                        if (dragboard.hasFiles()) {
-                            final File f = dragboard.getFiles().get(0);
-                            uploadFile(f);
-                        }
-                        event.setDropCompleted(true);
-                        event.consume();
-
-                    });
-
+                    
                     // FIXME use column name not index
                     TableColumn<TableRow, Label> nameColumn = (TableColumn<TableRow, Label>) files.getColumns().get(0);
                     nameColumn.setCellValueFactory(new PropertyValueFactory<TableRow, Label>("name"));
@@ -383,24 +319,6 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     nine.setOnMouseClicked(getOnNumClick(nine));
                     zero.setOnMouseClicked(getOnNumClick(zero));
 
-                    topPane.setOnMouseClicked(event -> {
-                        switch (event.getClickCount()) {
-                        case 1:
-                            // FIXME
-                            break;
-                        case 2:
-                            Main._stage.setMaximized(!Main._stage.isMaximized());
-                            break;
-                        }
-
-                    });
-                    KeyCombination backCombination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
-                    Main._stage.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
-                        if (backCombination.match(event)) {
-                            back();
-                        }
-
-                    });
                     refresh.setOnMouseClicked(event -> {
                         clearContent();
                         loadContent(cur_path.id, "", current_tv);
@@ -434,11 +352,6 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     flashsafe.setCursor(Cursor.MOVE);
                     attachWindowDragControlToElement(topPane);
 
-                    buildSelectViewControl();
-                            return d1.compareTo(d2);
-                        }
-                    });
-
                     files.setItems(currentDirectoryEntries);
 
                     one.setOnMouseClicked(getOnNumClick(one));
@@ -459,6 +372,9 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     
                     topPane.setOnMouseClicked(event -> {
                         switch (event.getClickCount()) {
+                        case 1:
+                            display_menu.setVisible(false);
+                            break;
                         case 2:
                             Main._stage.setMaximized(!Main._stage.isMaximized());
                             break;
@@ -482,24 +398,6 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     });
                     settings_close.setOnMouseClicked(event -> settings_pane.setVisible(false));
 
-                    Label[] settings_categories = { rendering, caching, hardware, software };
-                    for (Label l : settings_categories) {
-                        l.setOnMousePressed(getOnSettingsCategoryClickListener(l));
-                    }
-                    rendering.setStyle("-fx-text-fill: #555555;");
-                    rendering.getStyleClass().remove("category");
-                    rendering.getStyleClass().add("category2");
-                    link.setOnAction(event -> {
-                        if (Desktop.isDesktopSupported()) {
-                            try {
-                                Desktop.getDesktop().browse(new URI(link.getText()));
-                            } catch (IOException | URISyntaxException e) {
-                                logger.error(e);
-                            }
-                        }
-
-                    });
-
                     attachWindowDragControlToElement(flashsafe);
                     flashsafe.setCursor(Cursor.MOVE);
                     attachWindowDragControlToElement(topPane);
@@ -521,9 +419,11 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     display_list.getItems().get(4).setOnMouseClicked(event -> { changeToTileView(); });
                     display_list.getItems().get(5).setOnMouseClicked(event -> { changeToListView(); });
                     display_list.getItems().get(6).setOnMouseClicked(event -> { changeToTableView(); });
-                    display_slider.setMin(0.0);
-                    display_slider.setMax(0.6);
-                    display_slider.setValue(0.0);
+                    display_slider.setMin(0);
+                    display_slider.setMax(6);
+                    display_slider.setValue(0);
+                    display_slider.setMajorTickUnit(1);
+                    display_slider.setMinorTickCount(0);
                     display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/itable.png"))));
                     display_choice.setOnAction(event -> display_menu.setVisible(!display_menu.isVisible()));
                     display_choice.setStyle("-fx-background-color: transparent");
@@ -611,9 +511,9 @@ public class MainSceneController implements Initializable, UploadProgressListene
 //                                    break;
 //                            }
                         }
-                    });
+                     });
+                //TODO
                 }
-
             });
             return null;
         }
@@ -1104,32 +1004,6 @@ public class MainSceneController implements Initializable, UploadProgressListene
         return new Tooltip(tooltipString.toString());
     }
 
-    private Tooltip createTooltipFor(FSObject fsObject) {
-        StringBuilder tooltipString = new StringBuilder();
-        tooltipString
-                .append(resourceBundle.getString("name"))
-                .append(": ")
-                .append(fsObject.name)
-                .append(System.lineSeparator())
-                .append(resourceBundle.getString("type"))
-                .append(": ")
-                .append(fsObject.type)
-                .append(System.lineSeparator())
-                .append("file".equals(fsObject.type) ? resourceBundle.getString("file_format") + ": " + fsObject.format : "")
-                .append(System.lineSeparator())
-                .append(resourceBundle.getString("size"))
-                .append(": ")
-                .append(String.valueOf(fsObject.size / 1024))
-                .append(" КБ")
-                .append(System.lineSeparator())
-                .append("dir".equals(fsObject.type) ? resourceBundle.getString("number_of_files") + ": " + fsObject.count + ""
-                        : "").append(System.lineSeparator()).append(resourceBundle.getString("creation_date")).append(": ")
-                .append(new Date(fsObject.create_time * 1000).toLocaleString()).append(System.lineSeparator())
-                .append(resourceBundle.getString("last_update")).append(": ")
-                .append(new Date(fsObject.update_time * 1000).toLocaleString()).append(System.lineSeparator());
-        return new Tooltip(tooltipString.toString());
-    }
-
     private int loadContent(int path_id, String pin, TreeView tv) {
         Object[] answer = HttpAPI.getInstance().getContent(path_id, pin);
         int code = (int) answer[1];
@@ -1351,7 +1225,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     public void changeToXLargeView() {
         changeToGridView(content, 96, false);
         display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/ixlarge.png"))));
-        display_slider.setValue(0.6);
+        display_slider.setValue(6);
         display_menu.setVisible(false);
         view_type = 0;
     }
@@ -1359,7 +1233,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     public void changeToLargeView() {
         changeToGridView(content, 64, false);
         display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/ilarge.png"))));
-        display_slider.setValue(0.5);
+        display_slider.setValue(5);
         display_menu.setVisible(false);
         view_type = 1;
     }
@@ -1367,7 +1241,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     public void changeToMediumView() {
         changeToGridView(content, 48, false);
         display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/imedium.png"))));
-        display_slider.setValue(0.4);
+        display_slider.setValue(4);
         display_menu.setVisible(false);
         view_type = 2;
     }
@@ -1375,7 +1249,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     public void changeToSmallView() {
         changeToGridView(content, 24, true);
         display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/ismall.png"))));
-        display_slider.setValue(0.3);
+        display_slider.setValue(3);
         display_menu.setVisible(false);
         view_type = 3;
     }
@@ -1383,7 +1257,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     public void changeToTileView() {
         changeToGridView(content, 48, true);
         display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/itile.png"))));
-        display_slider.setValue(0.2);
+        display_slider.setValue(2);
         display_menu.setVisible(false);
         view_type = 4;
     }
@@ -1485,3 +1359,4 @@ public class MainSceneController implements Initializable, UploadProgressListene
         }
     }
 }
+          

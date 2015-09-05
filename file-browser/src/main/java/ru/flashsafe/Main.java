@@ -17,8 +17,6 @@ import javafx.stage.StageStyle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import ru.flashsafe.util.ResizeHelper;
-
 /**
  * Main class of a FlashSafe Desktop Client
  * 
