@@ -26,7 +26,7 @@
                       <TableColumn minWidth="0.0" prefWidth="110.0" text="%size" />
                     </columns>
                   </TableView>
-                  <GridPane fx:id="gfiles" prefHeight="589.0" prefWidth="702.0" visible="false">
+                  <GridPane fx:id="gfiles" prefHeight="589.0" prefWidth="702.0" visible="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -37,7 +37,7 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                   </GridPane>
-                  <ListView fx:id="lfiles" prefHeight="588.0" prefWidth="704.0" visible="false" />
+                  <ListView fx:id="lfiles" prefHeight="588.0" prefWidth="704.0" visible="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
         </content>
@@ -47,7 +47,7 @@
       <Button id="DisplayChoice" fx:id="display_choice" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="15.0" />
       <HBox id="DisplayMenu" fx:id="display_menu" alignment="CENTER" maxHeight="185.0" maxWidth="195.0" minHeight="185.0" minWidth="195.0" visible="false" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="15.0">
          <children>
-            <Slider id="DisplaySlider" fx:id="display_slider" maxHeight="200.0" orientation="VERTICAL" />
+            <Slider id="DisplaySlider" fx:id="display_slider" maxHeight="50.0" orientation="VERTICAL" AnchorPane.topAnchor="5.0"/>
             <ListView id="DisplayList" fx:id="display_list" prefHeight="180.0" prefWidth="200.0" />
          </children>
       </HBox>

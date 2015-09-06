@@ -1,4 +1,4 @@
-package ru.flashsafe;
+package ru.flashsafe.util;
 
 import java.awt.AWTException;
 import java.awt.SystemTray;

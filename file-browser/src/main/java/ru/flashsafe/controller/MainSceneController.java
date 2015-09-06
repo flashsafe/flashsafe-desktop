@@ -29,7 +29,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -39,27 +38,23 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -73,21 +68,26 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import ru.flashsafe.FileController;
 import ru.flashsafe.IconUtil;
 import ru.flashsafe.Main;
 import ru.flashsafe.http.HttpAPI;
 import ru.flashsafe.http.UploadProgressListener;
 import ru.flashsafe.model.FSObject;
+import ru.flashsafe.perspective.ListPerspective;
+import ru.flashsafe.perspective.Perspective;
+import ru.flashsafe.perspective.PerspectiveManager;
+import ru.flashsafe.perspective.PerspectiveType;
+import ru.flashsafe.perspective.TablePerspective;
 import ru.flashsafe.util.FontUtil;
 import ru.flashsafe.util.FontUtil.FontType;
-import ru.flashsafe.util.ResizeHandler;
 
 /**
  * FXML Controller class
  * 
  * @author alex_xpert
  */
-public class MainSceneController implements Initializable, UploadProgressListener {
+public class MainSceneController implements Initializable, FileController, UploadProgressListener {
 
     private static final Logger logger = LogManager.getLogger(MainSceneController.class);
     private final Image folderBlackIcon = new Image(getClass().getResourceAsStream("/img/fs/folder_empty.png"));
@@ -113,10 +113,12 @@ public class MainSceneController implements Initializable, UploadProgressListene
     private ObservableList<TableRow> currentDirectoryEntries = FXCollections.observableArrayList();
 
     private ResourceBundle resourceBundle;
-    
-    private int view_type = 6;
-    
+
+    private PerspectiveType currentPerspective = PerspectiveType.TABLE;
+
     private FSObject[] temp_content;
+    
+    private PerspectiveManager perspectiveManager;
 
     @FXML
     private Pane topPane;
@@ -185,7 +187,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     @FXML
     private GridPane gfiles;
     @FXML
-    private ListView lfiles;
+    private ListView<TableRow> lfiles;
     @FXML
     private ScrollPane scroll_pane;
     @FXML
@@ -208,103 +210,111 @@ public class MainSceneController implements Initializable, UploadProgressListene
 
                 @Override
                 public void run() {
-                    gfiles.setOnDragDetected(event -> {
-                        Dragboard db = files.startDragAndDrop(TransferMode.ANY);
-                        ClipboardContent content = new ClipboardContent();
-                        List<File> list = new ArrayList<>();
-                        list.add(new File("./mime.mime"));
-                        content.putFiles(list);
-                        db.setContent(content);
-                        event.consume();
-
-                    });
-                    gfiles.setOnDragOver(event -> {
-                        if (event.getGestureSource() != files && event.getDragboard().hasFiles()) {
-                            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                        }
-                        event.consume();
-                    });
-                    gfiles.setOnDragDropped(event -> {
-                        Dragboard db = event.getDragboard();
-                        if (db.hasFiles()) {
-                            final File f = db.getFiles().get(0);
-                            uploadFile(f);
-                        }
-                        event.setDropCompleted(true);
-                        event.consume();
-
-                    });
+//                    gfiles.setOnDragDetected(event -> {
+//                        Dragboard db = files.startDragAndDrop(TransferMode.ANY);
+//                        ClipboardContent content = new ClipboardContent();
+//                        List<File> list = new ArrayList<>();
+//                        list.add(new File("./mime.mime"));
+//                        content.putFiles(list);
+//                        db.setContent(content);
+//                        event.consume();
+//
+//                    });
+//                    gfiles.setOnDragOver(event -> {
+//                        if (event.getGestureSource() != files && event.getDragboard().hasFiles()) {
+//                            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+//                        }
+//                        event.consume();
+//                    });
+//                    gfiles.setOnDragDropped(event -> {
+//                        Dragboard db = event.getDragboard();
+//                        if (db.hasFiles()) {
+//                            final File f = db.getFiles().get(0);
+//                            uploadFile(f);
+//                        }
+//                        event.setDropCompleted(true);
+//                        event.consume();
+//
+//                    });
                     
-                    lfiles.setOnDragDetected(event -> {
-                        Dragboard db = files.startDragAndDrop(TransferMode.ANY);
-                        ClipboardContent content = new ClipboardContent();
-                        List<File> list = new ArrayList<>();
-                        list.add(new File("./mime.mime"));
-                        content.putFiles(list);
-                        db.setContent(content);
-                        event.consume();
+//                    lfiles.setOnDragDetected(event -> {
+//                        Dragboard db = files.startDragAndDrop(TransferMode.ANY);
+//                        ClipboardContent content = new ClipboardContent();
+//                        List<File> list = new ArrayList<>();
+//                        list.add(new File("./mime.mime"));
+//                        content.putFiles(list);
+//                        db.setContent(content);
+//                        event.consume();
+//
+//                    });
+//                    lfiles.setOnDragOver(event -> {
+//                        if (event.getGestureSource() != files && event.getDragboard().hasFiles()) {
+//                            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+//                        }
+//                        event.consume();
+//                    });
+//                    lfiles.setOnDragDropped(event -> {
+//                        Dragboard db = event.getDragboard();
+//                        if (db.hasFiles()) {
+//                            final File f = db.getFiles().get(0);
+//                            uploadFile(f);
+//                        }
+//                        event.setDropCompleted(true);
+//                        event.consume();
+//
+//                    });
+//                    
+//                    lfiles.setCellFactory(new Callback<ListView<TableRow>, ListCell<TableRow>>() {
+//
+//                        @Override
+//                        public ListCell<TableRow> call(ListView<TableRow> listView) {
+//                            return new FileCell();
+//                        }
+//                    });
 
-                    });
-                    lfiles.setOnDragOver(event -> {
-                        if (event.getGestureSource() != files && event.getDragboard().hasFiles()) {
-                            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                        }
-                        event.consume();
-                    });
-                    lfiles.setOnDragDropped(event -> {
-                        Dragboard db = event.getDragboard();
-                        if (db.hasFiles()) {
-                            final File f = db.getFiles().get(0);
-                            uploadFile(f);
-                        }
-                        event.setDropCompleted(true);
-                        event.consume();
+//                    files.setOnDragDetected(event -> {
+//                        Dragboard db = files.startDragAndDrop(TransferMode.ANY);
+//                        ClipboardContent content = new ClipboardContent();
+//                        List<File> list = new ArrayList<>();
+//                        list.add(new File("./mime.mime"));
+//                        content.putFiles(list);
+//                        db.setContent(content);
+//                        event.consume();
+//
+//                    });
+//                    files.setOnDragOver(event -> {
+//                        if (event.getGestureSource() != files && event.getDragboard().hasFiles()) {
+//                            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+//                        }
+//                        event.consume();
+//                    });
+//                    files.setOnDragDropped(event -> {
+//                        Dragboard db = event.getDragboard();
+//                        if (db.hasFiles()) {
+//                            final File f = db.getFiles().get(0);
+//                            uploadFile(f);
+//                        }
+//                        event.setDropCompleted(true);
+//                        event.consume();
+//
+//                    });
 
-                    });
-                    
-                    files.setOnDragDetected(event -> {
-                        Dragboard db = files.startDragAndDrop(TransferMode.ANY);
-                        ClipboardContent content = new ClipboardContent();
-                        List<File> list = new ArrayList<>();
-                        list.add(new File("./mime.mime"));
-                        content.putFiles(list);
-                        db.setContent(content);
-                        event.consume();
-
-                    });
-                    files.setOnDragOver(event -> {
-                        if (event.getGestureSource() != files && event.getDragboard().hasFiles()) {
-                            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                        }
-                        event.consume();
-                    });
-                    files.setOnDragDropped(event -> {
-                        Dragboard db = event.getDragboard();
-                        if (db.hasFiles()) {
-                            final File f = db.getFiles().get(0);
-                            uploadFile(f);
-                        }
-                        event.setDropCompleted(true);
-                        event.consume();
-
-                    });
-                    
-                    // FIXME use column name not index
-                    TableColumn<TableRow, Label> nameColumn = (TableColumn<TableRow, Label>) files.getColumns().get(0);
-                    nameColumn.setCellValueFactory(new PropertyValueFactory<TableRow, Label>("name"));
-
-                    TableColumn<TableRow, String> createDateColumn = (TableColumn<TableRow, String>) files.getColumns().get(1);
-                    createDateColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("createDate"));
-
-                    ((TableColumn) files.getColumns().get(2)).setCellValueFactory(new PropertyValueFactory<TableRow, String>(
-                            "type"));
-
-                    TableColumn<TableRow, String> sizeColumn = (TableColumn<TableRow, String>) files.getColumns().get(3);
-                    sizeColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("size"));
-
-                    SortedList<TableRow> sortedFiles = new SortedList<>(currentDirectoryEntries);
-                    files.setItems(sortedFiles);
-                    sortedFiles.comparatorProperty().bind(files.comparatorProperty());
+//                    // FIXME use column name not index
+//                    TableColumn<TableRow, Label> nameColumn = (TableColumn<TableRow, Label>) files.getColumns().get(0);
+//                    nameColumn.setCellValueFactory(new PropertyValueFactory<TableRow, Label>("name"));
+//
+//                    TableColumn<TableRow, String> createDateColumn = (TableColumn<TableRow, String>) files.getColumns().get(1);
+//                    createDateColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("createDate"));
+//
+//                    ((TableColumn) files.getColumns().get(2)).setCellValueFactory(new PropertyValueFactory<TableRow, String>(
+//                            "type"));
+//
+//                    TableColumn<TableRow, String> sizeColumn = (TableColumn<TableRow, String>) files.getColumns().get(3);
+//                    sizeColumn.setCellValueFactory(new PropertyValueFactory<TableRow, String>("size"));
+//
+//                    SortedList<TableRow> sortedFiles = new SortedList<>(currentDirectoryEntries);
+//                    files.setItems(sortedFiles);
+//                    sortedFiles.comparatorProperty().bind(files.comparatorProperty());
 
                     backspace.setOnMouseClicked(event -> backspace());
 
@@ -352,7 +362,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     flashsafe.setCursor(Cursor.MOVE);
                     attachWindowDragControlToElement(topPane);
 
-                    files.setItems(currentDirectoryEntries);
+                    //files.setItems(currentDirectoryEntries);
 
                     one.setOnMouseClicked(getOnNumClick(one));
                     two.setOnMouseClicked(getOnNumClick(two));
@@ -364,12 +374,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     eight.setOnMouseClicked(getOnNumClick(eight));
                     nine.setOnMouseClicked(getOnNumClick(nine));
                     zero.setOnMouseClicked(getOnNumClick(zero));
-                    
-                    ResizeHandler handler = new ResizeHandler(Main._scene, Main._stage);
-                    window.setOnMouseMoved(handler);
-                    window.setOnMousePressed(handler);
-                    window.setOnMouseDragged(handler);
-                    
+
                     topPane.setOnMouseClicked(event -> {
                         switch (event.getClickCount()) {
                         case 1:
@@ -381,17 +386,17 @@ public class MainSceneController implements Initializable, UploadProgressListene
                         }
 
                     });
-                    
+
                     KeyCombination backCombination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN);
                     KeyCombination createFolderCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN);
                     Main._stage.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
                         if (backCombination.match(event)) {
                             back();
-                        } else if(createFolderCombination.match(event)) {
+                        } else if (createFolderCombination.match(event)) {
                             onCreatePathClick();
                         }
                     });
-                    
+
                     settings.setOnMouseClicked(event -> {
                         settings_pane.setVisible(true);
 
@@ -402,117 +407,60 @@ public class MainSceneController implements Initializable, UploadProgressListene
                     flashsafe.setCursor(Cursor.MOVE);
                     attachWindowDragControlToElement(topPane);
 
-                    String[] dlitems = { "xlarge", "large", "medium", "small", "tile", "list", "table" };
-                    String[] dlinames = { "Огромные значки", "Большие значки", "Обычные значки", "Маленькие значки", "Плитка",
-                            "Список", "Таблица" };
-                    for (int i = 0; i < dlinames.length; i++) {
-                        Label l = new Label();
-                        l.setText(dlinames[i]);
-                        l.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/" + dlitems[i] + ".png"))));
-                        l.setStyle("-fx-text-fill: #353F4B ; -fx-font-size: 14px");
-                        display_list.getItems().add(l);
-                    }
-                    display_list.getItems().get(0).setOnMouseClicked(event -> { changeToXLargeView(); });
-                    display_list.getItems().get(1).setOnMouseClicked(event -> { changeToLargeView(); });
-                    display_list.getItems().get(2).setOnMouseClicked(event -> { changeToMediumView(); });
-                    display_list.getItems().get(3).setOnMouseClicked(event -> { changeToSmallView(); });
-                    display_list.getItems().get(4).setOnMouseClicked(event -> { changeToTileView(); });
-                    display_list.getItems().get(5).setOnMouseClicked(event -> { changeToListView(); });
-                    display_list.getItems().get(6).setOnMouseClicked(event -> { changeToTableView(); });
-                    display_slider.setMin(0);
-                    display_slider.setMax(6);
-                    display_slider.setValue(0);
-                    display_slider.setMajorTickUnit(1);
-                    display_slider.setMinorTickCount(0);
-                    display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/itable.png"))));
-                    display_choice.setOnAction(event -> display_menu.setVisible(!display_menu.isVisible()));
-                    display_choice.setStyle("-fx-background-color: transparent");
-                    
                     Font myriadPro = Font.loadFont(getClass().getResourceAsStream("/font/myriadpro_regular.ttf"), 20);
                     Label[] categories = { myfiles, docs, pictures, sounds, videos, loads, contacts };
                     for (Label l : categories) {
                         l.setFont(myriadPro);
                         l.setOnMousePressed(getOnCategoryClickListener(l));
                     }
-                    myfiles.getStyleClass().remove(0);
-                    myfiles.getStyleClass().add("category1");
-                    
+
                     pincode_textfield.setOnKeyTyped(new EventHandler<KeyEvent>() {
                         @Override
                         public void handle(KeyEvent event) {
                             pin += event.getCharacter();
                         }
                     });
-                    
+
                     gfiles.getColumnConstraints().clear();
                     gfiles.getRowConstraints().clear();
-                    
+
                     search_field.textProperty().addListener(new ChangeListener<String>() {
                         @Override
                         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                            List tmp = new ArrayList<FSObject>();
-                            for(FSObject fso : content) {
-                                if(fso.name.contains(newValue)) {
+                            List<FSObject> tmp = new ArrayList<>();
+                            for (FSObject fso : content) {
+                                if (fso.name.contains(newValue)) {
                                     tmp.add(fso);
                                 }
                             }
                             temp_content = new FSObject[tmp.size()];
                             tmp.toArray(temp_content);
-                            switch(view_type) {
-                                case 0:
-                                    changeToGridView(temp_content, 96, false);
-                                    break;
-                                case 1:
-                                    changeToGridView(temp_content, 64, false);
-                                    break;
-                                case 2:
-                                    changeToGridView(temp_content, 48, false);
-                                    break;
-                                case 3:
-                                    changeToGridView(temp_content, 24, false);
-                                    break;
-                                case 4:
-                                    changeToGridView(temp_content, 48, true);
-                                    break;
-                                case 5:
-                                    changeToListView1(temp_content);
-                                    break;
-                                case 6:
-                                    changeToTableView1(temp_content);
-                                    break;
+                            switch (currentPerspective) {
+                            case ICONS_X_LARGE:
+                                changeToGridView(temp_content, 96, false);
+                                break;
+                            case ICONS_LARGE:
+                                changeToGridView(temp_content, 64, false);
+                                break;
+                            case ICONS_MEDIUM:
+                                changeToGridView(temp_content, 48, false);
+                                break;
+                            case ICONS_SMALL:
+                                changeToGridView(temp_content, 24, false);
+                                break;
+                            case TILE:
+                                changeToGridView(temp_content, 48, true);
+                                break;
+                            case LIST:
+                                changeToListView1(temp_content);
+                                break;
+                            case TABLE:
+                                changeToTableView1(temp_content);
+                                break;
                             }
                         }
                     });
-                    display_slider.valueProperty().addListener(new ChangeListener<Number>() {
-                        @Override
-                        public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//                            int num = (int) (newValue.doubleValue() * 10);
-//                            switch(num) {
-//                                case 0:
-//                                    if(view_type != 0) changeToXLargeView();
-//                                    break;
-//                                case 1:
-//                                    if(view_type != 1) changeToLargeView();
-//                                    break;
-//                                case 2:
-//                                    if(view_type != 2) changeToMediumView();
-//                                    break;
-//                                case 3:
-//                                    if(view_type != 3) changeToSmallView();
-//                                    break;
-//                                case 4:
-//                                    if(view_type != 4) changeToTileView();
-//                                    break;
-//                                case 5:
-//                                    if(view_type != 5) changeToListView();
-//                                    break;
-//                                case 6:
-//                                    if(view_type != 6) changeToTableView();
-//                                    break;
-//                            }
-                        }
-                     });
-                //TODO
+                    buildSelectViewControl();
                 }
             });
             return null;
@@ -529,23 +477,107 @@ public class MainSceneController implements Initializable, UploadProgressListene
             windowYPosition = event.getSceneY();
         });
     }
-    
+
     private void buildSelectViewControl() {
-        String[] dlitems = { "xlarge", "large", "medium", "small", "tile", "list", "table" };
-        String[] dlinames = { "Огромные значки", "Большие значки", "Обычные значки", "Маленькие значки", "Плитка",
-                "Список", "Таблица" };
+        String[] dlitems = { /*"xlarge", "large", "medium", "small", "tile",*/ "list", "table" };
+        String[] dlinames = { /*"Огромные значки", "Большие значки", "Обычные значки", "Маленькие значки", "Плитка",*/ "Список",
+                "Таблица" };
         for (int i = 0; i < dlinames.length; i++) {
-            Label itemLabel = new Label();
-            itemLabel.setText(dlinames[i]);
-            itemLabel.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/" + dlitems[i] + ".png"))));
-            itemLabel.setStyle("-fx-text-fill: #353F4B ; -fx-font-size: 14px");
-            display_list.getItems().add(itemLabel);
+            Label perspectiveLabel = new Label();
+            perspectiveLabel.setText(dlinames[i]);
+            perspectiveLabel.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/" + dlitems[i] + ".png"))));
+            perspectiveLabel.setStyle("-fx-text-fill: #353F4B ; -fx-font-size: 14px");
+            display_list.getItems().add(perspectiveLabel);
         }
-        display_slider.setMin(0.0);
-        display_slider.setMax(0.6);
-        display_slider.setValue(0.0);
-        display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/table.png"))));
+//        display_list.getItems().get(0).setOnMouseClicked(event -> {
+//            display_slider.setValue(6);
+//            changeToXLargeView();
+//        });
+//        display_list.getItems().get(1).setOnMouseClicked(event -> {
+//            display_slider.setValue(5);
+//            changeToLargeView();
+//        });
+//        display_list.getItems().get(2).setOnMouseClicked(event -> {
+//            display_slider.setValue(4);
+//            changeToMediumView();
+//        });
+//        display_list.getItems().get(3).setOnMouseClicked(event -> {
+//            display_slider.setValue(3);
+//            changeToSmallView();
+//        });
+//        display_list.getItems().get(4).setOnMouseClicked(event -> {
+//            display_slider.setValue(2);
+//            changeToTileView();
+//        });
+        display_list.getItems().get(0).setOnMouseClicked(event -> {
+            display_slider.setValue(1);
+            switchPerspectiveTo(PerspectiveType.LIST);
+            display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/ilist.png"))));
+            display_menu.setVisible(false);
+        });
+        display_list.getItems().get(1).setOnMouseClicked(event -> {
+            display_slider.setValue(0);
+            switchPerspectiveTo(PerspectiveType.TABLE);
+            display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/itable.png"))));
+            display_menu.setVisible(false);
+        });
+
+        display_slider.setMajorTickUnit(1);
+        display_slider.setMinorTickCount(0);
+        display_slider.setSnapToTicks(true);
+
+        display_slider.setMin(0);
+        display_slider.setMax(1);
+        display_slider.setValue(0);
+        
+        display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/itable.png"))));
         display_choice.setOnAction(event -> display_menu.setVisible(!display_menu.isVisible()));
+        display_choice.setStyle("-fx-background-color: transparent");
+
+        display_slider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                if (display_slider.isPressed()) {
+                    // FIXME apply skipped value
+                    return;
+                }
+                int num = newValue.intValue();
+                switch (num) {
+                case 0:
+                    if (currentPerspective != PerspectiveType.TABLE)
+                        switchPerspectiveTo(PerspectiveType.TABLE);
+                    display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/ilist.png"))));
+                    display_menu.setVisible(false);
+                    break;
+                case 1:
+                    if (currentPerspective != PerspectiveType.LIST)
+                        switchPerspectiveTo(PerspectiveType.LIST);
+                    display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/itable.png"))));
+                    display_menu.setVisible(false);
+                    break;
+//                case 2:
+//                    if (currentPerspective != PerspectiveType.TILE)
+//                        changeToTileView();
+//                    break;
+//                case 3:
+//                    if (currentPerspective != PerspectiveType.ICONS_SMALL)
+//                        changeToSmallView();
+//                    break;
+//                case 4:
+//                    if (currentPerspective != PerspectiveType.ICONS_MEDIUM)
+//                        changeToMediumView();
+//                    break;
+//                case 5:
+//                    if (currentPerspective != PerspectiveType.ICONS_LARGE)
+//                        changeToLargeView();
+//                    break;
+//                case 6:
+//                    if (currentPerspective != PerspectiveType.ICONS_X_LARGE)
+//                        changeToXLargeView();
+//                    break;
+                }
+            }
+        });
     }
 
     /**
@@ -572,6 +604,10 @@ public class MainSceneController implements Initializable, UploadProgressListene
         }
         myfiles.getStyleClass().remove(0);
         myfiles.getStyleClass().add("category1");
+        
+        perspectiveManager = new PerspectiveManager(getPerspectives());
+        perspectiveManager.switchTo(PerspectiveType.TABLE);
+        
         HttpAPI.getInstance().addListener(this);
         Future<Boolean> connect = Main.es.submit(new ConnectToCloudTask());
         while (!connect.isDone()) {
@@ -585,12 +621,22 @@ public class MainSceneController implements Initializable, UploadProgressListene
             logger.error(e);
         }
     }
+    
+    private List<Perspective> getPerspectives() {
+        List<Perspective> perspectives = new ArrayList<>();
+        TablePerspective<TableRow> tablePerspective = new TablePerspective<>(files, currentDirectoryEntries, this);
+        perspectives.add(tablePerspective);
+
+        ListPerspective listPerspective = new ListPerspective(lfiles, currentDirectoryEntries, this);
+        perspectives.add(listPerspective);
+        return perspectives;
+    }
 
     public void refresh() {
         clearContent();
         loadContent(cur_path.id, "", current_tv);
     }
-    
+
     public void exit() {
         Main._stage.close();
         Platform.exit();
@@ -730,98 +776,98 @@ public class MainSceneController implements Initializable, UploadProgressListene
     }
 
     public void onPathnameSubmit() {
-        pathname_dialog.setVisible(false);
-        if (!pathname_textfield.getText().isEmpty()) {
-            int id = HttpAPI.getInstance().createPath(cur_path.id, pincode, pathname_textfield.getText());
-            FSObject path = new FSObject(id, "dir", pathname_textfield.getText(), "", 0, false, 0, System.currentTimeMillis(),
-                    System.currentTimeMillis());
-            ImageView icon = new ImageView(folderBlackIcon);
-            Label label = new Label(path.name);
-            label.setFont(new Font("Ubuntu Condensed", 18));
-            label.setTextFill(Paint.valueOf("#7C7C7C"));
-            label.setId(String.valueOf(path.id));
-            label.setPrefWidth(340);
-            Tooltip tooltip = createTooltipFor(path);
-            label.setTooltip(tooltip);
-            HBox hbox;
-            VBox vbox;
-            int col = 0, row = 0;
-            if(view_type < 5) { // Вычисляем ячейку
-                col = gfiles.getChildren().size() % gfiles.getColumnConstraints().size();
-                row = col == 0 ? gfiles.getRowConstraints().size() : gfiles.getRowConstraints().size() - 1;
-            }
-            switch(view_type) {
-                case 0: // XLarge
-                    icon.setFitHeight(96);
-                    icon.setFitWidth(96);
-                    vbox = new VBox();
-                    vbox.getChildren().add(icon);
-                    vbox.getChildren().add(label);
-                    vbox.setOnMouseClicked(getOnElementClick(label));
-                    gfiles.add(vbox, col, row);
-                    break;
-                case 1: // Large
-                    icon.setFitHeight(64);
-                    icon.setFitWidth(64);
-                    vbox = new VBox();
-                    vbox.getChildren().add(icon);
-                    vbox.getChildren().add(label);
-                    vbox.setOnMouseClicked(getOnElementClick(label));
-                    gfiles.add(vbox, col, row);
-                    break;
-                case 2: // Medium
-                    icon.setFitHeight(48);
-                    icon.setFitWidth(48);
-                    vbox = new VBox();
-                    vbox.getChildren().add(icon);
-                    vbox.getChildren().add(label);
-                    vbox.setOnMouseClicked(getOnElementClick(label));
-                    gfiles.add(vbox, col, row);
-                    col++;
-                    break;
-                case 3: // Small
-                    icon.setFitHeight(24);
-                    icon.setFitWidth(24);
-                    vbox = new VBox();
-                    vbox.getChildren().add(icon);
-                    vbox.getChildren().add(label);
-                    vbox.setOnMouseClicked(getOnElementClick(label));
-                    gfiles.add(vbox, col, row);
-                    break;
-                case 4: // Tile
-                    icon.setFitHeight(48);
-                    icon.setFitWidth(48);
-                    label.setPadding(new Insets(15, 0, 0, 5));
-                    hbox = new HBox();
-                    hbox.getChildren().add(icon);
-                    hbox.getChildren().add(label);
-                    hbox.setOnMouseClicked(getOnElementClick(label));
-                    gfiles.add(hbox, col, row);
-                    break;
-                case 5: // List
-                    icon.setFitHeight(24);
-                    icon.setFitWidth(24);
-                    label.setOnMouseClicked(getOnElementClick(label));
-                    label.setGraphic(icon);
-                    lfiles.getItems().add(label);
-                    break;
-                case 6: // Table
-                    icon.setFitHeight(24);
-                    icon.setFitWidth(24);
-                    label.setOnMouseClicked(getOnElementClick(label));
-                    label.setGraphic(icon);
-                    currentDirectoryEntries.add(TableRow.fromFSObject(path, label, resourceBundle));
-                    break;
-            }
-            FSObject[] new_content = new FSObject[content.length + 1];
-            for (int i = 0; i < content.length; i++) {
-                new_content[i] = content[i];
-            }
-            new_content[content.length] = path;
-            content = new_content;
-        } else {
-            pathname_dialog.setVisible(true);
-        }
+//        pathname_dialog.setVisible(false);
+//        if (!pathname_textfield.getText().isEmpty()) {
+//            int id = HttpAPI.getInstance().createPath(cur_path.id, pincode, pathname_textfield.getText());
+//            FSObject path = new FSObject(id, "dir", pathname_textfield.getText(), "", 0, false, 0, System.currentTimeMillis(),
+//                    System.currentTimeMillis());
+//            ImageView icon = new ImageView(folderBlackIcon);
+//            Label label = new Label(path.name);
+//            label.setFont(new Font("Ubuntu Condensed", 18));
+//            label.setTextFill(Paint.valueOf("#7C7C7C"));
+//            label.setId(String.valueOf(path.id));
+//            label.setPrefWidth(340);
+//            Tooltip tooltip = createTooltipFor(path);
+//            label.setTooltip(tooltip);
+//            HBox hbox;
+//            VBox vbox;
+//            int col = 0, row = 0;
+//            if (currentPerspective != PerspectiveType.TABLE || currentPerspective != PerspectiveType.LIST ) { // Вычисляем ячейку
+//                col = gfiles.getChildren().size() % gfiles.getColumnConstraints().size();
+//                row = col == 0 ? gfiles.getRowConstraints().size() : gfiles.getRowConstraints().size() - 1;
+//            }
+//            switch (currentPerspective) {
+//            case ICONS_X_LARGE: // XLarge
+//                icon.setFitHeight(96);
+//                icon.setFitWidth(96);
+//                vbox = new VBox();
+//                vbox.getChildren().add(icon);
+//                vbox.getChildren().add(label);
+//                vbox.setOnMouseClicked(getOnElementClick(label));
+//                gfiles.add(vbox, col, row);
+//                break;
+//            case ICONS_LARGE: // Large
+//                icon.setFitHeight(64);
+//                icon.setFitWidth(64);
+//                vbox = new VBox();
+//                vbox.getChildren().add(icon);
+//                vbox.getChildren().add(label);
+//                vbox.setOnMouseClicked(getOnElementClick(label));
+//                gfiles.add(vbox, col, row);
+//                break;
+//            case ICONS_MEDIUM: // Medium
+//                icon.setFitHeight(48);
+//                icon.setFitWidth(48);
+//                vbox = new VBox();
+//                vbox.getChildren().add(icon);
+//                vbox.getChildren().add(label);
+//                vbox.setOnMouseClicked(getOnElementClick(label));
+//                gfiles.add(vbox, col, row);
+//                col++;
+//                break;
+//            case ICONS_SMALL: // Small
+//                icon.setFitHeight(24);
+//                icon.setFitWidth(24);
+//                vbox = new VBox();
+//                vbox.getChildren().add(icon);
+//                vbox.getChildren().add(label);
+//                vbox.setOnMouseClicked(getOnElementClick(label));
+//                gfiles.add(vbox, col, row);
+//                break;
+//            case TILE: // Tile
+//                icon.setFitHeight(48);
+//                icon.setFitWidth(48);
+//                label.setPadding(new Insets(15, 0, 0, 5));
+//                hbox = new HBox();
+//                hbox.getChildren().add(icon);
+//                hbox.getChildren().add(label);
+//                hbox.setOnMouseClicked(getOnElementClick(label));
+//                gfiles.add(hbox, col, row);
+//                break;
+//            case LIST: // List
+//                icon.setFitHeight(24);
+//                icon.setFitWidth(24);
+//                label.setOnMouseClicked(getOnElementClick(label));
+//                label.setGraphic(icon);
+//                //lfiles.getItems().add(label);
+//                break;
+//            case TABLE: // Table
+//                icon.setFitHeight(24);
+//                icon.setFitWidth(24);
+//                label.setOnMouseClicked(getOnElementClick(label));
+//                label.setGraphic(icon);
+//                currentDirectoryEntries.add(TableRow.fromFSObject(path, label, resourceBundle));
+//                break;
+//            }
+//            FSObject[] new_content = new FSObject[content.length + 1];
+//            for (int i = 0; i < content.length; i++) {
+//                new_content[i] = content[i];
+//            }
+//            new_content[content.length] = path;
+//            content = new_content;
+//        } else {
+//            pathname_dialog.setVisible(true);
+//        }
     }
 
     public void onUploadFileClick() {
@@ -875,72 +921,72 @@ public class MainSceneController implements Initializable, UploadProgressListene
                         HBox hbox;
                         VBox vbox;
                         int col = 0, row = 0;
-                        if(view_type < 5) { // Вычисляем ячейку
+                        if (currentPerspective != PerspectiveType.TABLE || currentPerspective != PerspectiveType.LIST) { // Вычисляем ячейку
                             col = gfiles.getChildren().size() % gfiles.getColumnConstraints().size();
                             row = col == 0 ? gfiles.getRowConstraints().size() : gfiles.getRowConstraints().size() - 1;
                         }
-                        switch(view_type) {
-                            case 0: // XLarge
-                                icon.setFitHeight(96);
-                                icon.setFitWidth(96);
-                                vbox = new VBox();
-                                vbox.getChildren().add(icon);
-                                vbox.getChildren().add(label);
-                                vbox.setOnMouseClicked(getOnElementClick(label));
-                                gfiles.add(vbox, col, row);
-                                break;
-                            case 1: // Large
-                                icon.setFitHeight(64);
-                                icon.setFitWidth(64);
-                                vbox = new VBox();
-                                vbox.getChildren().add(icon);
-                                vbox.getChildren().add(label);
-                                vbox.setOnMouseClicked(getOnElementClick(label));
-                                gfiles.add(vbox, col, row);
-                                break;
-                            case 2: // Medium
-                                icon.setFitHeight(48);
-                                icon.setFitWidth(48);
-                                vbox = new VBox();
-                                vbox.getChildren().add(icon);
-                                vbox.getChildren().add(label);
-                                vbox.setOnMouseClicked(getOnElementClick(label));
-                                gfiles.add(vbox, col, row);
-                                col++;
-                                break;
-                            case 3: // Small
-                                icon.setFitHeight(24);
-                                icon.setFitWidth(24);
-                                vbox = new VBox();
-                                vbox.getChildren().add(icon);
-                                vbox.getChildren().add(label);
-                                vbox.setOnMouseClicked(getOnElementClick(label));
-                                gfiles.add(vbox, col, row);
-                                break;
-                            case 4: // Tile
-                                icon.setFitHeight(48);
-                                icon.setFitWidth(48);
-                                label.setPadding(new Insets(15, 0, 0, 5));
-                                hbox = new HBox();
-                                hbox.getChildren().add(icon);
-                                hbox.getChildren().add(label);
-                                hbox.setOnMouseClicked(getOnElementClick(label));
-                                gfiles.add(hbox, col, row);
-                                break;
-                            case 5: // List
-                                icon.setFitHeight(24);
-                                icon.setFitWidth(24);
-                                label.setGraphic(icon);
-                                label.setOnMouseClicked(getOnElementClick(label));
-                                lfiles.getItems().add(label);
-                                break;
-                            case 6: // Table
-                                icon.setFitHeight(24);
-                                icon.setFitWidth(24);
-                                label.setGraphic(icon);
-                                label.setOnMouseClicked(getOnElementClick(label));
-                                currentDirectoryEntries.add(TableRow.fromFSObject(f, label, resourceBundle));
-                                break;
+                        switch (currentPerspective) {
+                        case ICONS_X_LARGE: // XLarge
+                            icon.setFitHeight(96);
+                            icon.setFitWidth(96);
+                            vbox = new VBox();
+                            vbox.getChildren().add(icon);
+                            vbox.getChildren().add(label);
+                            vbox.setOnMouseClicked(getOnElementClick(label));
+                            gfiles.add(vbox, col, row);
+                            break;
+                        case ICONS_LARGE: // Large
+                            icon.setFitHeight(64);
+                            icon.setFitWidth(64);
+                            vbox = new VBox();
+                            vbox.getChildren().add(icon);
+                            vbox.getChildren().add(label);
+                            vbox.setOnMouseClicked(getOnElementClick(label));
+                            gfiles.add(vbox, col, row);
+                            break;
+                        case ICONS_MEDIUM: // Medium
+                            icon.setFitHeight(48);
+                            icon.setFitWidth(48);
+                            vbox = new VBox();
+                            vbox.getChildren().add(icon);
+                            vbox.getChildren().add(label);
+                            vbox.setOnMouseClicked(getOnElementClick(label));
+                            gfiles.add(vbox, col, row);
+                            col++;
+                            break;
+                        case ICONS_SMALL: // Small
+                            icon.setFitHeight(24);
+                            icon.setFitWidth(24);
+                            vbox = new VBox();
+                            vbox.getChildren().add(icon);
+                            vbox.getChildren().add(label);
+                            vbox.setOnMouseClicked(getOnElementClick(label));
+                            gfiles.add(vbox, col, row);
+                            break;
+                        case TILE: // Tile
+                            icon.setFitHeight(48);
+                            icon.setFitWidth(48);
+                            label.setPadding(new Insets(15, 0, 0, 5));
+                            hbox = new HBox();
+                            hbox.getChildren().add(icon);
+                            hbox.getChildren().add(label);
+                            hbox.setOnMouseClicked(getOnElementClick(label));
+                            gfiles.add(hbox, col, row);
+                            break;
+                        case LIST: // List
+                            icon.setFitHeight(24);
+                            icon.setFitWidth(24);
+                            label.setGraphic(icon);
+                            label.setOnMouseClicked(getOnElementClick(label));
+                            //lfiles.getItems().add(label);
+                            break;
+                        case TABLE: // Table
+                            icon.setFitHeight(24);
+                            icon.setFitWidth(24);
+                            label.setGraphic(icon);
+                            label.setOnMouseClicked(getOnElementClick(label));
+                            currentDirectoryEntries.add(TableRow.fromFSObject(f, label, resourceBundle));
+                            break;
                         }
                     }
                 });
@@ -974,25 +1020,14 @@ public class MainSceneController implements Initializable, UploadProgressListene
 
     private Tooltip createTooltipFor(FSObject fsObject) {
         StringBuilder tooltipString = new StringBuilder();
-        tooltipString
-                .append(resourceBundle.getString("name"))
-                .append(": ")
-                .append(fsObject.name)
-                .append(System.lineSeparator())
-                .append(resourceBundle.getString("type"))
-                .append(": ")
-                .append(fsObject.type)
-                .append(System.lineSeparator());
+        tooltipString.append(resourceBundle.getString("name")).append(": ").append(fsObject.name).append(System.lineSeparator())
+                .append(resourceBundle.getString("type")).append(": ").append(fsObject.type).append(System.lineSeparator());
         if ("file".equals(fsObject.type)) {
             tooltipString.append(resourceBundle.getString("file_format")).append(": ").append(fsObject.format)
                     .append(System.lineSeparator());
         }
-        tooltipString
-                .append(resourceBundle.getString("size"))
-                .append(": ")
-                .append(String.valueOf(fsObject.size / 1024))
-                .append(" КБ")
-                .append(System.lineSeparator());
+        tooltipString.append(resourceBundle.getString("size")).append(": ").append(String.valueOf(fsObject.size / 1024))
+                .append(" КБ").append(System.lineSeparator());
         if ("dir".equals(fsObject.type)) {
             tooltipString.append(resourceBundle.getString("number_of_files")).append(": ").append(fsObject.count)
                     .append(System.lineSeparator());
@@ -1005,6 +1040,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
     }
 
     private int loadContent(int path_id, String pin, TreeView tv) {
+        currentDirectoryEntries.clear();
         Object[] answer = HttpAPI.getInstance().getContent(path_id, pin);
         int code = (int) answer[1];
         switch (code) {
@@ -1012,24 +1048,27 @@ public class MainSceneController implements Initializable, UploadProgressListene
             content = (FSObject[]) answer[0];
             List<FSObject> path_childrens = new ArrayList<>();
             int columns_count = 0;
-            switch(view_type) {
-                case 0: // XLarge
-                    columns_count = (int) ((gfiles.getWidth() - 10) / (96 + 10));
-                    break;
-                case 1: // Large
-                    columns_count = (int) ((gfiles.getWidth() - 10) / (64 + 10));
-                    break;
-                case 2: // Medium
-                    columns_count = (int) ((gfiles.getWidth() - 10) / (48 + 10));
-                    break;
-                case 3: // Small
-                    columns_count = (int) ((gfiles.getWidth() - 10) / (24 + 10));
-                    break;
-                case 4: // Tile
-                    columns_count = (int) ((gfiles.getWidth() - 10) / 150);
-                    break;
+            switch (currentPerspective) {
+            case ICONS_X_LARGE: // XLarge
+                columns_count = (int) ((gfiles.getWidth() - 10) / (96 + 10));
+                break;
+            case ICONS_LARGE: // Large
+                columns_count = (int) ((gfiles.getWidth() - 10) / (64 + 10));
+                break;
+            case ICONS_MEDIUM: // Medium
+                columns_count = (int) ((gfiles.getWidth() - 10) / (48 + 10));
+                break;
+            case ICONS_SMALL: // Small
+                columns_count = (int) ((gfiles.getWidth() - 10) / (24 + 10));
+                break;
+            case TILE: // Tile
+                columns_count = (int) ((gfiles.getWidth() - 10) / 150);
+                break;
+            default:
+                break;
             }
-            int col = 0, row = 0;
+            int col = 0,
+            row = 0;
             for (int i = 0; i < content.length; i++) {
                 FSObject fso = content[i];
                 ImageView icon = new ImageView(fso.type.equals("dir") ? fso.pincode ? lockBlackIcon : fso.count > 0 ? folderFull
@@ -1042,92 +1081,92 @@ public class MainSceneController implements Initializable, UploadProgressListene
                 label.setTooltip(tooltip);
                 HBox hbox;
                 VBox vbox;
-                switch(view_type) {
-                    case 0: // XLarge
-                        icon.setFitHeight(96);
-                        icon.setFitWidth(96);
-                        vbox = new VBox();
-                        vbox.getChildren().add(icon);
-                        vbox.getChildren().add(label);
-                        vbox.setOnMouseClicked(getOnElementClick(label));
-                        gfiles.add(vbox, col, row);
-                        col++;
-                        if(col == columns_count) {
-                            col = 0;
-                            row++;
-                        }
-                        break;
-                    case 1: // Large
-                        icon.setFitHeight(64);
-                        icon.setFitWidth(64);
-                        vbox = new VBox();
-                        vbox.getChildren().add(icon);
-                        vbox.getChildren().add(label);
-                        vbox.setOnMouseClicked(getOnElementClick(label));
-                        gfiles.add(vbox, col, row);
-                        col++;
-                        if(col == columns_count) {
-                            col = 0;
-                            row++;
-                        }
-                        break;
-                    case 2: // Medium
-                        icon.setFitHeight(48);
-                        icon.setFitWidth(48);
-                        vbox = new VBox();
-                        vbox.getChildren().add(icon);
-                        vbox.getChildren().add(label);
-                        vbox.setOnMouseClicked(getOnElementClick(label));
-                        gfiles.add(vbox, col, row);
-                        col++;
-                        if(col == columns_count) {
-                            col = 0;
-                            row++;
-                        }
-                        break;
-                    case 3: // Small
-                        icon.setFitHeight(24);
-                        icon.setFitWidth(24);
-                        vbox = new VBox();
-                        vbox.getChildren().add(icon);
-                        vbox.getChildren().add(label);
-                        vbox.setOnMouseClicked(getOnElementClick(label));
-                        gfiles.add(vbox, col, row);
-                        col++;
-                        if(col == columns_count) {
-                            col = 0;
-                            row++;
-                        }
-                        break;
-                    case 4: // Tile
-                        icon.setFitHeight(48);
-                        icon.setFitWidth(48);
-                        label.setPadding(new Insets(15, 0, 0, 5));
-                        hbox = new HBox();
-                        hbox.getChildren().add(icon);
-                        hbox.getChildren().add(label);
-                        hbox.setOnMouseClicked(getOnElementClick(label));
-                        gfiles.add(hbox, col, row);
-                        col++;
-                        if(col == columns_count) {
-                            col = 0;
-                            row++;
-                        }
-                        break;
-                    case 5: // List
-                        icon.setFitHeight(24);
-                        icon.setFitWidth(24);
-                        label.setGraphic(icon);
-                        label.setOnMouseClicked(getOnElementClick(label));
-                        lfiles.getItems().add(label);
-                        break;
-                    case 6: // Table
-                        icon.setFitHeight(24);
-                        icon.setFitWidth(24);
-                        label.setGraphic(icon);
-                        label.setOnMouseClicked(getOnElementClick(label));
-                        currentDirectoryEntries.add(TableRow.fromFSObject(fso, label, resourceBundle));
-                        break;
+                switch (currentPerspective) {
+                case ICONS_X_LARGE: // XLarge
+                    icon.setFitHeight(96);
+                    icon.setFitWidth(96);
+                    vbox = new VBox();
+                    vbox.getChildren().add(icon);
+                    vbox.getChildren().add(label);
+                    vbox.setOnMouseClicked(getOnElementClick(label));
+                    gfiles.add(vbox, col, row);
+                    col++;
+                    if (col == columns_count) {
+                        col = 0;
+                        row++;
+                    }
+                    break;
+                case ICONS_LARGE: // Large
+                    icon.setFitHeight(64);
+                    icon.setFitWidth(64);
+                    vbox = new VBox();
+                    vbox.getChildren().add(icon);
+                    vbox.getChildren().add(label);
+                    vbox.setOnMouseClicked(getOnElementClick(label));
+                    gfiles.add(vbox, col, row);
+                    col++;
+                    if (col == columns_count) {
+                        col = 0;
+                        row++;
+                    }
+                    break;
+                case ICONS_MEDIUM: // Medium
+                    icon.setFitHeight(48);
+                    icon.setFitWidth(48);
+                    vbox = new VBox();
+                    vbox.getChildren().add(icon);
+                    vbox.getChildren().add(label);
+                    vbox.setOnMouseClicked(getOnElementClick(label));
+                    gfiles.add(vbox, col, row);
+                    col++;
+                    if (col == columns_count) {
+                        col = 0;
+                        row++;
+                    }
+                    break;
+                case ICONS_SMALL: // Small
+                    icon.setFitHeight(24);
+                    icon.setFitWidth(24);
+                    vbox = new VBox();
+                    vbox.getChildren().add(icon);
+                    vbox.getChildren().add(label);
+                    vbox.setOnMouseClicked(getOnElementClick(label));
+                    gfiles.add(vbox, col, row);
+                    col++;
+                    if (col == columns_count) {
+                        col = 0;
+                        row++;
+                    }
+                    break;
+                case TILE: // Tile
+                    icon.setFitHeight(48);
+                    icon.setFitWidth(48);
+                    label.setPadding(new Insets(15, 0, 0, 5));
+                    hbox = new HBox();
+                    hbox.getChildren().add(icon);
+                    hbox.getChildren().add(label);
+                    hbox.setOnMouseClicked(getOnElementClick(label));
+                    gfiles.add(hbox, col, row);
+                    col++;
+                    if (col == columns_count) {
+                        col = 0;
+                        row++;
+                    }
+                    break;
+                case LIST: // List
+                    icon.setFitHeight(24);
+                    icon.setFitWidth(24);
+                    label.setGraphic(icon);
+                    label.setOnMouseClicked(getOnElementClick(label));
+                    //lfiles.getItems().add(label);
+                    break;
+                case TABLE: // Table
+                    icon.setFitHeight(24);
+                    icon.setFitWidth(24);
+                    label.setGraphic(icon);
+//                    label.setOnMouseClicked(getOnElementClick(label));
+                    currentDirectoryEntries.add(TableRow.fromFSObject(fso, label, resourceBundle));
+                    break;
                 }
             }
             CHILDRENS.put(path_id, path_childrens);
@@ -1179,9 +1218,13 @@ public class MainSceneController implements Initializable, UploadProgressListene
         return code;
     }
 
+    private synchronized void switchPerspectiveTo(PerspectiveType perspective) {
+        perspectiveManager.switchTo(perspective);
+    }
+
     public void changeToGridView(FSObject[] content, int size, boolean tile) {
-        files.setVisible(false);
-        lfiles.setVisible(false);
+        //files.setVisible(false);
+        //lfiles.setVisible(false);
         gfiles.getChildren().clear();
         gfiles.setHgap(10);
         gfiles.setVgap(10);
@@ -1189,7 +1232,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
         int csize = tile ? 150 : size;
         int columns_count = (int) ((gfiles.getWidth() - 10) / (csize + 10));
         int col = 0, row = 0;
-        for(FSObject fso : content) {
+        for (FSObject fso : content) {
             ImageView icon = new ImageView(fso.type.equals("dir") ? fso.pincode ? lockBlackIcon : fso.count > 0 ? folderFull
                     : folderBlackIcon : getFileIcon(fso.name));
             icon.setFitHeight(size);
@@ -1198,7 +1241,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
             name.setId(String.valueOf(fso.id));
             name.setOnMouseClicked(getOnElementClick(name));
             name.setTooltip(createTooltipFor(fso));
-            if(tile) {
+            if (tile) {
                 name.setPadding(new Insets(15, 0, 0, 5));
                 HBox box = new HBox();
                 box.getChildren().add(icon);
@@ -1212,7 +1255,7 @@ public class MainSceneController implements Initializable, UploadProgressListene
                 gfiles.add(box, col, row);
             }
             col++;
-            if(col == columns_count) {
+            if (col == columns_count) {
                 col = 0;
                 row++;
             }
@@ -1221,56 +1264,51 @@ public class MainSceneController implements Initializable, UploadProgressListene
         scroll_pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         gfiles.setVisible(true);
     }
-    
+
     public void changeToXLargeView() {
         changeToGridView(content, 96, false);
         display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/ixlarge.png"))));
-        display_slider.setValue(6);
         display_menu.setVisible(false);
-        view_type = 0;
+        currentPerspective = PerspectiveType.ICONS_X_LARGE;
     }
-    
+
     public void changeToLargeView() {
         changeToGridView(content, 64, false);
         display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/ilarge.png"))));
-        display_slider.setValue(5);
         display_menu.setVisible(false);
-        view_type = 1;
+        currentPerspective = PerspectiveType.ICONS_LARGE;
     }
-    
+
     public void changeToMediumView() {
         changeToGridView(content, 48, false);
         display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/imedium.png"))));
-        display_slider.setValue(4);
         display_menu.setVisible(false);
-        view_type = 2;
+        currentPerspective = PerspectiveType.ICONS_MEDIUM;
     }
-    
+
     public void changeToSmallView() {
         changeToGridView(content, 24, true);
         display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/ismall.png"))));
-        display_slider.setValue(3);
         display_menu.setVisible(false);
-        view_type = 3;
+        currentPerspective = PerspectiveType.ICONS_SMALL;
     }
-    
+
     public void changeToTileView() {
         changeToGridView(content, 48, true);
         display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/itile.png"))));
-        display_slider.setValue(2);
         display_menu.setVisible(false);
-        view_type = 4;
+        currentPerspective = PerspectiveType.TILE;
     }
-    
+
     public void changeToListView() {
         changeToListView1(content);
     }
-    
+
     private void changeToListView1(FSObject[] content) {
-        gfiles.setVisible(false);
-        files.setVisible(false);
-        lfiles.getItems().clear();
-        for(FSObject fso : content) {
+        //gfiles.setVisible(false);
+        //files.setVisible(false);
+        //lfiles.getItems().clear();
+        /*for (FSObject fso : content) {
             ImageView icon = new ImageView(fso.type.equals("dir") ? fso.pincode ? lockBlackIcon : fso.count > 0 ? folderFull
                     : folderBlackIcon : getFileIcon(fso.name));
             icon.setFitHeight(24);
@@ -1280,26 +1318,26 @@ public class MainSceneController implements Initializable, UploadProgressListene
             name.setOnMouseClicked(getOnElementClick(name));
             name.setTooltip(createTooltipFor(fso));
             lfiles.getItems().add(name);
-        }
+        }*/
         scroll_pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scroll_pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        lfiles.setVisible(true);
+        //lfiles.setItems(currentDirectoryEntries);
+        //lfiles.setVisible(true);
         display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/ilist.png"))));
-        display_slider.setValue(0.1);
         display_menu.setVisible(false);
-        view_type = 5;
+        currentPerspective = PerspectiveType.LIST;
     }
-    
+
     public void changeToTableView() {
         changeToTableView1(content);
     }
-    
+
     private void changeToTableView1(FSObject[] content) {
-        gfiles.setVisible(false);
-        lfiles.setVisible(false);
-        files.getItems().clear();
+        //gfiles.setVisible(false);
+        //lfiles.setVisible(false);
+        //files.getItems().clear();
         currentDirectoryEntries.clear();
-        for(FSObject fso : content) {
+        for (FSObject fso : content) {
             ImageView icon = new ImageView(fso.type.equals("dir") ? fso.pincode ? lockBlackIcon : fso.count > 0 ? folderFull
                     : folderBlackIcon : getFileIcon(fso.name));
             icon.setFitHeight(24);
@@ -1315,9 +1353,19 @@ public class MainSceneController implements Initializable, UploadProgressListene
         scroll_pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         files.setVisible(true);
         display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/itable.png"))));
-        display_slider.setValue(0.0);
         display_menu.setVisible(false);
-        view_type = 6;
+        currentPerspective = PerspectiveType.TABLE;
+    }
+
+    public static class FileCell extends ListCell<TableRow> {
+        @Override
+        public void updateItem(TableRow item, boolean empty) {
+            super.updateItem(item, empty);
+            if (item != null) {
+                item.getName();
+                setGraphic(item.getName());
+            }
+        }
     }
     
     public static class TableRow {
@@ -1358,5 +1406,14 @@ public class MainSceneController implements Initializable, UploadProgressListene
             return createDate.get();
         }
     }
+
+    @Override
+    public void upload(File file) {
+        uploadFile(file);
+    }
+
+    @Override
+    public void loadContent(int resourceId) {
+        loadContent(resourceId, "", current_tv);
+    }
 }
-          

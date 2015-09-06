@@ -17,6 +17,9 @@ import javafx.stage.StageStyle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import ru.flashsafe.util.ResizeHelper;
+import ru.flashsafe.util.SystemTrayUtil;
+
 /**
  * Main class of a FlashSafe Desktop Client
  * 
@@ -52,6 +55,7 @@ public class Main extends Application {
                     Scene scene = new Scene(root);
                     _scene = scene;
                     stage.setScene(scene);
+                    ResizeHelper.addResizeListener(stage);
                 } catch (Exception e) {
                     log.error(e);
                     e.printStackTrace();
