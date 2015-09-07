@@ -829,14 +829,16 @@ public class MainSceneController implements Initializable, FileController {
             Task<Void> task = new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
-                    progress.setVisible(true);
+                    Platform.runLater(() -> progress.setVisible(true));
                     while (uploadOperation.getState() != OperationState.FINISHED) {
                         updateProgress(uploadOperation.getProgress(), 100);
                         Thread.sleep(200);
                     }
-                    progress.setVisible(false);
                     //FIXME dirty hack - should add loaded objects to FileOperation
-                    Platform.runLater(() -> refresh());
+                    Platform.runLater(() -> {
+                        progress.setVisible(false);
+                        refresh();
+                    });
                     return null;
                 }
             };
