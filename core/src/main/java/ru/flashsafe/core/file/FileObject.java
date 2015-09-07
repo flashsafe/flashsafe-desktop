@@ -28,6 +28,16 @@ public interface FileObject {
     long getSize() throws IOException;
     
     /**
+     * @return 
+     */
+    long getCreationTime();
+    
+    /**
+     * @return 
+     */
+    long getLastModifiedTime();
+    
+    /**
      * @return the exact type of this fileObject 
      */
     FileObjectType getType();

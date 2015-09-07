@@ -9,7 +9,7 @@
 		</console>
 	</appenders>
 	<loggers>
-		<root level="warn">
+		<root level="debug">
 			<appender-ref ref="STDOUT" />
 			<appender-ref ref="FILE" />
 		</root>

@@ -40,6 +40,18 @@ public class LocalDirectory implements Directory {
     public int getCount() {
         return -1;
     }
+    
+    @Override
+    public long getCreationTime() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public long getLastModifiedTime() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
     @Override
     public FileObjectType getType() {

@@ -14,9 +14,10 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import ru.flashsafe.core.FlashSafeApplication;
 import ru.flashsafe.util.ResizeHelper;
 import ru.flashsafe.util.SystemTrayUtil;
 
@@ -27,7 +28,7 @@ import ru.flashsafe.util.SystemTrayUtil;
  */
 public class Main extends Application {
 
-    private static final Logger log = LogManager.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private static Locale currentLocale;
 
@@ -41,6 +42,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        FlashSafeApplication.run();
         es.submit(() -> {
             Platform.runLater(() -> {
                 _stage = stage;
@@ -57,7 +59,7 @@ public class Main extends Application {
                     stage.setScene(scene);
                     ResizeHelper.addResizeListener(stage);
                 } catch (Exception e) {
-                    log.error(e);
+                    LOGGER.error("Error while building main window", e);
                     e.printStackTrace();
                 }
                 stage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
@@ -71,6 +73,7 @@ public class Main extends Application {
 
     @Override
     public void stop() throws Exception {
+        FlashSafeApplication.stop();
         SystemTrayUtil.removeFromSystemTray();
         es.shutdown();
     }

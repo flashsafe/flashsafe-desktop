@@ -117,12 +117,14 @@ public class ResourceResolver {
             currentPathObject = findResource(currentPathObject, pathElement);
             if (currentPathObject == null) {
                 if (exceptionIfNotExists) {
-                    throw new ResourceResolverException("Can't resolve " + resourcePath + ". " + pathElement + " is unknown");
+                    throw new ResourceResolverException("Can't resolve "+ parent.getAbsolutePath() + resourcePath + ". " + pathElement + " is unknown");
                 }
                 return null;
             }
         }
-        currentPathObject.setAbsolutePath(parent.getAbsolutePath() + "/" + resourcePath);
+        String absolutePath = parent.getAbsolutePath()
+                + (parent.getAbsolutePath().endsWith("/") ? resourcePath : "/" + resourcePath);
+        currentPathObject.setAbsolutePath(absolutePath);
         return currentPathObject;
     }
     
@@ -146,7 +148,7 @@ public class ResourceResolver {
                 content = storageService.list(parent.getId());
             }
         } catch (FlashSafeStorageException e) {
-            LOGGER.warn("Error while finding resource with id " + parent.getId(), e);
+            LOGGER.warn("Error while finding resource with id " + parent.getId() + " name " + parent.getAbsolutePath(), e);
             throw new ResourceResolverException("Error while finding resource with id " + parent.getId(), e);
         }
         for (FlashSafeStorageFileObject resource : content) {

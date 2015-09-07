@@ -43,7 +43,7 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeStorageServiceImpl.class);
 
-    private static final char PATH_SEPARATOR = '/';
+    private static final String PATH_SEPARATOR = "/";
 
     private final ResourceResolver resourceResolver;
 
@@ -82,12 +82,13 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
                 FileObjectSecurityHandler handler = handlerProvider.getFileObjectSecurityHandler();
                 FileObjectSecurityEventResult eventResult = handler.handle(new FileObjectSecurityEvent(resource));
                 if (eventResult.getResult() == ResultType.CONTINUE) {
-                    return storageService.list(resource.getId(), eventResult.getCode());
+                    return addAbsolutePath(storageService.list(resource.getId(), eventResult.getCode()),
+                            resource.getAbsolutePath());
                 }
-                //FIXME add specific exception
+                // FIXME add specific exception
                 throw new FlashSafeStorageException("Security code request was canceled");
             } else {
-                return storageService.list(resource.getId());
+                return addAbsolutePath(storageService.list(resource.getId()), resource.getAbsolutePath());
             }
         } catch (ResourceResolverException e) {
             throw new FlashSafeStorageException("Error while listing directory", e);
@@ -104,7 +105,9 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
         try {
             FlashSafeStorageFileObject parentDirectory = resourceResolver.resolveResource(parentDirectoryPath);
             String newDirectoryName = path.substring(path.lastIndexOf(PATH_SEPARATOR) + 1);
-            return storageService.createDirectory(parentDirectory.getId(), newDirectoryName);
+            FlashSafeStorageDirectory directory = storageService.createDirectory(parentDirectory.getId(), newDirectoryName);
+            directory.setAbsolutePath(path);
+            return directory;
         } catch (ResourceResolverException e) {
             LOGGER.warn("Error while creating directory " + path, e);
             throw new FlashSafeStorageException("Error while creating directory " + path, e);
@@ -124,7 +127,9 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
             FlashSafeStorageFileObject toPathResource = resourceResolver.resolveResource(remoteDirectoryPath);
             /* we should think about moving this operation inside async context */
             if (Files.isDirectory(localObjectPath)) {
-                toPathResource = storageService.createDirectory(toPathResource.getId(), localObjectPath.getFileName().toString());
+                String pathName = localObjectPath.getFileName().toString();
+                toPathResource = storageService.createDirectory(toPathResource.getId(), pathName);
+                setAbsolutePath(toPathResource, remoteDirectoryPath);
             }
             FileOperationInfo operationInfo = new FileOperationInfo(localObjectPathString, remoteDirectoryPath, localObjectPath
                     .getFileName().toString());
@@ -132,8 +137,8 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
                     FileOperationType.COPY, StorageOperationType.UPLOAD, operationInfo);
 
             Future<OperationResult> operationFuture = executorService.submit(new AsyncFileTreeWalker(localObjectPath,
-                    new CopyDirectoryToStorageVisitor(localObjectPath, toPathResource, storageService, resourceResolver, storageOperation),
-                    storageOperation));
+                    new CopyDirectoryToStorageVisitor(localObjectPath, toPathResource, storageService, resourceResolver,
+                            storageOperation), storageOperation));
             storageOperation.setOperationFuture(operationFuture);
             return storageOperation;
         } catch (ResourceResolverException | FlashSafeStorageException e) {
@@ -175,6 +180,20 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
             LOGGER.warn("Error while deleting " + path, e);
             throw new FlashSafeStorageException("Error while deleting ", e);
         }
+    }
+
+    private static List<FlashSafeStorageFileObject> addAbsolutePath(List<FlashSafeStorageFileObject> fileObjects,
+            String absolutePath) {
+        fileObjects.forEach(fileObject -> {
+            setAbsolutePath(fileObject, absolutePath);
+        });
+        return fileObjects;
+    }
+    
+    private static void setAbsolutePath(FlashSafeStorageFileObject fileObject, String absolutePath) {
+        String path = absolutePath
+                + (absolutePath.endsWith(PATH_SEPARATOR) ? fileObject.getName() : PATH_SEPARATOR + fileObject.getName());
+        fileObject.setAbsolutePath(path);
     }
 
 }

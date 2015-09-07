@@ -33,6 +33,18 @@ public class LocalFile implements File {
     public long getSize() throws IOException {
         return Files.size(filePath);
     }
+    
+    @Override
+    public long getCreationTime() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public long getLastModifiedTime() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
     @Override
     public String getFileFormat() throws IOException {

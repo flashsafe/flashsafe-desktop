@@ -27,6 +27,7 @@ project(':token-examples') {
 
 project(':file-browser') {
     dependencies {
+        compile project(':core')
         compile project(':token')
     }
 }

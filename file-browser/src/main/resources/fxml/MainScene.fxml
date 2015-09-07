@@ -45,10 +45,10 @@
       <Pane id="TopToolbar" fx:id="topPane" maxHeight="55.0" minHeight="55.0" minWidth="975.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <Label id="Flashsafe" fx:id="flashsafe" prefHeight="55.0" prefWidth="55.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <Button id="DisplayChoice" fx:id="display_choice" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="15.0" />
-      <HBox id="DisplayMenu" fx:id="display_menu" alignment="CENTER" maxHeight="185.0" maxWidth="195.0" minHeight="185.0" minWidth="195.0" visible="false" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="15.0">
+      <HBox id="DisplayMenu" fx:id="display_menu" alignment="CENTER" maxHeight="60.0" maxWidth="195.0" minHeight="60.0" minWidth="195.0" visible="false" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="15.0">
          <children>
             <Slider id="DisplaySlider" fx:id="display_slider" maxHeight="50.0" orientation="VERTICAL" AnchorPane.topAnchor="5.0"/>
-            <ListView id="DisplayList" fx:id="display_list" prefHeight="180.0" prefWidth="200.0" />
+            <ListView id="DisplayList" fx:id="display_list" prefHeight="50.0" prefWidth="200.0" />
          </children>
       </HBox>
       <Label id="Settings" fx:id="settings" alignment="CENTER" contentDisplay="CENTER" prefHeight="55.0" prefWidth="30.0" textAlignment="CENTER" AnchorPane.rightAnchor="60.0" AnchorPane.topAnchor="0.0" />

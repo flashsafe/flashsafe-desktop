@@ -6,6 +6,6 @@ public interface FileController {
 
     void upload(File file);
     
-    void loadContent(int resourceId);
+    void loadContent(String path);
     
 }

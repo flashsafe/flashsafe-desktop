@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import ru.flashsafe.core.file.Directory;
 import javafx.scene.image.Image;
 
 /**
@@ -15,6 +16,12 @@ import javafx.scene.image.Image;
  *
  */
 public class IconUtil {
+    
+    private static final Image EMPTY_FOLDER_ICON = new Image(IconUtil.class.getResourceAsStream("/img/fs/folder_empty.png"));
+    
+    private static final Image LOCKED_FOLDER_ICON = new Image(IconUtil.class.getResourceAsStream("/img/fs/folder_lock.png"));
+    
+    private static final Image FOLDER_ICON = new Image(IconUtil.class.getResourceAsStream("/img/fs/folder.png"));
 
     private static final Map<String, Image> extensionToIconMap = new HashMap<>();
 
@@ -47,6 +54,13 @@ public class IconUtil {
         String extension = filename.substring(filename.lastIndexOf(".") + 1);
         Image fileIcon = extensionToIconMap.get(extension);
         return fileIcon != null ? fileIcon : extensionToIconMap.get(UNKNOWN_EXTENSION); 
+    }
+    
+    public static Image getFolderIcon(Directory folder) {
+        if (folder.getCount() > 0 ) {
+            return FOLDER_ICON;
+        }
+        return EMPTY_FOLDER_ICON;
     }
 
     private static void init() {

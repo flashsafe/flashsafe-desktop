@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CancellationException;
@@ -146,7 +147,8 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
                 .request(MediaType.APPLICATION_JSON_TYPE).get(DirectoryListResponse.class);
         ResponseMeta responseMeta = listResponse.getResponseMeta();
         if (responseMeta.getResponseCode() == HTTP_OK) {
-            return listResponse.getFileObjects();
+            List<FlashSafeStorageFileObject> fileObjects = listResponse.getFileObjects();
+            return fileObjects == null ? Collections.emptyList() : fileObjects;
         }
         throw new FlashSafeStorageException("Error while listing directory. " + responseMeta.getResponseMessage(), null);
     }
