@@ -12,9 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
@@ -39,7 +37,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -65,6 +62,10 @@ import ru.flashsafe.core.FlashSafeSystem;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.FileObject;
 import ru.flashsafe.core.file.FileOperation;
+import ru.flashsafe.core.file.event.FileObjectSecurityEvent;
+import ru.flashsafe.core.file.event.FileObjectSecurityEventResult;
+import ru.flashsafe.core.file.event.FileObjectSecurityEventResult.ResultType;
+import ru.flashsafe.core.file.event.FileObjectSecurityHandler;
 import ru.flashsafe.core.file.exception.FileOperationException;
 import ru.flashsafe.core.operation.OperationState;
 import ru.flashsafe.model.FSObject;
@@ -76,36 +77,22 @@ import ru.flashsafe.perspective.TablePerspective;
 import ru.flashsafe.util.FileObjectViewHelper;
 import ru.flashsafe.util.FontUtil;
 import ru.flashsafe.util.FontUtil.FontType;
+import ru.flashsafe.util.HistoryObject;
+import ru.flashsafe.util.WaitForEvent;
 
 /**
  * FXML Controller class
  * 
  * @author alex_xpert
  */
-public class MainSceneController implements Initializable, FileController {
+public class MainSceneController implements Initializable, FileController, FileObjectSecurityHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainSceneController.class);
 
-    private final List<FSObject> PARENT_PATH = new ArrayList<>();
-    
-    private final Map<Integer, List<FSObject>> CHILDRENS = new HashMap<>();
-    
-    private FSObject cur_path = new FSObject(0, "dir", "/", "", 0, false, 0, 0, 0);
-    
-    private FSObject current_element = cur_path;
-    
     private FSObject[] content;
-    
-    private boolean back = false;
-    
-    private int path;
-    
-    private String pincode = "";
-    
-    private TreeView current_tv = null;
 
     private double windowXPosition;
-    
+
     private double windowYPosition;
 
     private String pin = "";
@@ -114,14 +101,18 @@ public class MainSceneController implements Initializable, FileController {
 
     private PerspectiveType currentPerspective = PerspectiveType.TABLE;
 
-    private FSObject[] temp_content;
+    private WaitForEvent pincodeEnteredEvent = new WaitForEvent();
 
     private PerspectiveManager perspectiveManager;
-    
+
     private FlashSafeSystem flashSafeSystem;
-    
+
+    private FileManager fileManager;
+
     private final ObservableList<FileObject> currentFolderEntries = FXCollections.observableArrayList();
-    
+
+    private HistoryObject<String> historyObject = new HistoryObject<>();
+
     private String currentFolder = FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX;
 
     @FXML
@@ -205,6 +196,14 @@ public class MainSceneController implements Initializable, FileController {
 
                 @Override
                 public void run() {
+                    files.setPlaceholder(new Label(""));
+                    pathname_textfield.setOnKeyPressed(event -> {
+                        KeyCode keyCode = event.getCode();
+                        if (keyCode == KeyCode.ESCAPE) {
+                            hidePathDialog();
+                        }
+                    });
+
                     backspace.setOnMouseClicked(event -> backspace());
 
                     settings.setOnMouseClicked(event -> {
@@ -258,11 +257,14 @@ public class MainSceneController implements Initializable, FileController {
 
                     });
 
-                    KeyCombination backCombination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN);
+                    KeyCombination backwardCombination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN);
+                    KeyCombination forwardCombination = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.ALT_DOWN);
                     KeyCombination createFolderCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN);
                     Main._stage.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
-                        if (backCombination.match(event)) {
-                            back();
+                        if (backwardCombination.match(event)) {
+                            navigateBackward();
+                        } else if (forwardCombination.match(event)) {
+                            navigateForward();
                         } else if (createFolderCombination.match(event)) {
                             onCreatePathClick();
                         }
@@ -354,7 +356,7 @@ public class MainSceneController implements Initializable, FileController {
         String[] dlinames = { /*
                                * "Огромные значки", "Большие значки",
                                * "Обычные значки", "Маленькие значки", "Плитка",
-                               */"Список", "Таблица" };
+                               */resourceBundle.getString("perspective.list"), resourceBundle.getString("perspective.table") };
         for (int i = 0; i < dlinames.length; i++) {
             Label perspectiveLabel = new Label();
             perspectiveLabel.setText(dlinames[i]);
@@ -390,10 +392,10 @@ public class MainSceneController implements Initializable, FileController {
         display_slider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//                if (display_slider.isValueChanging()) {
-//                    // FIXME apply skipped value
-//                    return;
-//                }
+                // if (display_slider.isValueChanging()) {
+                // // FIXME apply skipped value
+                // return;
+                // }
                 int num = newValue.intValue();
                 switch (num) {
                 case 0:
@@ -427,19 +429,21 @@ public class MainSceneController implements Initializable, FileController {
         }
         myfiles.getStyleClass().remove(0);
         myfiles.getStyleClass().add("category1");
-        
+
         flashSafeSystem = FlashSafeApplication.flashSafeSystem();
-        
+        fileManager = flashSafeSystem.fileManager();
+        flashSafeSystem.fileManagementService().registerFileObjectSecurityHandler(this);
+
         perspectiveManager = new PerspectiveManager(getPerspectives());
         perspectiveManager.switchTo(PerspectiveType.TABLE);
 
         Main.es.submit(new AddHandlersTask());
-        listRootFolder();
+        browseFolder(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
     }
 
     private List<Perspective> getPerspectives() {
-        FileObjectViewHelper fileObjectViewHelper = new FileObjectViewHelper(resourceBundle); 
-        
+        FileObjectViewHelper fileObjectViewHelper = new FileObjectViewHelper(resourceBundle);
+
         List<Perspective> perspectives = new ArrayList<>();
         TablePerspective tablePerspective = new TablePerspective(files, currentFolderEntries, fileObjectViewHelper, this);
         perspectives.add(tablePerspective);
@@ -543,123 +547,32 @@ public class MainSceneController implements Initializable, FileController {
         };
     }
 
-    public void onPincodeSubmit() {
-        pincode_dialog.setVisible(false);
-        if (!pin.isEmpty()) {
-//            if (back) {
-//                loadContent(PARENT_PATH.isEmpty() ? 0 : PARENT_PATH.get(PARENT_PATH.size() - 1).id, pin, current_tv);
-//            } else {
-//                clearContent();
-//                (path, pin, current_tv);
-//            }
-//            pin = "";
-//            pincode_textfield.setText("");
-        }
+    private void showPathDialog() {
+        pathname_dialog.setVisible(true);
+        pathname_textfield.requestFocus();
+    }
+
+    private void hidePathDialog() {
+        pathname_dialog.setVisible(false);
+        pathname_textfield.setText("");
     }
 
     public void onCreatePathClick() {
-        pathname_dialog.setVisible(true);
+        showPathDialog();
     }
 
     public void onPathnameSubmit() {
-        // pathname_dialog.setVisible(false);
-        // if (!pathname_textfield.getText().isEmpty()) {
-        // int id = HttpAPI.getInstance().createPath(cur_path.id, pincode,
-        // pathname_textfield.getText());
-        // FSObject path = new FSObject(id, "dir", pathname_textfield.getText(),
-        // "", 0, false, 0, System.currentTimeMillis(),
-        // System.currentTimeMillis());
-        // ImageView icon = new ImageView(folderBlackIcon);
-        // Label label = new Label(path.name);
-        // label.setFont(new Font("Ubuntu Condensed", 18));
-        // label.setTextFill(Paint.valueOf("#7C7C7C"));
-        // label.setId(String.valueOf(path.id));
-        // label.setPrefWidth(340);
-        // Tooltip tooltip = createTooltipFor(path);
-        // label.setTooltip(tooltip);
-        // HBox hbox;
-        // VBox vbox;
-        // int col = 0, row = 0;
-        // if (currentPerspective != PerspectiveType.TABLE || currentPerspective
-        // != PerspectiveType.LIST ) { // Вычисляем ячейку
-        // col = gfiles.getChildren().size() %
-        // gfiles.getColumnConstraints().size();
-        // row = col == 0 ? gfiles.getRowConstraints().size() :
-        // gfiles.getRowConstraints().size() - 1;
-        // }
-        // switch (currentPerspective) {
-        // case ICONS_X_LARGE: // XLarge
-        // icon.setFitHeight(96);
-        // icon.setFitWidth(96);
-        // vbox = new VBox();
-        // vbox.getChildren().add(icon);
-        // vbox.getChildren().add(label);
-        // vbox.setOnMouseClicked(getOnElementClick(label));
-        // gfiles.add(vbox, col, row);
-        // break;
-        // case ICONS_LARGE: // Large
-        // icon.setFitHeight(64);
-        // icon.setFitWidth(64);
-        // vbox = new VBox();
-        // vbox.getChildren().add(icon);
-        // vbox.getChildren().add(label);
-        // vbox.setOnMouseClicked(getOnElementClick(label));
-        // gfiles.add(vbox, col, row);
-        // break;
-        // case ICONS_MEDIUM: // Medium
-        // icon.setFitHeight(48);
-        // icon.setFitWidth(48);
-        // vbox = new VBox();
-        // vbox.getChildren().add(icon);
-        // vbox.getChildren().add(label);
-        // vbox.setOnMouseClicked(getOnElementClick(label));
-        // gfiles.add(vbox, col, row);
-        // col++;
-        // break;
-        // case ICONS_SMALL: // Small
-        // icon.setFitHeight(24);
-        // icon.setFitWidth(24);
-        // vbox = new VBox();
-        // vbox.getChildren().add(icon);
-        // vbox.getChildren().add(label);
-        // vbox.setOnMouseClicked(getOnElementClick(label));
-        // gfiles.add(vbox, col, row);
-        // break;
-        // case TILE: // Tile
-        // icon.setFitHeight(48);
-        // icon.setFitWidth(48);
-        // label.setPadding(new Insets(15, 0, 0, 5));
-        // hbox = new HBox();
-        // hbox.getChildren().add(icon);
-        // hbox.getChildren().add(label);
-        // hbox.setOnMouseClicked(getOnElementClick(label));
-        // gfiles.add(hbox, col, row);
-        // break;
-        // case LIST: // List
-        // icon.setFitHeight(24);
-        // icon.setFitWidth(24);
-        // label.setOnMouseClicked(getOnElementClick(label));
-        // label.setGraphic(icon);
-        // //lfiles.getItems().add(label);
-        // break;
-        // case TABLE: // Table
-        // icon.setFitHeight(24);
-        // icon.setFitWidth(24);
-        // label.setOnMouseClicked(getOnElementClick(label));
-        // label.setGraphic(icon);
-        // currentDirectoryEntries.add(TableRow.fromFSObject(path, label,
-        // resourceBundle));
-        // break;
-        // }
-        // FSObject[] new_content = new FSObject[content.length + 1];
-        // for (int i = 0; i < content.length; i++) {
-        // new_content[i] = content[i];
-        // }
-        // new_content[content.length] = path;
-        // content = new_content;
-        // } else {
-        // pathname_dialog.setVisible(true);
-        // }
+        String folderName = pathname_textfield.getText();
+        hidePathDialog();
+        if (folderName.isEmpty()) {
+            return;
+        }
+        try {
+            fileManager.createDirectory(currentFolder + "/" + folderName);
+            refresh();
+        } catch (FileOperationException e) {
+            LOGGER.warn("Error while creating a new folder", e);
+        }
     }
 
     public void onUploadFileClick() {
@@ -674,189 +587,135 @@ public class MainSceneController implements Initializable, FileController {
                         "*.3gp", "*.3gpp"), new ExtensionFilter(resourceBundle.getString("all_types"), "*.*"));
         File selectedFile = fileChooser.showOpenDialog(Main._stage);
         if (selectedFile != null) {
-            //uploadFile(selectedFile);
+            // uploadFile(selectedFile);
         }
     }
 
-//    private void uploadFile(File selectedFile) {
-//        Thread t = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Platform.runLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        progress.setProgress(0);
-//                        progress.setVisible(true);
-//                    }
-//                });
-//                int id = HttpAPI.getInstance().uploadFile(cur_path.id, pincode, -1, selectedFile);
-//                Platform.runLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        progress.setVisible(false);
-//                    }
-//                });
-//                FSObject f = new FSObject(id, "file", selectedFile.getName(), selectedFile.getName().split("\\.")[selectedFile
-//                        .getName().split("\\.").length - 1].toLowerCase(), selectedFile.length(), false, 0,
-//                        System.currentTimeMillis(), System.currentTimeMillis());
-//                ImageView icon = new ImageView(getFileIcon(f.name));
-//                Label label = new Label(f.name);
-//                label.setMaxHeight(24);
-//                label.setFont(new Font("Ubuntu Condensed", 18));
-//                label.setTextFill(Paint.valueOf("#7C7C7C"));
-//                label.setId(String.valueOf(f.id));
-//                Tooltip tooltip = createTooltipFor(f);
-//                label.setTooltip(tooltip);
-//                Platform.runLater(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        currentDirectoryEntries.add(TableRow.fromFSObject(f, label, resourceBundle));
-//                    }
-//                });
-//                FSObject[] new_content = Arrays.copyOf(content, content.length + 1);
-//                new_content[content.length] = f;
-//                content = new_content;
-//            }
-//        });
-//        t.setDaemon(true);
-//        t.start();
-//    }
-
-    public void back() {
-        back = true;
-        clearContent();
-        //loadContent(PARENT_PATH.isEmpty() ? 0 : PARENT_PATH.get(PARENT_PATH.size() - 1).id, "", current_tv);
-    }
-    
-    private void clearContent() {
-        currentFolderEntries.clear();
-    }
-    
-    private void listRootFolder() {
-        listFolder(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
+    public synchronized void navigateBackward() {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                if (historyObject.hasPrevious()) {
+                    String previousLocation = historyObject.previous();
+                    if (listFolder(previousLocation)) {
+                        currentFolder = previousLocation;
+                    }
+                }
+                return null;
+            }
+        };
+        new Thread(task).start();
     }
 
-    private void listFolder(String path) {
-        FileManager fileManager = flashSafeSystem.fileManager();
+    public synchronized void navigateForward() {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                if (historyObject.hasNext()) {
+                    String previousLocation = historyObject.next();
+                    if (listFolder(previousLocation)) {
+                        currentFolder = previousLocation;
+                    }
+                }
+                return null;
+            }
+        };
+        new Thread(task).start();
+    }
+
+    public synchronized void browseFolder(String folderPath) {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                if (listFolder(folderPath)) {
+                    currentFolder = folderPath;
+                    historyObject.addObject(currentFolder);
+                }
+                return null;
+            }
+        };
+        new Thread(task).start();
+    }
+
+    private boolean listFolder(String path) {
         try {
+            Platform.runLater(() -> {
+                Main._scene.setCursor(Cursor.WAIT);
+            });
             List<FileObject> folderEntries = fileManager.list(path);
-            currentFolderEntries.clear();
-            currentFolderEntries.addAll(folderEntries);
-            currentFolder = path;
+            Platform.runLater(() -> {
+                currentFolderEntries.clear();
+                currentFolderEntries.addAll(folderEntries);
+            });
+            return true;
         } catch (FileOperationException e) {
             LOGGER.warn("Error while executing list", e);
+            return false;
+        } finally {
+            Platform.runLater(() -> {
+                Main._scene.setCursor(Cursor.DEFAULT);
+            });
         }
     }
-    
-//    private int loadContent(int path_id, String pin, TreeView tv) {
-//        currentDirectoryEntries.clear();
-//        Object[] answer = HttpAPI.getInstance().getContent(path_id, pin);
-//        int code = (int) answer[1];
-//        switch (code) {
-//        case 0:
-//            content = (FSObject[]) answer[0];
-//            List<FSObject> path_childrens = new ArrayList<>();
-//            int col = 0,
-//            row = 0;
-//            for (int i = 0; i < content.length; i++) {
-//                FSObject fso = content[i];
-//                ImageView icon = new ImageView(fso.type.equals("dir") ? fso.pincode ? lockBlackIcon : fso.count > 0 ? folderFull
-//                        : folderBlackIcon : /* fileIcon */getFileIcon(fso.name));
-//                Label label = new Label(fso.name);
-//                label.setFont(new Font("Ubuntu Condensed", 14));
-//                label.setTextFill(Paint.valueOf("#000"));
-//                label.setId(String.valueOf(fso.id));
-//                Tooltip tooltip = createTooltipFor(fso);
-//                icon.setFitHeight(24);
-//                icon.setFitWidth(24);
-//                label.setGraphic(icon);
-//                currentDirectoryEntries.add(TableRow.fromFSObject(fso, label, resourceBundle));
-//            }
-//            CHILDRENS.put(path_id, path_childrens);
-//            if (!pin.equals("")) {
-//                pincode = pincode_textfield.getText();
-//                pincode_textfield.setText("");
-//            }
-//            if (back) {
-//                if (!PARENT_PATH.isEmpty() && PARENT_PATH.size() > 1) {
-//                    PARENT_PATH.remove(PARENT_PATH.size() - 1);
-//                    cur_path = PARENT_PATH.get(PARENT_PATH.size() - 1);
-//                } else {
-//                    cur_path = new FSObject(0, "dir", "/", "", 0, false, 0, 0, 0);
-//                }
-//                back = false;
-//            } else {
-//                PARENT_PATH.add(cur_path);
-//                cur_path = current_element;
-//            }
-//            break;
-//        case 1:
-//            CHILDRENS.put(path_id, new ArrayList<>());
-//            if (!pin.equals("")) {
-//                pincode = pincode_textfield.getText();
-//                pincode_textfield.setText("");
-//            }
-//            if (back) {
-//                if (!PARENT_PATH.isEmpty() && PARENT_PATH.size() > 1) {
-//                    PARENT_PATH.remove(PARENT_PATH.size() - 1);
-//                    cur_path = PARENT_PATH.get(PARENT_PATH.size() - 1);
-//                } else {
-//                    cur_path = new FSObject(0, "dir", "/", "", 0, false, 0, 0, 0);
-//                }
-//                back = false;
-//            } else {
-//                PARENT_PATH.add(cur_path);
-//                cur_path = current_element;
-//            }
-//            break;
-//        case 2:
-//            break;
-//        case 3:
-//            path = path_id;
-//            pincode_dialog.setVisible(true);
-//            break;
-//        case 4:
-//            break;
-//        }
-//        return code;
-//    }
+
+    public void onPincodeSubmit() {
+        pincodeEnteredEvent.happened();
+    }
+
+    @Override
+    public FileObjectSecurityEventResult handle(FileObjectSecurityEvent event) {
+        Platform.runLater(() -> pincode_dialog.setVisible(true));
+        pincodeEnteredEvent.waitEvent();
+
+        ResultType result = ResultType.CANCEL;
+        String codeValue = "";
+        if (!pin.isEmpty()) {
+            result = ResultType.CONTINUE;
+            codeValue = pin;
+        }
+        pin = "";
+        Platform.runLater(() -> {
+            pincode_dialog.setVisible(false);
+            pincode_textfield.setText("");
+        });
+        return new FileObjectSecurityEventResult(result, codeValue);
+    }
 
     @Override
     public void upload(File file) {
-        FileManager fileManager = flashSafeSystem.fileManager();
-        try {
-            FileOperation uploadOperation = fileManager.copy(file.getAbsolutePath(), currentFolder);
-            Task<Void> task = new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    FileOperation uploadOperation = fileManager.copy(file.getAbsolutePath(), currentFolder);
                     Platform.runLater(() -> progress.setVisible(true));
                     while (uploadOperation.getState() != OperationState.FINISHED) {
                         updateProgress(uploadOperation.getProgress(), 100);
                         Thread.sleep(200);
                     }
-                    //FIXME dirty hack - should add loaded objects to FileOperation
+                    // FIXME dirty hack - should add loaded objects to
+                    // fileOperation
                     Platform.runLater(() -> {
                         progress.setVisible(false);
                         refresh();
                     });
-                    return null;
+                } catch (FileOperationException e) {
+                    LOGGER.warn("Error while uploading file " + file.getAbsolutePath(), e);
                 }
-            };
-            progress.progressProperty().bind(task.progressProperty());
-            new Thread(task).start();
-        } catch (FileOperationException e) {
-            LOGGER.warn("Error while uploading file " + file.getAbsolutePath(), e);
-        }
+                return null;
+            }
+        };
+        progress.progressProperty().bind(task.progressProperty());
+        new Thread(task).start();
     }
 
     @Override
-    public void loadContent(String path) {
-        listFolder(path);
+    public synchronized void loadContent(String path) {
+        browseFolder(path);
     }
-    
+
     private synchronized void switchPerspectiveTo(PerspectiveType perspective) {
         perspectiveManager.switchTo(perspective);
         currentPerspective = perspective;
     }
-
 }

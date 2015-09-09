@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,10 +98,11 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
 
     @Override
     public FlashSafeStorageDirectory createDirectory(String path) throws FlashSafeStorageException {
-        int lastPathSeparatorIndex = path.lastIndexOf(PATH_SEPARATOR, FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX.length());
+        String resourcePath = path.replaceFirst( FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX, StringUtils.EMPTY);
+        int lastPathSeparatorIndex = resourcePath.lastIndexOf(PATH_SEPARATOR);
         String parentDirectoryPath = FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX;
-        if (lastPathSeparatorIndex > FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX.length()) {
-            parentDirectoryPath = path.substring(0, lastPathSeparatorIndex);
+        if (lastPathSeparatorIndex > 0) {
+            parentDirectoryPath = resourcePath.substring(0, lastPathSeparatorIndex);
         }
         try {
             FlashSafeStorageFileObject parentDirectory = resourceResolver.resolveResource(parentDirectoryPath);

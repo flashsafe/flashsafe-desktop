@@ -47,6 +47,10 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeAuthClientFilter.class);
 
+    private final String clientId;
+    
+    private final String clientSecret;
+    
     private final Client client;
 
     private final WebTarget authTarget;
@@ -55,6 +59,8 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
 
     @Inject
     public FlashSafeAuthClientFilter(FlashSafeEventService eventService) {
+        clientId = FlashSafeRegistry.readProperty(FlashSafeRegistry.USER_ID);
+        clientSecret = FlashSafeRegistry.readProperty(FlashSafeRegistry.SECRET);
         client = ClientBuilder.newBuilder().register(JacksonFeature.class).register(ContentTypeFixerFilter.class).build();
         String storageAddress = FlashSafeRegistry.getStorageAddress();
         authTarget = client.target(storageAddress).path(AUTH_URL);
@@ -95,12 +101,12 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
 
     private AuthData doAuth(boolean exitOnFail) {
         AuthResponse authResponse = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(
-                Entity.form(new Form(ID_PARAMETER, "1")), AuthResponse.class);
+                Entity.form(new Form(ID_PARAMETER, clientId)), AuthResponse.class);
 
         AuthData authData = authResponse.getAuthData();
         String hash = md5(authData.getToken() + getSecret() + authData.getTimestamp());
 
-        Form form = new Form(ID_PARAMETER, "1");
+        Form form = new Form(ID_PARAMETER, clientId);
         form.param(ACCESS_TOKEN_PARAMETER, hash);
         /* add try-catch and try again - just temporary workaround - back-end do something weird when you request it first time */
         try {
@@ -147,6 +153,6 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
     }
 
     private String getSecret() {
-        return "open123458";
+        return clientSecret;
     }
 }
