@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.flashsafe.core.FlashSafeApplication;
+import ru.flashsafe.core.FlashSafeConfiguration;
+import ru.flashsafe.util.ApplicationProperties;
 import ru.flashsafe.util.ResizeHelper;
 import ru.flashsafe.util.SystemTrayUtil;
 
@@ -42,6 +44,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        FlashSafeConfiguration configuration = createConfiguration();
+        FlashSafeApplication.setConfiguration(configuration);
         FlashSafeApplication.run();
         es.submit(() -> {
             Platform.runLater(() -> {
@@ -70,6 +74,11 @@ public class Main extends Application {
         SystemTrayUtil.addToSystemTray(currentResourceBundle.getString("connection_established"),
                 currentResourceBundle.getString("flashsafe_ready_to_use"));
     }
+    
+    private static FlashSafeConfiguration createConfiguration() {
+        return FlashSafeConfiguration.builder().registerUserId(ApplicationProperties.userId())
+                .registerSecret(ApplicationProperties.secret()).build();
+    }
 
     @Override
     public void stop() throws Exception {
@@ -83,7 +92,8 @@ public class Main extends Application {
      *            the command line arguments
      */
     public static void main(String[] args) {
-        currentLocale = Locale.getDefault();
+        String languageValue = ApplicationProperties.languageTag(); 
+        currentLocale = Locale.forLanguageTag(languageValue);
         currentResourceBundle = ResourceBundle.getBundle("bundles.interface", currentLocale);
         launch(args);
     }

@@ -12,6 +12,10 @@ public class FlashSafeRegistry {
 
     public static final String STORAGE_ADDRESS = "STORAGE_ADDRESS";
     
+    public static final String USER_ID = "USER_ID";
+    
+    public static final String SECRET = "SECRET";
+    
     /**
      * Number of operations on  local fileObjects that could be executed simultaneously.
      */
@@ -40,5 +44,9 @@ public class FlashSafeRegistry {
     @SuppressWarnings("unchecked")
     public static <T> T readProperty(String name) {
         return (T) flashSafeProperties.get(name);
+    }
+
+    static void writeProperty(String name, Object value) {
+        flashSafeProperties.put(name, value);
     }
 }

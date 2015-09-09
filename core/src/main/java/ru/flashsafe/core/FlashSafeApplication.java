@@ -1,5 +1,8 @@
 package ru.flashsafe.core;
 
+import java.util.Objects;
+import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +24,8 @@ public class FlashSafeApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeApplication.class);
 
     private static final Injector injector;
+
+    private static FlashSafeConfiguration applicationConfiguration;
     
     private static volatile boolean applicationStarted = false;
 
@@ -46,6 +51,13 @@ public class FlashSafeApplication {
         }
         return flashSafeSystem;
     }
+    
+    public static void setConfiguration(FlashSafeConfiguration configuration) {
+        if (applicationStarted) {
+            throw new IllegalStateException("Can not set FlashSafeSystem configuration. The application is running");
+        }
+        applicationConfiguration = Objects.requireNonNull(configuration);
+    }
 
     /**
      * Runs the application.
@@ -57,6 +69,7 @@ public class FlashSafeApplication {
             throw new IllegalStateException("The application is already started");
         }
         LOGGER.info("Lookup FlashSafeSystem");
+        applyConfiguration();
         flashSafeSystem = lookupFlashSafeSystem();
         applicationStarted = true;
     }
@@ -76,6 +89,13 @@ public class FlashSafeApplication {
 
     private static FlashSafeSystem lookupFlashSafeSystem() {
         return injector.getInstance(DefaultFlashSafeSystem.class);
+    }
+    
+    private static void applyConfiguration() {
+        Properties configurationProperties = applicationConfiguration.getConfigurationProperties();
+        configurationProperties.keySet().forEach(key -> {
+            FlashSafeRegistry.writeProperty(key.toString(), configurationProperties.get(key));
+        });
     }
     
     private static void stopApplication() {
