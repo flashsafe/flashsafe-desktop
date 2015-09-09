@@ -5,6 +5,7 @@ import static ru.flashsafe.core.storage.util.StorageUtils.STORAGE_PATH_PREFIX;
 import static ru.flashsafe.core.storage.util.StorageUtils.STORAGE_PATH_SEPARATOR;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,6 +20,9 @@ import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
 import ru.flashsafe.core.storage.util.StorageUtils;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -39,6 +43,10 @@ public class ResourceResolver {
     
     private final FlashSafeStorageIdBasedService storageService;
     
+    private static final long CACHE_MAX_SIZE = 100;
+    //TODO move cache to wrapper 
+    private final LoadingCache<ResourceCacheKey, FlashSafeStorageFileObject> resourceCache;
+    
     //TODO move out to runtime configuration
     static {
         ROOT_DIRECTORY = new FlashSafeStorageDirectory();
@@ -51,6 +59,14 @@ public class ResourceResolver {
     public ResourceResolver(FlashSafeStorageIdBasedService storageService, FileManagementEventHandlerProvider handlerProvider) {
         this.storageService = requireNonNull(storageService);
         this.handlerProvider = handlerProvider;
+        this.resourceCache = CacheBuilder.newBuilder().maximumSize(CACHE_MAX_SIZE)
+                .build(new CacheLoader<ResourceCacheKey, FlashSafeStorageFileObject>() {
+                    @Override
+                    public FlashSafeStorageFileObject load(ResourceCacheKey key) throws Exception {
+                        LOGGER.debug("Loading resource " + key);
+                        return doResolveResource(key.getParent(), key.getResourceName(), key.isExceptionIfNotExists());
+                    }
+                });
     }
 
     /**
@@ -105,8 +121,18 @@ public class ResourceResolver {
             throw new IllegalStateException("Unexpected behaviour", e);
         }
     }
-
+    
     private FlashSafeStorageFileObject resolveResource(FlashSafeStorageFileObject parent, String resourcePath,
+            final boolean exceptionIfNotExists) throws ResourceResolverException {
+        try {
+            return resourceCache.get(new ResourceCacheKey(parent, resourcePath, exceptionIfNotExists)); 
+        } catch (ExecutionException e) {
+            throw new ResourceResolverException(e);
+        }
+        //return doResolveResource(parent, resourcePath, exceptionIfNotExists);
+    }
+
+    private FlashSafeStorageFileObject doResolveResource(FlashSafeStorageFileObject parent, String resourcePath,
             final boolean exceptionIfNotExists) throws ResourceResolverException {
         if (resourcePath.length() == 0) {
             return parent;
@@ -158,5 +184,67 @@ public class ResourceResolver {
         }
         return null;
     }
+    
+    private static class ResourceCacheKey {
+        
+        private final FlashSafeStorageFileObject parent;
+        
+        private final String resourceName;
+        
+        private final boolean exceptionIfNotExists;
+        
+        public ResourceCacheKey(FlashSafeStorageFileObject parent, String resourceName, boolean exceptionIfNotExists) {
+            this.parent = parent;
+            this.resourceName = resourceName;
+            this.exceptionIfNotExists = exceptionIfNotExists;
+        }
 
+        public FlashSafeStorageFileObject getParent() {
+            return parent;
+        }
+
+        public String getResourceName() {
+            return resourceName;
+        }
+
+        public boolean isExceptionIfNotExists() {
+            return exceptionIfNotExists;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+            result = prime * result + ((resourceName == null) ? 0 : resourceName.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            ResourceCacheKey other = (ResourceCacheKey) obj;
+            if (parent == null) {
+                if (other.parent != null)
+                    return false;
+            } else if (!parent.equals(other.parent))
+                return false;
+            if (resourceName == null) {
+                if (other.resourceName != null)
+                    return false;
+            } else if (!resourceName.equals(other.resourceName))
+                return false;
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return "ResourceCacheKey [parent=" + parent.getAbsolutePath() + ", resourceName=" + resourceName + "]";
+        }
+    }
 }

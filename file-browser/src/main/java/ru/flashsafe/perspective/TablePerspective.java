@@ -4,10 +4,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -74,7 +78,7 @@ public class TablePerspective implements Perspective {
             if (clickCount == 2) {
                 FileObject row = tableView.getSelectionModel().getSelectedItem();
                 if (row != null && row.getType() == FileObjectType.DIRECTORY) {
-                    fileController.loadContent(row.getAbsolutePath());    
+                    fileController.loadContent(row.getAbsolutePath());
                 }
             }
         });

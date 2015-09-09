@@ -1,6 +1,7 @@
 package ru.flashsafe;
 
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -92,9 +93,15 @@ public class Main extends Application {
      *            the command line arguments
      */
     public static void main(String[] args) {
-        String languageValue = ApplicationProperties.languageTag(); 
+        String languageValue = ApplicationProperties.languageTag();
         currentLocale = Locale.forLanguageTag(languageValue);
-        currentResourceBundle = ResourceBundle.getBundle("bundles.interface", currentLocale);
+        try {
+            currentResourceBundle = ResourceBundle.getBundle("bundles.interface", currentLocale);
+        } catch (NullPointerException | MissingResourceException e) {
+            LOGGER.warn("Unable to load resource bundle for locale:" + currentLocale + " . The application will use ENGLISH", e);
+            currentLocale = Locale.ENGLISH;
+            currentResourceBundle = ResourceBundle.getBundle("bundles.interface", Locale.ENGLISH);
+        }
         launch(args);
     }
 

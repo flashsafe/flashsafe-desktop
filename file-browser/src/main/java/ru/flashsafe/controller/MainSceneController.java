@@ -203,7 +203,7 @@ public class MainSceneController implements Initializable, FileController, FileO
                             hidePathDialog();
                         }
                     });
-                    
+
                     backspace.setOnMouseClicked(event -> backspace());
 
                     settings.setOnMouseClicked(event -> {
@@ -546,12 +546,12 @@ public class MainSceneController implements Initializable, FileController, FileO
 
         };
     }
-    
+
     private void showPathDialog() {
         pathname_dialog.setVisible(true);
         pathname_textfield.requestFocus();
     }
-    
+
     private void hidePathDialog() {
         pathname_dialog.setVisible(false);
         pathname_textfield.setText("");
@@ -639,15 +639,22 @@ public class MainSceneController implements Initializable, FileController, FileO
 
     private boolean listFolder(String path) {
         try {
+            Platform.runLater(() -> {
+                Main._scene.setCursor(Cursor.WAIT);
+            });
             List<FileObject> folderEntries = fileManager.list(path);
-            Platform.runLater(()-> {
+            Platform.runLater(() -> {
                 currentFolderEntries.clear();
-                currentFolderEntries.addAll(folderEntries); 
+                currentFolderEntries.addAll(folderEntries);
             });
             return true;
         } catch (FileOperationException e) {
             LOGGER.warn("Error while executing list", e);
             return false;
+        } finally {
+            Platform.runLater(() -> {
+                Main._scene.setCursor(Cursor.DEFAULT);
+            });
         }
     }
 
@@ -665,11 +672,12 @@ public class MainSceneController implements Initializable, FileController, FileO
         if (!pin.isEmpty()) {
             result = ResultType.CONTINUE;
             codeValue = pin;
-            pin = "";
-            pincode_textfield.setText("");
         }
-
-        Platform.runLater(() -> pincode_dialog.setVisible(false));
+        pin = "";
+        Platform.runLater(() -> {
+            pincode_dialog.setVisible(false);
+            pincode_textfield.setText("");
+        });
         return new FileObjectSecurityEventResult(result, codeValue);
     }
 
@@ -687,7 +695,7 @@ public class MainSceneController implements Initializable, FileController, FileO
                     }
                     progress.setVisible(false);
                     // FIXME dirty hack - should add loaded objects to
-                    // FileOperation
+                    // fileOperation
                     Platform.runLater(() -> refresh());
                 } catch (FileOperationException e) {
                     LOGGER.warn("Error while uploading file " + file.getAbsolutePath(), e);
