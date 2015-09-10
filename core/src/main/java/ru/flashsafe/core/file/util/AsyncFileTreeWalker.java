@@ -12,8 +12,6 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
 import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.operation.OperationState;
 
@@ -23,11 +21,12 @@ import ru.flashsafe.core.operation.OperationState;
  * @author Andrew
  *
  */
-//FIXME Runtime exceptions and threads - think about call Future.get() on operation
+// FIXME Runtime exceptions and threads - think about call Future.get() on
+// operation
 public class AsyncFileTreeWalker implements Callable<OperationResult> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncFileTreeWalker.class);
-    
+
     private final Path start;
 
     private final FileVisitor<Path> visitor;
@@ -36,9 +35,12 @@ public class AsyncFileTreeWalker implements Callable<OperationResult> {
 
     /**
      * 
-     * @param start start point of TreeWalker execution
-     * @param visitor visitor to use
-     * @param operation operation
+     * @param start
+     *            start point of TreeWalker execution
+     * @param visitor
+     *            visitor to use
+     * @param operation
+     *            operation
      */
     public AsyncFileTreeWalker(Path start, FileVisitor<Path> visitor, CompositeFileOperation operation) {
         this.start = requireNonNull(start);
@@ -60,6 +62,9 @@ public class AsyncFileTreeWalker implements Callable<OperationResult> {
         } catch (IOException e) {
             operation.setResult(OperationResult.ERROR);
             LOGGER.warn("Error while walking file tree with root " + start, e);
+            return OperationResult.ERROR;
+        } catch (RuntimeException e) {
+            LOGGER.error("Unexpected error while walking file tree with root " + start, e);
             return OperationResult.ERROR;
         } finally {
             operation.setState(OperationState.FINISHED);

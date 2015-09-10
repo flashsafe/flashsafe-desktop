@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.old.storage.FlashSafeStorageIdBasedService;
+import ru.flashsafe.core.old.storage.FlashSafeStorageNullFileObject;
 import ru.flashsafe.core.old.storage.ResourceResolver;
 import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.storage.CompositeFileStorageOperation;
@@ -54,7 +55,7 @@ public class CopyDirectoryToStorageVisitor extends SimpleFileVisitor<Path> {
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
         String resourcePath = convertToFlashSafeStoragePath(fromPath.relativize(dir));
         FlashSafeStorageFileObject directory = resolveResourceIfExists(toPath, resourcePath);
-        if (directory == null) {
+        if (directory == FlashSafeStorageNullFileObject.NULL_OBJECT) {
             LOGGER.debug("Creating directory {}{}{}", toPath.getAbsolutePath(), STORAGE_PATH_SEPARATOR, resourcePath);
             FlashSafeStorageFileObject parentDirectory = toPath;
             int lastElementPosition = resourcePath.lastIndexOf(STORAGE_PATH_SEPARATOR);

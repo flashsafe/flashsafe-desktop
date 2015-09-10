@@ -10,7 +10,7 @@ import java.io.IOException;
  *
  */
 public interface FileObject {
-
+    
     /**
      * @return name of current object
      */

@@ -5,7 +5,6 @@ import static ru.flashsafe.core.storage.util.StorageUtils.STORAGE_PATH_PREFIX;
 import static ru.flashsafe.core.storage.util.StorageUtils.STORAGE_PATH_SEPARATOR;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -125,11 +124,15 @@ public class ResourceResolver {
     private FlashSafeStorageFileObject resolveResource(FlashSafeStorageFileObject parent, String resourcePath,
             final boolean exceptionIfNotExists) throws ResourceResolverException {
         try {
-            return resourceCache.get(new ResourceCacheKey(parent, resourcePath, exceptionIfNotExists)); 
-        } catch (ExecutionException e) {
+            FlashSafeStorageFileObject resource = resourceCache.get(new ResourceCacheKey(parent, resourcePath,
+                    exceptionIfNotExists));
+            if (resource == FlashSafeStorageNullFileObject.NULL_OBJECT) {
+                resource = doResolveResource(parent, resourcePath, exceptionIfNotExists);
+            }
+            return resource;
+        } catch (Exception e) {
             throw new ResourceResolverException(e);
         }
-        //return doResolveResource(parent, resourcePath, exceptionIfNotExists);
     }
 
     private FlashSafeStorageFileObject doResolveResource(FlashSafeStorageFileObject parent, String resourcePath,
@@ -145,7 +148,7 @@ public class ResourceResolver {
                 if (exceptionIfNotExists) {
                     throw new ResourceResolverException("Can't resolve "+ parent.getAbsolutePath() + resourcePath + ". " + pathElement + " is unknown");
                 }
-                return null;
+                return FlashSafeStorageNullFileObject.NULL_OBJECT;
             }
         }
         String absolutePath = parent.getAbsolutePath()
