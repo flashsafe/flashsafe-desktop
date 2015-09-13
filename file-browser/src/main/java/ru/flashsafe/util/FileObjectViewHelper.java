@@ -3,16 +3,25 @@ package ru.flashsafe.util;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
+import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import ru.flashsafe.IconUtil;
 import ru.flashsafe.core.file.Directory;
 import ru.flashsafe.core.file.File;
 import ru.flashsafe.core.file.FileObject;
 import ru.flashsafe.core.file.FileObjectType;
+import ru.flashsafe.view.CreatePathPane;
+import ru.flashsafe.view.EnterPincodePane;
+import ru.flashsafe.view.MainPane;
 
 public class FileObjectViewHelper {
 
@@ -33,6 +42,10 @@ public class FileObjectViewHelper {
             label.setTooltip(tooltip);
             ImageView icon = createIcon(fileObject);
             label.setGraphic(icon);
+            if(fileObject.getType() == FileObjectType.DIRECTORY) {
+	            ContextMenu menu = createContextMenuFor(fileObject);
+	            label.setContextMenu(menu);
+            }
             return label;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -94,4 +107,28 @@ public class FileObjectViewHelper {
         return new Tooltip(tooltipString.toString());
     }
     
+    private ContextMenu createContextMenuFor(FileObject fileObject) {
+    	ContextMenu menu = new ContextMenu();
+    	MenuItem item = new MenuItem();
+    	item.setText(resourceBundle.getString("open_in_new_window"));
+    	item.setOnAction(event -> openInNewWindow(fileObject));
+    	menu.getItems().add(item);
+    	return menu;
+    }
+    
+    private void openInNewWindow(FileObject fileObject) {
+    	Stage stage = new Stage();
+    	stage.setTitle("Flashsafe");
+        stage.setMinWidth(975);
+        stage.setMinHeight(650);
+        stage.initStyle(StageStyle.TRANSPARENT);
+        stage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
+        CreatePathPane pathnameDialog = new CreatePathPane(resourceBundle);
+    	EnterPincodePane pincodeDialog = new EnterPincodePane(resourceBundle);
+        MainPane mainPane = new MainPane(resourceBundle, fileObject.getAbsolutePath(), stage, pathnameDialog, pincodeDialog);
+        Scene scene = new Scene(/*root*/mainPane);
+        stage.setScene(scene);
+        ResizeHelper.addResizeListener(stage);
+        stage.show();
+    }
 }

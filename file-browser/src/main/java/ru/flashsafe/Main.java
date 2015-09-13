@@ -12,17 +12,23 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.flashsafe.controller.MainSceneController;
 import ru.flashsafe.core.FlashSafeApplication;
 import ru.flashsafe.core.FlashSafeConfiguration;
+import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.util.ApplicationProperties;
 import ru.flashsafe.util.ResizeHelper;
 import ru.flashsafe.util.SystemTrayUtil;
+import ru.flashsafe.view.CreatePathPane;
+import ru.flashsafe.view.EnterPincodePane;
+import ru.flashsafe.view.MainPane;
 
 /**
  * Main class of a FlashSafe Desktop Client
@@ -42,6 +48,8 @@ public class Main extends Application {
     public static Scene _scene;
 
     public static ExecutorService es = Executors.newFixedThreadPool(3);
+    
+    //public static FXMLLoader fxmlLoader = new FXMLLoader();
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -52,14 +60,18 @@ public class Main extends Application {
             Platform.runLater(() -> {
                 _stage = stage;
                 stage.setTitle("Flashsafe");
-                stage.setResizable(true);
                 stage.setMinWidth(975);
                 stage.setMinHeight(650);
+                stage.initStyle(StageStyle.TRANSPARENT);
+                stage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
                 try {
-                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/MainScene.fxml"));
-                    fxmlLoader.setResources(currentResourceBundle);
-                    Parent root = fxmlLoader.load();
-                    Scene scene = new Scene(root);
+                    //fxmlLoader.setLocation(getClass().getResource("/fxml/MainScene.fxml"));
+                    //fxmlLoader.setResources(currentResourceBundle);
+                    //Parent root = fxmlLoader.load();
+                	CreatePathPane pathnameDialog = new CreatePathPane(currentResourceBundle);
+                	EnterPincodePane pincodeDialog = new EnterPincodePane(currentResourceBundle);
+                	MainPane mainPane = new MainPane(currentResourceBundle, FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX, stage, pathnameDialog, pincodeDialog);
+                    Scene scene = new Scene(/*root*/mainPane);
                     _scene = scene;
                     stage.setScene(scene);
                     ResizeHelper.addResizeListener(stage);
@@ -67,8 +79,6 @@ public class Main extends Application {
                     LOGGER.error("Error while building main window", e);
                     e.printStackTrace();
                 }
-                stage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
-                stage.initStyle(StageStyle.TRANSPARENT);
                 stage.show();
             });
         });

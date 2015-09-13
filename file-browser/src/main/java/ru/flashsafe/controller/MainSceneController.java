@@ -28,10 +28,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
@@ -48,9 +51,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,14 +84,19 @@ import ru.flashsafe.util.FileObjectViewHelper;
 import ru.flashsafe.util.FontUtil;
 import ru.flashsafe.util.FontUtil.FontType;
 import ru.flashsafe.util.HistoryObject;
+import ru.flashsafe.util.ResizeHelper;
 import ru.flashsafe.util.WaitForEvent;
+import ru.flashsafe.view.CreatePathPane;
+import ru.flashsafe.view.EnterPincodePane;
+import ru.flashsafe.view.MainPane;
+import ru.flashsafe.view.SettingsPane;
 
 /**
  * FXML Controller class
- * 
- * @author alex_xpert
+ *
+ * @author Alexander Krysin
  */
-public class MainSceneController implements Initializable, FileController, FileObjectSecurityHandler {
+public class MainSceneController implements FileController, FileObjectSecurityHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainSceneController.class);
 
@@ -114,79 +125,104 @@ public class MainSceneController implements Initializable, FileController, FileO
     private HistoryObject<String> historyObject = new HistoryObject<>();
 
     private String currentFolder = FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX;
+    
+    private Stage settingsStage, createPathStage, enterPincodeStage;
+    
+    private Stage stage;
 
-    @FXML
     private Pane topPane;
-    @FXML
     private AnchorPane window;
-    @FXML
     private Label settings, refresh, exit;
-    @FXML
     private Pane menu;
-    @FXML
-    private Pane pincode_dialog;
-    @FXML
+    private EnterPincodePane pincode_dialog;
     private TextField pincode_textfield;
-    // @FXML
-    // private Button pincode_submit;
-    @FXML
     private Button backspace;
-    @FXML
     private Button one;
-    @FXML
     private Button two;
-    @FXML
     private Button three;
-    @FXML
     private Button four;
-    @FXML
     private Button five;
-    @FXML
     private Button six;
-    @FXML
     private Button seven;
-    @FXML
     private Button eight;
-    @FXML
     private Button nine;
-    @FXML
     private Button zero;
-    @FXML
     private TableView<FileObject> files;
-    @FXML
-    private Pane pathname_dialog;
-    @FXML
+    private CreatePathPane pathname_dialog;
     private TextField pathname_textfield;
-    // @FXML
-    // private Button pathname_submit;
-    @FXML
     private ProgressBar progress;
-    @FXML
     private Label flashsafe, myfiles, docs, pictures, sounds, videos, loads, contacts;
-    @FXML
-    private Pane settings_pane, software_pane;
-    @FXML
+    private SettingsPane settings_pane;
+    private Pane software_pane;
     private Label rendering, caching, hardware, software, settings_close;
-    @FXML
     private Hyperlink link;
-    @FXML
     private Button display_choice;
-    @FXML
     private Slider display_slider;
-    @FXML
     private ListView<Label> display_list;
-    @FXML
     private HBox display_menu;
-    @FXML
     private AnchorPane files_area;
-    @FXML
     private GridPane gfiles;
-    @FXML
     private ListView<FileObject> lfiles;
-    @FXML
     private ScrollPane scroll_pane;
-    @FXML
     private TextField search_field;
+
+    public MainSceneController(MainPane mainPane, ResourceBundle resourceBundle, String currentFolder, Stage stage) {
+    	this.currentFolder = currentFolder;
+    	this.stage = stage;
+    	
+    	window = mainPane.window;
+    	scroll_pane = mainPane.scroll_pane;
+    	files_area = mainPane.files_area;
+    	files = mainPane.files;
+    	gfiles = mainPane.gfiles;
+    	lfiles = mainPane.lfiles;
+    	topPane = mainPane.topPane;
+    	flashsafe = mainPane.flashsafe;
+    	display_choice = mainPane.display_choice;
+    	display_menu = mainPane.display_menu;
+        display_slider = mainPane.display_slider;
+        display_list = mainPane.display_list;
+        settings = mainPane.settings;
+        refresh = mainPane.refresh;
+        exit = mainPane.exit;
+        progress = mainPane.progress;
+        myfiles = mainPane.myfiles;
+        docs = mainPane.docs;
+        pictures = mainPane.pictures;
+        sounds = mainPane.sounds;
+        videos = mainPane.videos;
+        loads = mainPane.loads;
+        contacts = mainPane.contacts;
+        search_field = mainPane.search_field;
+        
+        this.resourceBundle = resourceBundle;
+        
+        settings_pane = new SettingsPane(resourceBundle);
+    	rendering = settings_pane.rendering;
+    	caching = settings_pane.caching;
+    	hardware = settings_pane.hardware;
+    	software = settings_pane.software;
+    	settings_close = settings_pane.settings_close;
+    	software_pane = settings_pane.software_pane;
+    	link = settings_pane.link;
+    	
+    	pathname_dialog = mainPane.pathname_dialog;
+    	pathname_textfield = pathname_dialog.pathname_textfield;
+    	
+    	pincode_dialog = mainPane.pincode_dialog;
+		pincode_textfield = pincode_dialog.pincode_textfield;
+		backspace = pincode_dialog.backspace;
+		one = pincode_dialog.one;
+		two = pincode_dialog.two;
+		three = pincode_dialog.three;
+		four = pincode_dialog.four;
+		five = pincode_dialog.five;
+		six = pincode_dialog.six;
+		seven = pincode_dialog.seven;
+		eight = pincode_dialog.eight;
+		nine = pincode_dialog.nine;
+		zero = pincode_dialog.zero;
+    }
 
     private class AddHandlersTask implements Callable<Void> {
 
@@ -206,12 +242,6 @@ public class MainSceneController implements Initializable, FileController, FileO
 
                     backspace.setOnMouseClicked(event -> backspace());
 
-                    settings.setOnMouseClicked(event -> {
-                        settings_pane.setVisible(true);
-
-                    });
-                    settings_close.setOnMouseClicked(event -> settings_pane.setVisible(false));
-
                     Label[] settings_categories = { rendering, caching, hardware, software };
                     for (Label l : settings_categories) {
                         l.setOnMousePressed(getOnSettingsCategoryClickListener(l));
@@ -230,10 +260,6 @@ public class MainSceneController implements Initializable, FileController, FileO
 
                     });
 
-                    attachWindowDragControlToElement(flashsafe);
-                    flashsafe.setCursor(Cursor.MOVE);
-                    attachWindowDragControlToElement(topPane);
-
                     one.setOnMouseClicked(getOnNumClick(one));
                     two.setOnMouseClicked(getOnNumClick(two));
                     three.setOnMouseClicked(getOnNumClick(three));
@@ -251,7 +277,7 @@ public class MainSceneController implements Initializable, FileController, FileO
                             display_menu.setVisible(false);
                             break;
                         case 2:
-                            Main._stage.setMaximized(!Main._stage.isMaximized());
+                            stage.setMaximized(!stage.isMaximized());
                             break;
                         }
 
@@ -271,10 +297,22 @@ public class MainSceneController implements Initializable, FileController, FileO
                     });
 
                     settings.setOnMouseClicked(event -> {
-                        settings_pane.setVisible(true);
-
+                        //settings_pane.setVisible(true);
+                    	if(settingsStage == null) {
+	                    	settingsStage = new Stage(StageStyle.TRANSPARENT);
+	                    	settingsStage.setWidth(600.0);
+	                    	settingsStage.setHeight(500.0);
+	                    	Scene scene = new Scene(settings_pane, Color.TRANSPARENT);
+	                    	settingsStage.setScene(scene);
+                    	}
+                    	settingsStage.show();
                     });
-                    settings_close.setOnMouseClicked(event -> settings_pane.setVisible(false));
+                    settings_close.setOnMouseClicked(event -> {
+                    	//settings_pane.setVisible(false);
+                    	if(settingsStage != null) {
+                    		settingsStage.close();
+                    	}
+                    });
 
                     attachWindowDragControlToElement(flashsafe);
                     flashsafe.setCursor(Cursor.MOVE);
@@ -342,8 +380,8 @@ public class MainSceneController implements Initializable, FileController, FileO
 
     private void attachWindowDragControlToElement(Node element) {
         element.setOnMouseDragged(event -> {
-            Main._stage.setX(event.getScreenX() - windowXPosition);
-            Main._stage.setY(event.getScreenY() - windowYPosition);
+            stage.setX(event.getScreenX() - windowXPosition);
+            stage.setY(event.getScreenY() - windowYPosition);
         });
         element.setOnMousePressed(event -> {
             windowXPosition = event.getSceneX();
@@ -418,9 +456,7 @@ public class MainSceneController implements Initializable, FileController, FileO
     /**
      * Initializes the controller class.
      */
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.resourceBundle = resourceBundle;
+    public void init() {
         Font leftMenuFont = FontUtil.instance().font(FontType.LEFT_MENU);
         Label[] leftMenuCategories = { myfiles, docs, pictures, sounds, videos, loads, contacts };
         for (Label categoryLabel : leftMenuCategories) {
@@ -438,7 +474,7 @@ public class MainSceneController implements Initializable, FileController, FileO
         perspectiveManager.switchTo(PerspectiveType.TABLE);
 
         Main.es.submit(new AddHandlersTask());
-        browseFolder(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
+        browseFolder(/*FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX*/currentFolder);
     }
 
     private List<Perspective> getPerspectives() {
@@ -458,8 +494,7 @@ public class MainSceneController implements Initializable, FileController, FileO
     }
 
     public void exit() {
-        Main._stage.close();
-        Platform.exit();
+        stage.close();
     }
 
     private EventHandler<MouseEvent> getOnCategoryClickListener(Label source) {
@@ -549,11 +584,25 @@ public class MainSceneController implements Initializable, FileController, FileO
 
     private void showPathDialog() {
         pathname_dialog.setVisible(true);
+    	if(createPathStage == null) {
+    		createPathStage.setTitle("Flashsafe");
+    		createPathStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
+	    	createPathStage = new Stage(StageStyle.TRANSPARENT);
+	    	createPathStage.setWidth(325.0);
+	    	createPathStage.setHeight(150.0);
+	    	Scene scene = new Scene(pathname_dialog, Color.TRANSPARENT);
+	    	createPathStage.setScene(scene);
+	    	createPathStage.setAlwaysOnTop(true);
+    	}
+    	createPathStage.show();
         pathname_textfield.requestFocus();
     }
 
     private void hidePathDialog() {
         pathname_dialog.setVisible(false);
+    	if(createPathStage != null) {
+    		createPathStage.close();
+    	}
         pathname_textfield.setText("");
     }
 
@@ -664,7 +713,20 @@ public class MainSceneController implements Initializable, FileController, FileO
 
     @Override
     public FileObjectSecurityEventResult handle(FileObjectSecurityEvent event) {
-        Platform.runLater(() -> pincode_dialog.setVisible(true));
+        Platform.runLater(() -> {
+        	//pincode_dialog.setVisible(true);
+        	if(enterPincodeStage == null) {
+        		enterPincodeStage.setTitle("Flashsafe");
+        		enterPincodeStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
+	        	enterPincodeStage = new Stage(StageStyle.TRANSPARENT);
+	        	enterPincodeStage.setWidth(300.0);
+	        	enterPincodeStage.setHeight(150.0);
+	        	Scene scene = new Scene(pincode_dialog, Color.TRANSPARENT);
+	        	enterPincodeStage.setScene(scene);
+	        	enterPincodeStage.setAlwaysOnTop(true);
+        	}
+        	enterPincodeStage.show();
+        });
         pincodeEnteredEvent.waitEvent();
 
         ResultType result = ResultType.CANCEL;
@@ -675,7 +737,10 @@ public class MainSceneController implements Initializable, FileController, FileO
         }
         pin = "";
         Platform.runLater(() -> {
-            pincode_dialog.setVisible(false);
+            //pincode_dialog.setVisible(false);
+        	if(enterPincodeStage != null) {
+        		enterPincodeStage.close();
+        	}
             pincode_textfield.setText("");
         });
         return new FileObjectSecurityEventResult(result, codeValue);

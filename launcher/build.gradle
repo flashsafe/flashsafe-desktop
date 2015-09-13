@@ -23,7 +23,7 @@ macAppBundle {
     appName = 'Flashsafe'
     appOutputDir = 'launch4mac'
     icon = "$project.projectDir/resources/AppMacIcon.icns"
-    bundleJRE = true
+    //bundleJRE = true
     //jreHome = '/Users/alex_xpert/Downloads/jre1.8.0_60.jre'
 }
 
