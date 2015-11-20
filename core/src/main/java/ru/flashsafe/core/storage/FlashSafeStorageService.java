@@ -29,7 +29,7 @@ public interface FlashSafeStorageService {
     FlashSafeStorageDirectory createDirectory(String path) throws FlashSafeStorageException;
 
     StorageFileOperation download(String remoteObjectPath, Path localDirectoryPath) throws FlashSafeStorageException;
-
+    
     StorageFileOperation upload(Path localObjectPath, String remoteDirectoryPath) throws FlashSafeStorageException;
 
     void copy(String fromPath, String toPath) throws FlashSafeStorageException;

@@ -1,5 +1,6 @@
 package ru.flashsafe;
 
+import com.sun.org.apache.bcel.internal.util.ClassPath;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -8,18 +9,29 @@ import java.util.concurrent.Executors;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.image.Image;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.pkcs11.jacknji11.CE;
+import org.pkcs11.jacknji11.CKR;
+import org.pkcs11.jacknji11.CKRException;
+import static org.pkcs11.jacknji11.CK_SESSION_INFO.CKF_RW_SESSION;
+import static org.pkcs11.jacknji11.CK_SESSION_INFO.CKF_SERIAL_SESSION;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ru.flashsafe.controller.MainSceneController;
 import ru.flashsafe.core.FlashSafeApplication;
 import ru.flashsafe.core.FlashSafeConfiguration;
 import ru.flashsafe.core.file.FileManager;
@@ -50,9 +62,14 @@ public class Main extends Application {
     public static ExecutorService es = Executors.newFixedThreadPool(3);
     
     //public static FXMLLoader fxmlLoader = new FXMLLoader();
+    
+    private static long session;
 
+    //private static String PIN = "00000000";
+    
     @Override
     public void start(Stage stage) throws Exception {
+        //initToken(stage);
         FlashSafeConfiguration configuration = createConfiguration();
         FlashSafeApplication.setConfiguration(configuration);
         FlashSafeApplication.run();
@@ -62,16 +79,16 @@ public class Main extends Application {
                 stage.setTitle("Flashsafe");
                 stage.setMinWidth(975);
                 stage.setMinHeight(650);
-                stage.initStyle(StageStyle.TRANSPARENT);
+                //stage.initStyle(StageStyle.TRANSPARENT);
                 stage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
                 try {
                     //fxmlLoader.setLocation(getClass().getResource("/fxml/MainScene.fxml"));
                     //fxmlLoader.setResources(currentResourceBundle);
                     //Parent root = fxmlLoader.load();
-                	CreatePathPane pathnameDialog = new CreatePathPane(currentResourceBundle);
-                	EnterPincodePane pincodeDialog = new EnterPincodePane(currentResourceBundle);
-                	MainPane mainPane = new MainPane(currentResourceBundle, FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX, stage, pathnameDialog, pincodeDialog);
-                    Scene scene = new Scene(/*root*/mainPane);
+                    CreatePathPane pathnameDialog = new CreatePathPane(currentResourceBundle);
+                    EnterPincodePane pincodeDialog = new EnterPincodePane(currentResourceBundle);
+                    MainPane mainPane = new MainPane(currentResourceBundle, FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX, stage, pathnameDialog, pincodeDialog);
+                    Scene scene = new Scene(/*root*/mainPane/*, Color.TRANSPARENT*/);
                     _scene = scene;
                     stage.setScene(scene);
                     ResizeHelper.addResizeListener(stage);
@@ -82,8 +99,8 @@ public class Main extends Application {
                 stage.show();
             });
         });
-        SystemTrayUtil.addToSystemTray(currentResourceBundle.getString("connection_established"),
-                currentResourceBundle.getString("flashsafe_ready_to_use"));
+//        SystemTrayUtil.addToSystemTray(currentResourceBundle.getString("connection_established"),
+//                currentResourceBundle.getString("flashsafe_ready_to_use"));
     }
     
     private static FlashSafeConfiguration createConfiguration() {
@@ -93,11 +110,58 @@ public class Main extends Application {
 
     @Override
     public void stop() throws Exception {
-        FlashSafeApplication.stop();
+        //FlashSafeApplication.stop();
         SystemTrayUtil.removeFromSystemTray();
         es.shutdown();
     }
 
+    private static void initToken(Stage stage) {
+        try {
+            System.loadLibrary("jcPKCS11");
+            CE.Initialize();
+            session = CE.OpenSession(0, CKF_SERIAL_SESSION | CKF_RW_SESSION, null, null);
+            _stage = stage;
+            stage.setTitle("Flashsafe Token");
+            stage.setMinWidth(260);
+            stage.setMinHeight(130);
+            stage.getIcons().add(new Image(Class.forName("ru.flashsafe.Main").getResource("/img/logo.png").toExternalForm()));
+            stage.setResizable(false);
+            final VBox vbox = new VBox();
+            vbox.setAlignment(Pos.CENTER);
+            vbox.setSpacing(5);
+            vbox.setPadding(new Insets(5));
+            Label label = new Label(currentResourceBundle.getString("enter_pin_code"));
+            PasswordField passwordField = new PasswordField();
+            Button button = new Button("OK");
+            final Label error = new Label(currentResourceBundle.getString("incorrect_pin_code"));
+            error.setTextFill(Color.RED);
+            button.setOnAction(new EventHandler<ActionEvent>() {
+
+                @Override
+                public void handle(ActionEvent event) {
+                    try {
+                        CE.LoginUser(session, passwordField.getText());
+                    } catch(CKRException ex) {
+                        if(ex.getCKR() == CKR.PIN_INCORRECT) {
+                            if(!vbox.getChildren().contains(error)) {
+                                vbox.getChildren().add(1, error);
+                            }
+                        }
+                    }
+                }
+            });
+            vbox.getChildren().add(label);
+            vbox.getChildren().add(passwordField);
+            vbox.getChildren().add(button);
+            Scene scene = new Scene(vbox);
+            stage.setScene(scene);
+            stage.show();
+        } catch(ClassNotFoundException ex) {
+            LOGGER.error("Error while building main window", ex);
+            ex.printStackTrace();
+        }
+    }
+    
     /**
      * @param args
      *            the command line arguments

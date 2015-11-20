@@ -31,7 +31,7 @@ public class SystemTrayUtil {
                 trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(SystemTrayUtil.class.getResource("/img/logo1.png")), "Flashsafe");
                 tray.add(trayIcon);
                 //BUG: it's doesn't work on Mac OS X!
-                //trayIcon.displayMessage(caption, text, TrayIcon.MessageType.INFO);
+                trayIcon.displayMessage(caption, text, TrayIcon.MessageType.INFO);
             } catch (AWTException e) {
                 logger.warn("Error while adding FlashSafe to tray", e);
             }

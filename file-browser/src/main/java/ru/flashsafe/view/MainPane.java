@@ -4,7 +4,6 @@ import java.util.ResourceBundle;
 
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -67,24 +66,36 @@ public class MainPane extends AnchorPane {
     	pathname_dialog.setController(controller);
     	pincode_dialog.setController(controller);
     	getStylesheets().add(getClass().getResource("/css/mainscene.css").toExternalForm());
-    	setId("MainPane");
-    	setPrefWidth(975.0);
+        setPrefWidth(975.0);
     	setPrefHeight(650.0);
-    	getChildren().add(getContentPane());
-    	getChildren().add(getTopPane());
-    	getChildren().add(getLogo());
-    	getChildren().add(getDisplayChoice());
-    	getChildren().add(getDisplayMenu());
-    	getChildren().add(getSettingsLabel());
-    	getChildren().add(getRefreshLabel());
-    	getChildren().add(getExitLabel());
-    	getChildren().add(getProgressBar());
-    	getChildren().add(getCategoriesIconsPane());
-    	getChildren().add(getCategoriesNamesPane());
-    	getChildren().add(getSearchPane());
+    	getChildren().add(getMainPane());
     	controller.init();
     }
 
+    private AnchorPane getMainPane() {
+        AnchorPane mainPane = new AnchorPane();
+        mainPane.setId("MainPane");
+    	mainPane.setPrefWidth(975.0);
+    	mainPane.setPrefHeight(650.0);
+    	mainPane.getChildren().add(getContentPane());
+    	mainPane.getChildren().add(getTopPane());
+    	mainPane.getChildren().add(getLogo());
+    	mainPane.getChildren().add(getDisplayChoice());
+    	mainPane.getChildren().add(getDisplayMenu());
+    	mainPane.getChildren().add(getSettingsLabel());
+    	mainPane.getChildren().add(getRefreshLabel());
+    	mainPane.getChildren().add(getExitLabel());
+    	mainPane.getChildren().add(getProgressBar());
+    	mainPane.getChildren().add(getCategoriesIconsPane());
+    	mainPane.getChildren().add(getCategoriesNamesPane());
+    	mainPane.getChildren().add(getSearchPane());
+        /*AnchorPane.setBottomAnchor(mainPane, 10.0);
+    	AnchorPane.setLeftAnchor(mainPane, 10.0);
+    	AnchorPane.setRightAnchor(mainPane, 10.0);
+    	AnchorPane.setTopAnchor(mainPane, 10.0);*/
+        return mainPane;
+    }
+    
     private ScrollPane getContentPane() {
     	scroll_pane.setFitToHeight(true);
     	scroll_pane.setFitToWidth(true);

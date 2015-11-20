@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'ru.flashsafe.starter.Main'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile group: 'ru.flashsafe', name: 'file-browser', version: '0.1'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}

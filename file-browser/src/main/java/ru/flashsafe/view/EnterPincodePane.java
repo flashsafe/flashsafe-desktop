@@ -37,7 +37,7 @@ public class EnterPincodePane extends Pane {
 		setId("PincodeDialog");
 		//setLayoutX(288.0);
 		//setLayoutY(150.0);
-		setPrefHeight(150.0);
+		setPrefHeight(340.0);
 		setPrefWidth(300.0);
 		getChildren().add(getTitleLabel());
 		getChildren().add(getPane());

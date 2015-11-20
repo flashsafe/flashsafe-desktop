@@ -38,6 +38,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import ru.flashsafe.core.file.FileObjectType;
 
 @Singleton
 public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
@@ -48,7 +49,7 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
 
     private final ResourceResolver resourceResolver;
 
-    private final FlashSafeStorageIdBasedService storageService;
+    public final FlashSafeStorageIdBasedService storageService;
 
     private final FileManagementEventHandlerProvider handlerProvider;
 
@@ -118,8 +119,25 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
 
     @Override
     public StorageFileOperation download(String remoteObjectPath, Path localDirectoryPath) throws FlashSafeStorageException {
-        // TODO Auto-generated method stub
-        throw new NotImplementedException();
+        //return storageService.downloadFile(remoteObjectPath, localDirectoryPath);
+        
+        String localDirectoryPathString = localDirectoryPath.toString();
+        try {
+            FlashSafeStorageFileObject toPathResource = resourceResolver.resolveResource(remoteObjectPath);
+            FileOperationInfo operationInfo = new FileOperationInfo(localDirectoryPathString, remoteObjectPath, localDirectoryPath
+                    .getFileName().toString());
+            CompositeFileStorageOperation storageOperation = new CompositeFileStorageOperation(OperationIDGenerator.nextId(),
+                    FileOperationType.COPY, StorageOperationType.DOWNLOAD, operationInfo);
+
+            Future<OperationResult> operationFuture = executorService.submit(new AsyncFileTreeWalker(localDirectoryPath,
+                    new CopyDirectoryToStorageVisitor(localDirectoryPath, toPathResource, storageService, resourceResolver,
+                            storageOperation), storageOperation));
+            storageOperation.setOperationFuture(operationFuture);
+            return storageOperation;
+        } catch (ResourceResolverException e) {
+            LOGGER.warn("Error while copying " + remoteObjectPath + " from storage", e);
+            throw new FlashSafeStorageException("Error while copying " + remoteObjectPath + " from storage", e);
+        }
     }
 
     @Override

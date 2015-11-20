@@ -1,6 +1,7 @@
 package ru.flashsafe.util;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Properties;
@@ -22,6 +23,11 @@ public class ApplicationProperties {
             APPLICATION_PROPERTIES.setProperty("id", "1");
             APPLICATION_PROPERTIES.setProperty("secret", "open123458");
             APPLICATION_PROPERTIES.setProperty("language", Locale.getDefault().getLanguage());
+            try {
+                APPLICATION_PROPERTIES.storeToXML(new FileOutputStream("./flashsafe.xml"), "Flashsafe Properties", "UTF-8");
+            } catch(IOException ex) {
+                LOGGER.error("Error while writing properties to file", e);
+            }
         }
     }
     

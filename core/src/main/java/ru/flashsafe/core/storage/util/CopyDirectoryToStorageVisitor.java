@@ -6,6 +6,7 @@ import static ru.flashsafe.core.storage.util.StorageUtils.convertToFlashSafeStor
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
@@ -19,6 +20,7 @@ import ru.flashsafe.core.old.storage.ResourceResolver;
 import ru.flashsafe.core.operation.OperationResult;
 import ru.flashsafe.core.storage.CompositeFileStorageOperation;
 import ru.flashsafe.core.storage.StorageFileOperation;
+import ru.flashsafe.core.storage.StorageOperationType;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
 
@@ -83,11 +85,20 @@ public class CopyDirectoryToStorageVisitor extends SimpleFileVisitor<Path> {
                 fileDirectory = resolveResource(toPath, resourcePath);
             }
         }
-        LOGGER.debug("Uploading file {} to {}{}{}", file, toPath.getAbsolutePath(), STORAGE_PATH_SEPARATOR, resourcePath);
-        StorageFileOperation uploadOperation = uploadFile(fileDirectory.getId(), file);
-        operation.setCurrentOperation(uploadOperation);
-        boolean shouldContinue = waitUntilFinished(uploadOperation);
-        operation.submitCurrentOperationAsFinished();
+        boolean shouldContinue;
+        if(operation.getStorageOperationType() == StorageOperationType.DOWNLOAD) {
+            LOGGER.debug("Downloading file {} to {}{}{}", file, toPath.getAbsolutePath(), STORAGE_PATH_SEPARATOR, resourcePath);
+            StorageFileOperation downloadOperation = downloadFile(((FlashSafeStorageFileObject) fromPath).getId(), Paths.get(toPath.getAbsolutePath()));
+            operation.setCurrentOperation(downloadOperation);
+            shouldContinue = waitUntilFinished(downloadOperation);
+            operation.submitCurrentOperationAsFinished();
+        } else {
+            LOGGER.debug("Uploading file {} to {}{}{}", file, toPath.getAbsolutePath(), STORAGE_PATH_SEPARATOR, resourcePath);
+            StorageFileOperation uploadOperation = uploadFile(fileDirectory.getId(), file);
+            operation.setCurrentOperation(uploadOperation);
+            shouldContinue = waitUntilFinished(uploadOperation);
+            operation.submitCurrentOperationAsFinished();
+        }
         return shouldContinue ? FileVisitResult.CONTINUE : FileVisitResult.TERMINATE;
     }
     
@@ -111,6 +122,15 @@ public class CopyDirectoryToStorageVisitor extends SimpleFileVisitor<Path> {
         } catch (FlashSafeStorageException e) {
             LOGGER.warn("Error while uploading file " + file, e);
             throw new IOException("Error while uploading file " + file, e);
+        }
+    }
+    
+    private StorageFileOperation downloadFile(long fileId, Path directory) throws IOException {
+        try {
+            return storageService.downloadFile(fileId, directory);
+        } catch (FlashSafeStorageException e) {
+            LOGGER.warn("Error while downloading file with id " + fileId, e);
+            throw new IOException("Error while downloading file with id " + fileId, e);
         }
     }
 

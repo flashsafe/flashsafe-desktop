@@ -1,0 +1,16 @@
+22:13:08,825 [WARN ] (ApplicationProperties.java:21) - Error while reading properties from file
+java.io.FileNotFoundException: .\flashsafe.xml (Не удается найти указанный файл)
+	at java.io.FileInputStream.open0(Native Method) ~[?:1.8.0_65]
+	at java.io.FileInputStream.open(FileInputStream.java:195) ~[?:1.8.0_65]
+	at java.io.FileInputStream.<init>(FileInputStream.java:138) ~[?:1.8.0_65]
+	at java.io.FileInputStream.<init>(FileInputStream.java:93) ~[?:1.8.0_65]
+	at ru.flashsafe.util.ApplicationProperties.<clinit>(ApplicationProperties.java:19) [file-browser-0.1.jar:?]
+	at ru.flashsafe.Main.main(Main.java:148) [file-browser-0.1.jar:?]
+	at ru.flashsafe.starter.Main.main(Main.java:14) [main/:?]
+22:13:09,267 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+22:13:09,527 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+22:13:09,976 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+22:14:09,552 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+22:14:09,553 [INFO ] (DefaultFlashSafeStorageService.java:129) - Handling application stop event
+22:14:09,560 [INFO ] (FlashSafeStorageServiceImpl.java:70) - Handling application stop event
+22:14:09,561 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event

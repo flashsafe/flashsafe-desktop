@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -23,18 +24,15 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
@@ -55,6 +53,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -73,7 +72,11 @@ import ru.flashsafe.core.file.event.FileObjectSecurityEventResult;
 import ru.flashsafe.core.file.event.FileObjectSecurityEventResult.ResultType;
 import ru.flashsafe.core.file.event.FileObjectSecurityHandler;
 import ru.flashsafe.core.file.exception.FileOperationException;
+import ru.flashsafe.core.file.impl.UnifiedFileManager;
+import ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService;
+import ru.flashsafe.core.old.storage.FlashSafeStorageServiceImpl;
 import ru.flashsafe.core.operation.OperationState;
+import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.model.FSObject;
 import ru.flashsafe.perspective.ListPerspective;
 import ru.flashsafe.perspective.Perspective;
@@ -84,8 +87,8 @@ import ru.flashsafe.util.FileObjectViewHelper;
 import ru.flashsafe.util.FontUtil;
 import ru.flashsafe.util.FontUtil.FontType;
 import ru.flashsafe.util.HistoryObject;
-import ru.flashsafe.util.ResizeHelper;
 import ru.flashsafe.util.WaitForEvent;
+import ru.flashsafe.view.CopyFilePane;
 import ru.flashsafe.view.CreatePathPane;
 import ru.flashsafe.view.EnterPincodePane;
 import ru.flashsafe.view.MainPane;
@@ -302,8 +305,11 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
 	                    	settingsStage = new Stage(StageStyle.TRANSPARENT);
 	                    	settingsStage.setWidth(600.0);
 	                    	settingsStage.setHeight(500.0);
+                                settingsStage.setResizable(false);
 	                    	Scene scene = new Scene(settings_pane, Color.TRANSPARENT);
 	                    	settingsStage.setScene(scene);
+                                settingsStage.initModality(Modality.WINDOW_MODAL);
+                                settingsStage.initOwner(stage);
                     	}
                     	settingsStage.show();
                     });
@@ -585,14 +591,16 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     private void showPathDialog() {
         pathname_dialog.setVisible(true);
     	if(createPathStage == null) {
-    		createPathStage.setTitle("Flashsafe");
-    		createPathStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
 	    	createPathStage = new Stage(StageStyle.TRANSPARENT);
 	    	createPathStage.setWidth(325.0);
 	    	createPathStage.setHeight(150.0);
+                createPathStage.setResizable(false);
+    		createPathStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
 	    	Scene scene = new Scene(pathname_dialog, Color.TRANSPARENT);
 	    	createPathStage.setScene(scene);
 	    	createPathStage.setAlwaysOnTop(true);
+                createPathStage.initModality(Modality.WINDOW_MODAL);
+                createPathStage.initOwner(stage);
     	}
     	createPathStage.show();
         pathname_textfield.requestFocus();
@@ -716,14 +724,16 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
         Platform.runLater(() -> {
         	//pincode_dialog.setVisible(true);
         	if(enterPincodeStage == null) {
-        		enterPincodeStage.setTitle("Flashsafe");
-        		enterPincodeStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
 	        	enterPincodeStage = new Stage(StageStyle.TRANSPARENT);
 	        	enterPincodeStage.setWidth(300.0);
-	        	enterPincodeStage.setHeight(150.0);
+	        	enterPincodeStage.setHeight(340.0);
+                        enterPincodeStage.setResizable(false);
+        		enterPincodeStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
 	        	Scene scene = new Scene(pincode_dialog, Color.TRANSPARENT);
 	        	enterPincodeStage.setScene(scene);
-	        	enterPincodeStage.setAlwaysOnTop(true);
+	        	//enterPincodeStage.setAlwaysOnTop(true);
+                        enterPincodeStage.initModality(Modality.WINDOW_MODAL);
+                        enterPincodeStage.initOwner(stage);
         	}
         	enterPincodeStage.show();
         });
@@ -748,12 +758,31 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
 
     @Override
     public void upload(File file) {
+        Stage copyFileStage = new Stage(StageStyle.TRANSPARENT);
+        copyFileStage.setWidth(420);
+        copyFileStage.setHeight(220);
+        copyFileStage.setResizable(false);
+        //copyFileStage.initModality(Modality.WINDOW_MODAL);
+        //copyFileStage.initOwner(stage);
+        CopyFilePane copyFilePane = new CopyFilePane(file.getAbsolutePath(), currentFolder, resourceBundle);
+        Scene scene = new Scene(copyFilePane, Color.TRANSPARENT);
+        copyFileStage.setScene(scene);
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 try {
                     FileOperation uploadOperation = fileManager.copy(file.getAbsolutePath(), currentFolder);
-                    Platform.runLater(() -> progress.setVisible(true));
+                    Platform.runLater(() -> {
+                        /*progress.setVisible(true);*/
+                        copyFileStage.show();
+                        copyFilePane.getCancel().setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent event) {
+                                uploadOperation.stop();
+                                copyFileStage.close();
+                            }
+                        });
+                    });
                     while (uploadOperation.getState() != OperationState.FINISHED) {
                         updateProgress(uploadOperation.getProgress(), 100);
                         Thread.sleep(200);
@@ -761,7 +790,8 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                     // FIXME dirty hack - should add loaded objects to
                     // fileOperation
                     Platform.runLater(() -> {
-                        progress.setVisible(false);
+                        //progress.setVisible(false);
+                        copyFileStage.close();
                         refresh();
                     });
                 } catch (FileOperationException e) {
@@ -770,7 +800,8 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                 return null;
             }
         };
-        progress.progressProperty().bind(task.progressProperty());
+        //progress.progressProperty().bind(task.progressProperty());
+        copyFilePane.getBar().progressProperty().bind(task.progressProperty());
         new Thread(task).start();
     }
 
@@ -782,5 +813,25 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     private synchronized void switchPerspectiveTo(PerspectiveType perspective) {
         perspectiveManager.switchTo(perspective);
         currentPerspective = perspective;
+    }
+    
+    public void downloadFile(long fileId, String toPath) {
+        //Task<Void> task = new Task<Void>() {
+            //@Override
+            //protected Void call() throws Exception {
+                try {
+                    ((FlashSafeStorageServiceImpl)((UnifiedFileManager) fileManager).flashSafeStorageService).storageService.downloadFile(fileId, Paths.get(new File(toPath).toURI()));
+                    //FileOperation uploadOperation = fileManager.copy(fromPath, toPath);
+                    //while (uploadOperation.getState() != OperationState.FINISHED) {
+                        //updateProgress(uploadOperation.getProgress(), 100);
+                        //Thread.sleep(200);
+                    //}
+                } catch (FlashSafeStorageException e) {
+                    LOGGER.warn("Error while downloading file with id " + fileId, e);
+                }
+                //return null;
+            //}
+        //};
+        //new Thread(task).start();
     }
 }

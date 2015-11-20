@@ -34,6 +34,7 @@ repositories {
 
 dependencies {
     compile group: 'ru.flashsafe', name: 'file-browser', version: '0.1'
+    compile group: 'com.threerings', name: 'getdown', version: '1.5'
 }
 
 launch4j {
@@ -41,6 +42,12 @@ launch4j {
     outfile = 'Flashsafe.exe'
     icon = "$project.projectDir/resources/AppIcon.ico"
     bundledJrePath = "C:/jre1.8.0_60"
+    version="0.0.0.1"
+    copyright="ROFN, LLC"
+    companyName="ROFN, LLC"
+    description="Infinite Flash Drive"
+    productName="Flashsafe"
+    opt="-Djava.library.path=./natives/windows"
 }
 
 task copyAppLibs(type: Copy) {

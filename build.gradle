@@ -38,6 +38,12 @@ project(':launcher') {
     }
 }
 
+project(':starter') {
+    dependencies {
+        compile project(':file-browser')
+    }
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '2.4'
 }

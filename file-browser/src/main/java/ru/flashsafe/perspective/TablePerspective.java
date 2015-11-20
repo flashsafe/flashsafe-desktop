@@ -20,8 +20,10 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import ru.flashsafe.FileController;
+import ru.flashsafe.controller.MainSceneController;
 import ru.flashsafe.core.file.FileObject;
 import ru.flashsafe.core.file.FileObjectType;
+import ru.flashsafe.core.old.storage.FlashSafeStorageFile;
 import ru.flashsafe.util.FileObjectViewHelper;
 
 public class TablePerspective implements Perspective {
@@ -77,8 +79,12 @@ public class TablePerspective implements Perspective {
             int clickCount = event.getClickCount();
             if (clickCount == 2) {
                 FileObject row = tableView.getSelectionModel().getSelectedItem();
-                if (row != null && row.getType() == FileObjectType.DIRECTORY) {
-                    fileController.loadContent(row.getAbsolutePath());
+                if(row != null) {
+                    if (row.getType() == FileObjectType.DIRECTORY) {
+                        fileController.loadContent(row.getAbsolutePath());
+                    } else {
+                        ((MainSceneController) fileController).downloadFile(((FlashSafeStorageFile) row).getId(), "/home/server/Рабочий стол/" + row.getName());
+                    }
                 }
             }
         });
