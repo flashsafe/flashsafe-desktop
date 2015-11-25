@@ -22,7 +22,7 @@ public class FlashSafeStorageFileManager implements FileManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeStorageFileManager.class);
 
-    public final FlashSafeStorageService storageService;
+    private final FlashSafeStorageService storageService;
     
     @Inject
     FlashSafeStorageFileManager(FlashSafeStorageService storageService) {

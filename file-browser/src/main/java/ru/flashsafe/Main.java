@@ -1,6 +1,8 @@
 package ru.flashsafe;
 
-import com.sun.org.apache.bcel.internal.util.ClassPath;
+import static org.pkcs11.jacknji11.CK_SESSION_INFO.CKF_RW_SESSION;
+import static org.pkcs11.jacknji11.CK_SESSION_INFO.CKF_SERIAL_SESSION;
+
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -20,15 +22,11 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+
 import org.pkcs11.jacknji11.CE;
 import org.pkcs11.jacknji11.CKR;
 import org.pkcs11.jacknji11.CKRException;
-import static org.pkcs11.jacknji11.CK_SESSION_INFO.CKF_RW_SESSION;
-import static org.pkcs11.jacknji11.CK_SESSION_INFO.CKF_SERIAL_SESSION;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +34,6 @@ import ru.flashsafe.core.FlashSafeApplication;
 import ru.flashsafe.core.FlashSafeConfiguration;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.util.ApplicationProperties;
-import ru.flashsafe.util.ResizeHelper;
 import ru.flashsafe.util.SystemTrayUtil;
 import ru.flashsafe.view.CreatePathPane;
 import ru.flashsafe.view.EnterPincodePane;
@@ -91,7 +88,7 @@ public class Main extends Application {
                     Scene scene = new Scene(/*root*/mainPane/*, Color.TRANSPARENT*/);
                     _scene = scene;
                     stage.setScene(scene);
-                    ResizeHelper.addResizeListener(stage);
+                    //ResizeHelper.addResizeListener(stage);
                 } catch (Exception e) {
                     LOGGER.error("Error while building main window", e);
                     e.printStackTrace();
@@ -110,7 +107,7 @@ public class Main extends Application {
 
     @Override
     public void stop() throws Exception {
-        //FlashSafeApplication.stop();
+        FlashSafeApplication.stop();
         SystemTrayUtil.removeFromSystemTray();
         es.shutdown();
     }

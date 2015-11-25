@@ -40,7 +40,7 @@ public class UnifiedFileManager implements FileManager {
 
     private final FlashSafeStorageFileManager flashSafeStorageFileManager;
     
-    public final FlashSafeStorageService flashSafeStorageService;
+    private final FlashSafeStorageService flashSafeStorageService;
 
     @Inject
     UnifiedFileManager(LocalFileManager localFileSystemManager, FlashSafeStorageFileManager flashSafeStorageFileManager,
@@ -90,7 +90,7 @@ public class UnifiedFileManager implements FileManager {
                 //return flashSafeStorageServiceHelper.copyToStorage(fromPath, toPath);
             } else {
                 try {
-                    return flashSafeStorageService.download(toPath, Paths.get(fromPath));
+                    return flashSafeStorageService.download(fromPath, Paths.get(toPath));
                 } catch (FlashSafeStorageException e) {
                     LOGGER.warn("Error while copying file" + fromPath + " to storage", e);
                     throw new FileOperationException("Error while copying file" + fromPath + " to storage", e);

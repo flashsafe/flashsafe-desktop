@@ -4,8 +4,12 @@ import java.io.File;
 
 public interface FileController {
 
-    void upload(File file);
+    void upload(File fileObject, String toPath);
+    
+    void download(String fromPath, File toFile);
     
     void loadContent(String path);
+    
+    String getCurrentLocation();
     
 }

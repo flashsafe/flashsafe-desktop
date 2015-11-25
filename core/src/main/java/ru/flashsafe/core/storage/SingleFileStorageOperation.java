@@ -28,6 +28,11 @@ public class SingleFileStorageOperation extends SingleFileOperation implements S
         super(id, operationType, operationInfo, size);
         this.storageOperationType = storageOperationType;
     }
+    
+    public SingleFileStorageOperation(long id, FileOperationType operationType, StorageOperationType storageOperationType,
+            FileOperationInfo operationInfo) {
+        this(id, operationType, storageOperationType, operationInfo, -1);
+    }
 
     @Override
     public StorageOperationType getStorageOperationType() {

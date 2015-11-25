@@ -71,7 +71,7 @@ public class ListPerspective implements Perspective {
             Dragboard db = event.getDragboard();
             if (db.hasFiles()) {
                 final File f = db.getFiles().get(0);
-                fileController.upload(f);
+                fileController.upload(f, fileController.getCurrentLocation());
             }
             event.setDropCompleted(true);
             event.consume();

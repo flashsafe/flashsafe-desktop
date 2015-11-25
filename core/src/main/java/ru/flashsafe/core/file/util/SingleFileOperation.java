@@ -12,13 +12,17 @@ import ru.flashsafe.core.file.impl.FileOperationInfo;
  */
 public class SingleFileOperation extends AbstractFileOperation {
     
-    private final long totalBytes;
+    private long totalBytes;
     
     public SingleFileOperation(long id, FileOperationType operationType, FileOperationInfo operationInfo, long size) {
         super(id, operationType, operationInfo);
         totalBytes = size;
     }
     
+    public void setTotalBytes(long totalBytes) {
+        this.totalBytes = totalBytes;
+    }
+
     @Override
     public long getTotalBytes() {
         return totalBytes;

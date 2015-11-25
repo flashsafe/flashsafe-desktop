@@ -5,8 +5,10 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -30,6 +32,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
@@ -66,10 +69,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import org.glassfish.jersey.client.ClientProperties;
 
 /**
  * 
@@ -113,9 +112,9 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.register(JacksonFeature.class).register(authFilter).register(ContentTypeFixerFilter.class).register(new ExternalExecutorProvider(executorService))
                 .register(MultiPartFeature.class).register(CustomMultipart.class).register(ProcessMonitorInputStream.class)
-                // .register(new
-                // LoggingFilter(Logger.getLogger(DefaultFlashSafeStorageService.class.getName()),
-                // true))
+//                 .register(new
+//                 LoggingFilter(java.util.logging.Logger.getLogger(DefaultFlashSafeStorageService.class.getName()),
+//                 true))
                 .property(HttpUrlConnectorProvider.USE_FIXED_LENGTH_STREAMING, true);
         restClient = ClientBuilder.newClient(clientConfig);
         String storageAddress = FlashSafeRegistry.getStorageAddress();
@@ -188,30 +187,29 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
     @Override
     public StorageFileOperation downloadFile(long fileId, Path directory) throws FlashSafeStorageException {
         Objects.requireNonNull(directory);
-        System.out.println("DOWNLOAD WAS STARTED");
-        final SingleFileStorageOperation operation = createOperationStatus(OperationIDGenerator.nextId(), directory);
+        final SingleFileStorageOperation operation = createDownloadOperationStatus(OperationIDGenerator.nextId(), directory);
         Future<Response> operationFuture = fileTarget.queryParam("file_id", fileId).request(MediaType.APPLICATION_OCTET_STREAM).async()
                 .get(new InvocationCallback<Response>() {
                     
                     @Override
                     public void completed(Response response) {
+                        InputStream inputStream = null;
+                        OutputStream outputStream = null;
                         try {
-                            InputStream in = (InputStream) response.getEntity();
-                            File file = directory.toFile();
-                            file.createNewFile();
-                            OutputStream out = new FileOutputStream(file);
-                            int b;
-                            while((b = in.read()) != -1) {
-                                out.write(b);
-                            }
-                            in.close();
-                            out.flush();
-                            out.close();
-                        } catch(IOException ex) {
+                            operation.setTotalBytes(response.getLength());
+                            inputStream = new ProcessMonitorInputStream(response.readEntity(InputStream.class), operation);
+                            outputStream = new FileOutputStream(directory.toString());
+                            IOUtils.copy(inputStream, outputStream);
+                            outputStream.flush();
+                            setStatusToFinished(operation, OperationResult.SUCCESS);
+                        } catch (IOException ex) {
+                            setStatusToFinished(operation, OperationResult.ERROR);
                             LOGGER.error("Error while downloading file with id " + fileId, ex);
+                        } finally {
+                            IOUtils.closeQuietly(inputStream);
+                            IOUtils.closeQuietly(outputStream);
+                            response.close();
                         }
-                        response.close();
-                        setStatusToFinished(operation, OperationResult.SUCCESS);
                     }
 
                     @Override
@@ -233,7 +231,7 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
     @Override
     public StorageFileOperation uploadFile(long directoryId, Path file) throws FlashSafeStorageException {
         Objects.requireNonNull(file);
-        final SingleFileStorageOperation operation = createOperationStatus(OperationIDGenerator.nextId(), file);
+        final SingleFileStorageOperation operation = createUploadOperationStatus(OperationIDGenerator.nextId(), file);
 
         FormDataMultiPart multiPart = new FormDataMultiPart();
         multiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
@@ -331,16 +329,21 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
         return length;
     }
 
-    private static SingleFileStorageOperation createOperationStatus(long operationId, Path file) throws FlashSafeStorageException {
+    private static SingleFileStorageOperation createUploadOperationStatus(long operationId, Path file)
+            throws FlashSafeStorageException {
         FileOperationInfo operationInfo = new FileOperationInfo(file.toString(), null, file.getFileName().toString());
         try {
             return new SingleFileStorageOperation(OperationIDGenerator.nextId(), null, StorageOperationType.UPLOAD,
                     operationInfo, Files.size(file));
         } catch (IOException e) {
-            //throw new FlashSafeStorageException("Error while calculating file size", e);
-            return new SingleFileStorageOperation(OperationIDGenerator.nextId(), null, StorageOperationType.UPLOAD,
-                    operationInfo, 0);
+            throw new FlashSafeStorageException("Error while calculating file size", e);
         }
+    }
+    
+    private static SingleFileStorageOperation createDownloadOperationStatus(long operationId, Path file)
+            throws FlashSafeStorageException {
+        FileOperationInfo operationInfo = new FileOperationInfo(file.toString(), null, file.getFileName().toString());
+        return new SingleFileStorageOperation(OperationIDGenerator.nextId(), null, StorageOperationType.DOWNLOAD, operationInfo);
     }
 
 }

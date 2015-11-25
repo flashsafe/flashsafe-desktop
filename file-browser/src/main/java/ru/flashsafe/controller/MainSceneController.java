@@ -10,8 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -72,11 +70,7 @@ import ru.flashsafe.core.file.event.FileObjectSecurityEventResult;
 import ru.flashsafe.core.file.event.FileObjectSecurityEventResult.ResultType;
 import ru.flashsafe.core.file.event.FileObjectSecurityHandler;
 import ru.flashsafe.core.file.exception.FileOperationException;
-import ru.flashsafe.core.file.impl.UnifiedFileManager;
-import ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService;
-import ru.flashsafe.core.old.storage.FlashSafeStorageServiceImpl;
 import ru.flashsafe.core.operation.OperationState;
-import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.model.FSObject;
 import ru.flashsafe.perspective.ListPerspective;
 import ru.flashsafe.perspective.Perspective;
@@ -757,21 +751,21 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     }
 
     @Override
-    public void upload(File file) {
+    public void upload(File fileObject, String toPath) {
         Stage copyFileStage = new Stage(StageStyle.TRANSPARENT);
         copyFileStage.setWidth(420);
         copyFileStage.setHeight(220);
         copyFileStage.setResizable(false);
         //copyFileStage.initModality(Modality.WINDOW_MODAL);
         //copyFileStage.initOwner(stage);
-        CopyFilePane copyFilePane = new CopyFilePane(file.getAbsolutePath(), currentFolder, resourceBundle);
+        CopyFilePane copyFilePane = new CopyFilePane(fileObject.getAbsolutePath(), currentFolder, resourceBundle);
         Scene scene = new Scene(copyFilePane, Color.TRANSPARENT);
         copyFileStage.setScene(scene);
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 try {
-                    FileOperation uploadOperation = fileManager.copy(file.getAbsolutePath(), currentFolder);
+                    FileOperation uploadOperation = fileManager.copy(fileObject.getAbsolutePath(), currentFolder);
                     Platform.runLater(() -> {
                         /*progress.setVisible(true);*/
                         copyFileStage.show();
@@ -795,7 +789,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                         refresh();
                     });
                 } catch (FileOperationException e) {
-                    LOGGER.warn("Error while uploading file " + file.getAbsolutePath(), e);
+                    LOGGER.warn("Error while uploading file " + fileObject.getAbsolutePath(), e);
                 }
                 return null;
             }
@@ -814,24 +808,30 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
         perspectiveManager.switchTo(perspective);
         currentPerspective = perspective;
     }
-    
-    public void downloadFile(long fileId, String toPath) {
+
+    @Override
+    public void download(String fromPath, File toFile) {
         //Task<Void> task = new Task<Void>() {
-            //@Override
-            //protected Void call() throws Exception {
-                try {
-                    ((FlashSafeStorageServiceImpl)((UnifiedFileManager) fileManager).flashSafeStorageService).storageService.downloadFile(fileId, Paths.get(new File(toPath).toURI()));
-                    //FileOperation uploadOperation = fileManager.copy(fromPath, toPath);
-                    //while (uploadOperation.getState() != OperationState.FINISHED) {
-                        //updateProgress(uploadOperation.getProgress(), 100);
-                        //Thread.sleep(200);
-                    //}
-                } catch (FlashSafeStorageException e) {
-                    LOGGER.warn("Error while downloading file with id " + fileId, e);
+        //@Override
+        //protected Void call() throws Exception {
+            try {
+                FileOperation downloadOperation = fileManager.copy(fromPath, toFile.getAbsolutePath());
+                //FileOperation uploadOperation = fileManager.copy(fromPath, toPath);
+                while (downloadOperation.getState() != OperationState.FINISHED) {
+                    //updateProgress(uploadOperation.getProgress(), 100);
+                    Thread.sleep(200);
                 }
-                //return null;
-            //}
-        //};
-        //new Thread(task).start();
+            } catch (FileOperationException | InterruptedException e) {
+                LOGGER.warn("Error while downloading " + fromPath, e);
+            }
+            //return null;
+        //}
+    //};
+    //new Thread(task).start();
+    }
+
+    @Override
+    public String getCurrentLocation() {
+        return currentFolder;
     }
 }

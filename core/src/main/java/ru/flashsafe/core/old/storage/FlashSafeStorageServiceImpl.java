@@ -16,6 +16,7 @@ import ru.flashsafe.core.FlashSafeRegistry;
 import ru.flashsafe.core.event.ApplicationStopEvent;
 import ru.flashsafe.core.event.FlashSafeEventService;
 import ru.flashsafe.core.file.FileManager;
+import ru.flashsafe.core.file.FileObjectType;
 import ru.flashsafe.core.file.FileOperationType;
 import ru.flashsafe.core.file.event.FileManagementEventHandlerProvider;
 import ru.flashsafe.core.file.event.FileObjectSecurityEvent;
@@ -33,12 +34,10 @@ import ru.flashsafe.core.storage.StorageOperationType;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 import ru.flashsafe.core.storage.exception.ResourceResolverException;
 import ru.flashsafe.core.storage.util.CopyDirectoryToStorageVisitor;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import ru.flashsafe.core.file.FileObjectType;
 
 @Singleton
 public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
@@ -119,21 +118,23 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
 
     @Override
     public StorageFileOperation download(String remoteObjectPath, Path localDirectoryPath) throws FlashSafeStorageException {
-        //return storageService.downloadFile(remoteObjectPath, localDirectoryPath);
-        
         String localDirectoryPathString = localDirectoryPath.toString();
         try {
-            FlashSafeStorageFileObject toPathResource = resourceResolver.resolveResource(remoteObjectPath);
-            FileOperationInfo operationInfo = new FileOperationInfo(localDirectoryPathString, remoteObjectPath, localDirectoryPath
-                    .getFileName().toString());
-            CompositeFileStorageOperation storageOperation = new CompositeFileStorageOperation(OperationIDGenerator.nextId(),
-                    FileOperationType.COPY, StorageOperationType.DOWNLOAD, operationInfo);
-
-            Future<OperationResult> operationFuture = executorService.submit(new AsyncFileTreeWalker(localDirectoryPath,
-                    new CopyDirectoryToStorageVisitor(localDirectoryPath, toPathResource, storageService, resourceResolver,
-                            storageOperation), storageOperation));
-            storageOperation.setOperationFuture(operationFuture);
-            return storageOperation;
+            FlashSafeStorageFileObject fromPathResource = resourceResolver.resolveResource(remoteObjectPath);
+            if (fromPathResource.getType() == FileObjectType.DIRECTORY) {
+                throw new IllegalStateException("Download process for directories is not implemented yet");
+            }
+//            FlashSafeStorageFileObject toPathResource = resourceResolver.resolveResource(remoteObjectPath);
+//            FileOperationInfo operationInfo = new FileOperationInfo(localDirectoryPathString, remoteObjectPath, localDirectoryPath
+//                    .getFileName().toString());
+//            CompositeFileStorageOperation storageOperation = new CompositeFileStorageOperation(OperationIDGenerator.nextId(),
+//                    FileOperationType.COPY, StorageOperationType.DOWNLOAD, operationInfo);
+//
+//            Future<OperationResult> operationFuture = executorService.submit(new AsyncFileTreeWalker(localDirectoryPath,
+//                    new CopyDirectoryToStorageVisitor(localDirectoryPath, toPathResource, storageService, resourceResolver,
+//                            storageOperation), storageOperation));
+//            storageOperation.setOperationFuture(operationFuture);
+            return storageService.downloadFile(fromPathResource.getId(), localDirectoryPath);
         } catch (ResourceResolverException e) {
             LOGGER.warn("Error while copying " + remoteObjectPath + " from storage", e);
             throw new FlashSafeStorageException("Error while copying " + remoteObjectPath + " from storage", e);

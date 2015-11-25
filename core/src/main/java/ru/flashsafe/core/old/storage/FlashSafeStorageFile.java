@@ -19,7 +19,7 @@ public class FlashSafeStorageFile extends FlashSafeStorageFileObject implements 
     
     @Override
     public String getAbsolutePath() {
-        return null;
+        return super.getAbsolutePath();
     }
 
     public String getFormat() {

@@ -79,6 +79,7 @@ public abstract class FlashSafeStorageFileObject implements FileObject {
         this.needPassword = needPassword;
     }
 
+    @Override
     public FileObjectType getType() {
         return objectType;
     }
