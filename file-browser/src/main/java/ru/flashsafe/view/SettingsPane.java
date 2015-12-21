@@ -31,6 +31,7 @@ public class SettingsPane extends Pane {
 	public SettingsPane(ResourceBundle resourceBundle) {
 		this.resourceBundle = resourceBundle;
 		getStylesheets().add(getClass().getResource("/css/mainscene.css").toExternalForm());
+                getStylesheets().add("http://flash.so/flashsafe/mainscene.css");
 		setPrefHeight(500.0);
 		setPrefWidth(600.0);
 		setStyle("-fx-background-color: #ECEFF4;");

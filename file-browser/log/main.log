@@ -12721,3 +12721,446 @@ java.io.FileNotFoundException: .\flashsafe.xml (Не удается найти указанный файл)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.8.0_65]
 	at java.lang.reflect.Method.invoke(Method.java:497) ~[?:1.8.0_65]
 	at sun.launcher.LauncherHelper$FXHelper.main(LauncherHelper.java:767) [?:1.8.0_65]
+02:03:31,600 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+02:03:35,301 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+02:03:49,733 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+02:04:02,506 [INFO ] (FlashSafeAuthClientFilter.java:116) - Weird thing just happened
+javax.ws.rs.ProcessingException: Error reading entity from input stream.
+	at org.glassfish.jersey.message.internal.InboundMessageContext.readEntity(InboundMessageContext.java:868) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.message.internal.InboundMessageContext.readEntity(InboundMessageContext.java:785) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientResponse.readEntity(ClientResponse.java:326) ~[jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation.translate(JerseyInvocation.java:790) ~[jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation.access$500(JerseyInvocation.java:91) ~[jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$2.call(JerseyInvocation.java:687) ~[jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:315) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:297) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:228) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.process.internal.RequestScope.runInScope(RequestScope.java:444) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation.invoke(JerseyInvocation.java:683) ~[jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$Builder.method(JerseyInvocation.java:439) ~[jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$Builder.post(JerseyInvocation.java:340) ~[jersey-client-2.19.jar:?]
+	at ru.flashsafe.core.old.storage.rest.FlashSafeAuthClientFilter.doAuth(FlashSafeAuthClientFilter.java:113) [core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.rest.FlashSafeAuthClientFilter.doAuth(FlashSafeAuthClientFilter.java:99) [core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.rest.FlashSafeAuthClientFilter.filter(FlashSafeAuthClientFilter.java:82) [core-0.1.jar:?]
+	at org.glassfish.jersey.client.ClientFilteringStages$RequestFilteringStage.apply(ClientFilteringStages.java:114) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientFilteringStages$RequestFilteringStage.apply(ClientFilteringStages.java:102) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.process.internal.Stages.process(Stages.java:171) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime.invoke(ClientRuntime.java:254) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$2.call(JerseyInvocation.java:687) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:315) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:297) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:228) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.process.internal.RequestScope.runInScope(RequestScope.java:444) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation.invoke(JerseyInvocation.java:683) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$Builder.method(JerseyInvocation.java:411) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$Builder.get(JerseyInvocation.java:307) [jersey-client-2.19.jar:?]
+	at ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService.doList(DefaultFlashSafeStorageService.java:157) [core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService.list(DefaultFlashSafeStorageService.java:140) [core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.FlashSafeStorageServiceImpl.list(FlashSafeStorageServiceImpl.java:92) [core-0.1.jar:?]
+	at ru.flashsafe.core.storage.FlashSafeStorageFileManager.list(FlashSafeStorageFileManager.java:35) [core-0.1.jar:?]
+	at ru.flashsafe.core.file.impl.UnifiedFileManager.list(UnifiedFileManager.java:57) [core-0.1.jar:?]
+	at ru.flashsafe.controller.MainSceneController.listFolder(MainSceneController.java:696) [main/:?]
+	at ru.flashsafe.controller.MainSceneController.access$5200(MainSceneController.java:96) [main/:?]
+	at ru.flashsafe.controller.MainSceneController$5.call(MainSceneController.java:681) [main/:?]
+	at ru.flashsafe.controller.MainSceneController$5.call(MainSceneController.java:678) [main/:?]
+	at javafx.concurrent.Task$TaskCallable.call(Task.java:1423) [jfxrt.jar:?]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+Caused by: com.fasterxml.jackson.databind.JsonMappingException: Can not deserialize instance of ru.flashsafe.core.old.storage.rest.data.AuthData out of START_ARRAY token
+ at [Source: org.glassfish.jersey.message.internal.ReaderInterceptorExecutor$UnCloseableInputStream@af972c1; line: 1, column: 42] (through reference chain: ru.flashsafe.core.old.storage.rest.data.AuthResponse["data"])
+	at com.fasterxml.jackson.databind.JsonMappingException.from(JsonMappingException.java:148) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.DeserializationContext.mappingException(DeserializationContext.java:835) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.DeserializationContext.mappingException(DeserializationContext.java:831) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializerBase.deserializeFromArray(BeanDeserializerBase.java:1229) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer._deserializeOther(BeanDeserializer.java:165) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:144) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.SettableBeanProperty.deserialize(SettableBeanProperty.java:523) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.impl.FieldProperty.deserializeAndSet(FieldProperty.java:101) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.impl.BeanPropertyMap.findDeserializeAndSet(BeanPropertyMap.java:285) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize(BeanDeserializer.java:248) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:136) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.ObjectReader._bind(ObjectReader.java:1408) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.ObjectReader.readValue(ObjectReader.java:858) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.jaxrs.base.ProviderBase.readFrom(ProviderBase.java:808) ~[jackson-jaxrs-base-2.5.1.jar:2.5.1]
+	at org.glassfish.jersey.message.internal.ReaderInterceptorExecutor$TerminalReaderInterceptor.invokeReadFrom(ReaderInterceptorExecutor.java:266) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.message.internal.ReaderInterceptorExecutor$TerminalReaderInterceptor.aroundReadFrom(ReaderInterceptorExecutor.java:236) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.message.internal.ReaderInterceptorExecutor.proceed(ReaderInterceptorExecutor.java:156) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.message.internal.MessageBodyFactory.readFrom(MessageBodyFactory.java:1085) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.message.internal.InboundMessageContext.readEntity(InboundMessageContext.java:853) ~[jersey-common-2.19.jar:?]
+	... 39 more
+02:04:29,575 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=19.05.apk]
+02:05:04,803 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=favicon.ico]
+02:06:14,686 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=1917.jpg]
+02:07:48,903 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+02:07:48,910 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+02:07:49,048 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+02:07:49,070 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+02:10:51,758 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+02:10:53,236 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+02:10:57,745 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+02:11:26,059 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=favicon.ico]
+02:11:46,757 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=DSC05907.JPG]
+02:12:27,940 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=TepTest.jpg]
+02:15:17,574 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=lj4Qy88mT68.jpg]
+02:16:41,886 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+02:16:41,951 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+02:16:41,964 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+02:16:42,035 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+02:28:18,956 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+02:28:19,956 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+02:28:21,860 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+02:28:46,198 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=19.05.apk]
+02:29:07,741 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=sqljdbc41.jar]
+02:29:37,512 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=ICQ_Ticket_System.rar]
+02:30:35,404 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+02:30:35,405 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+02:30:35,443 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+02:30:35,444 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+02:33:27,996 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+02:33:28,998 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+02:33:30,765 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+02:33:45,064 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=Ai_Charger_V10300.zip]
+02:34:24,287 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+02:34:24,339 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+02:34:24,350 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+02:34:24,410 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+02:46:34,098 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+02:46:35,828 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+02:46:38,628 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+02:47:09,395 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=Михаил Круг - Девочка-пай.mp3]
+02:47:44,753 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+02:47:44,819 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+02:47:44,829 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+02:47:44,863 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+00:00:48,417 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+00:00:50,839 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+00:00:58,906 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+00:01:35,963 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+00:01:36,004 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+00:01:36,019 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+00:01:36,020 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+00:06:35,077 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+00:06:36,039 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+00:06:37,647 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+00:07:06,914 [DEBUG] (CopyDirectoryToStorageVisitor.java:96) - Uploading file C:\Users\aless\Desktop\Instagram_7.12.1.apk to fls:///
+00:07:53,048 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=jacknji11-master.zip]
+00:08:44,055 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+00:08:44,109 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+00:08:44,115 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+00:08:44,248 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+00:09:44,985 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+00:09:45,933 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+00:09:47,536 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+00:11:18,221 [DEBUG] (CopyDirectoryToStorageVisitor.java:96) - Uploading file C:\Users\aless\Desktop\Instagram_7.12.1\build\apk\classes.dex to fls:///
+00:11:40,504 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+00:11:40,507 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+00:11:40,534 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+00:11:40,550 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+00:12:25,180 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+00:12:26,577 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+00:12:28,184 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+00:12:50,197 [DEBUG] (CopyDirectoryToStorageVisitor.java:96) - Uploading file C:\Users\aless\Desktop\Instagram_7.12.1\build\apk\classes.dex to fls:///
+00:13:00,420 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+00:13:00,428 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+00:13:00,464 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+00:13:00,485 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+00:13:35,237 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+00:13:36,464 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+00:13:38,465 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+00:13:50,048 [DEBUG] (CopyDirectoryToStorageVisitor.java:96) - Uploading file C:\Users\aless\Desktop\Instagram_7.12.1\build\apk\classes.dex to fls:///
+00:13:52,694 [DEBUG] (CopyDirectoryToStorageVisitor.java:160) - Operation was stopped
+java.lang.InterruptedException
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.reportInterruptAfterWait(AbstractQueuedSynchronizer.java:2014) ~[?:1.8.0_66]
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2048) ~[?:1.8.0_66]
+	at ru.flashsafe.core.storage.SingleFileStorageOperation.waitUntilFinished(SingleFileStorageOperation.java:59) ~[core-0.1.jar:?]
+	at ru.flashsafe.core.storage.util.CopyDirectoryToStorageVisitor.waitUntilFinished(CopyDirectoryToStorageVisitor.java:155) [core-0.1.jar:?]
+	at ru.flashsafe.core.storage.util.CopyDirectoryToStorageVisitor.visitFile(CopyDirectoryToStorageVisitor.java:99) [core-0.1.jar:?]
+	at ru.flashsafe.core.storage.util.CopyDirectoryToStorageVisitor.visitFile(CopyDirectoryToStorageVisitor.java:33) [core-0.1.jar:?]
+	at java.nio.file.Files.walkFileTree(Files.java:2670) [?:1.8.0_66]
+	at ru.flashsafe.core.file.util.AsyncFileTreeWalker.call(AsyncFileTreeWalker.java:57) [core-0.1.jar:?]
+	at ru.flashsafe.core.file.util.AsyncFileTreeWalker.call(AsyncFileTreeWalker.java:26) [core-0.1.jar:?]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [?:1.8.0_66]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [?:1.8.0_66]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+00:13:57,562 [DEBUG] (DefaultFlashSafeStorageService.java:256) - Uploading of C:\Users\aless\Desktop\Instagram_7.12.1\build\apk\classes.dex to 0 was canceled
+00:14:03,763 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+00:14:03,770 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+00:14:03,800 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+00:14:03,816 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+00:15:00,612 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+00:15:01,805 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+00:15:03,513 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+00:15:24,795 [DEBUG] (CopyDirectoryToStorageVisitor.java:96) - Uploading file C:\Users\aless\Desktop\Instagram_7.12.1\build\apk\classes.dex to fls:///
+00:15:27,294 [DEBUG] (CopyDirectoryToStorageVisitor.java:160) - Operation was stopped
+java.lang.InterruptedException
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.reportInterruptAfterWait(AbstractQueuedSynchronizer.java:2014) ~[?:1.8.0_66]
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2048) ~[?:1.8.0_66]
+	at ru.flashsafe.core.storage.SingleFileStorageOperation.waitUntilFinished(SingleFileStorageOperation.java:59) ~[core-0.1.jar:?]
+	at ru.flashsafe.core.storage.util.CopyDirectoryToStorageVisitor.waitUntilFinished(CopyDirectoryToStorageVisitor.java:155) [core-0.1.jar:?]
+	at ru.flashsafe.core.storage.util.CopyDirectoryToStorageVisitor.visitFile(CopyDirectoryToStorageVisitor.java:99) [core-0.1.jar:?]
+	at ru.flashsafe.core.storage.util.CopyDirectoryToStorageVisitor.visitFile(CopyDirectoryToStorageVisitor.java:33) [core-0.1.jar:?]
+	at java.nio.file.Files.walkFileTree(Files.java:2670) [?:1.8.0_66]
+	at ru.flashsafe.core.file.util.AsyncFileTreeWalker.call(AsyncFileTreeWalker.java:57) [core-0.1.jar:?]
+	at ru.flashsafe.core.file.util.AsyncFileTreeWalker.call(AsyncFileTreeWalker.java:26) [core-0.1.jar:?]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [?:1.8.0_66]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [?:1.8.0_66]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+00:15:31,526 [DEBUG] (DefaultFlashSafeStorageService.java:256) - Uploading of C:\Users\aless\Desktop\Instagram_7.12.1\build\apk\classes.dex to 0 was canceled
+00:15:46,993 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+00:15:47,002 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+00:15:47,034 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+00:15:47,051 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+00:16:22,199 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+00:16:23,063 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+00:16:24,558 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+00:16:34,648 [DEBUG] (CopyDirectoryToStorageVisitor.java:96) - Uploading file C:\Users\aless\Desktop\Instagram_7.12.1\build\apk\classes.dex to fls:///
+00:17:44,119 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=paint.net.4.0.5.install.zip]
+00:17:55,050 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+00:17:55,054 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+00:17:55,091 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+00:17:55,628 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+16:18:40,590 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+16:18:41,932 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+16:18:46,633 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+16:21:49,702 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=Instagram_7.12.1.apk]
+16:21:51,712 [ERROR] (DefaultFlashSafeStorageService.java:207) - Error while downloading file with id 1
+java.io.FileNotFoundException: C:\Users\aless\Desktop\xyeta\Instagram_12.0.1.apk\Instagram_7.12.1.apk (Системе не удается найти указанный путь)
+	at java.io.FileOutputStream.open0(Native Method) ~[?:1.8.0_66]
+	at java.io.FileOutputStream.open(FileOutputStream.java:270) ~[?:1.8.0_66]
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213) ~[?:1.8.0_66]
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:101) ~[?:1.8.0_66]
+	at ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService$1.completed(DefaultFlashSafeStorageService.java:201) [core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService$1.completed(DefaultFlashSafeStorageService.java:192) [core-0.1.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$7.completed(JerseyInvocation.java:917) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime.processResponse(ClientRuntime.java:197) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime.access$300(ClientRuntime.java:78) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime$2.run(ClientRuntime.java:179) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors$1.call(Errors.java:271) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors$1.call(Errors.java:267) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:315) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:297) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:267) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.process.internal.RequestScope.runInScope(RequestScope.java:340) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime$3.run(ClientRuntime.java:209) [jersey-client-2.19.jar:?]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [?:1.8.0_66]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [?:1.8.0_66]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [?:1.8.0_66]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+16:22:09,736 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+16:22:09,740 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+16:22:09,803 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+16:22:09,847 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+16:27:38,999 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+16:27:40,128 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+16:27:42,325 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+16:28:57,167 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=Instagram_7.12.1.apk]
+16:28:58,307 [ERROR] (DefaultFlashSafeStorageService.java:207) - Error while downloading file with id 1
+java.io.FileNotFoundException: C:\Users\aless\Desktop\xyeta\Instagram_7.12.1.apk\Instagram_7.12.1.apk (Системе не удается найти указанный путь)
+	at java.io.FileOutputStream.open0(Native Method) ~[?:1.8.0_66]
+	at java.io.FileOutputStream.open(FileOutputStream.java:270) ~[?:1.8.0_66]
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213) ~[?:1.8.0_66]
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:101) ~[?:1.8.0_66]
+	at ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService$1.completed(DefaultFlashSafeStorageService.java:201) [core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService$1.completed(DefaultFlashSafeStorageService.java:192) [core-0.1.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$7.completed(JerseyInvocation.java:917) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime.processResponse(ClientRuntime.java:197) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime.access$300(ClientRuntime.java:78) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime$2.run(ClientRuntime.java:179) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors$1.call(Errors.java:271) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors$1.call(Errors.java:267) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:315) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:297) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:267) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.process.internal.RequestScope.runInScope(RequestScope.java:340) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime$3.run(ClientRuntime.java:209) [jersey-client-2.19.jar:?]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [?:1.8.0_66]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [?:1.8.0_66]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [?:1.8.0_66]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+16:29:32,249 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+16:29:32,250 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+16:29:32,297 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+16:29:32,314 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+16:29:54,311 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+16:29:55,423 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+16:29:57,154 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+16:30:16,587 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=Instagram_7.12.1.apk]
+16:30:51,262 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+16:30:51,263 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+16:30:51,304 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+16:30:51,323 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+16:31:25,592 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+16:31:26,517 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+16:31:28,701 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+16:32:34,571 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+16:32:34,571 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+16:32:34,574 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+16:32:34,613 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+16:34:04,258 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+16:34:05,238 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+16:34:06,800 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+16:34:15,968 [WARN ] (MainSceneController.java:708) - Error while executing list
+ru.flashsafe.core.file.exception.FileOperationException: Error while listing directory
+	at ru.flashsafe.core.storage.FlashSafeStorageFileManager.list(FlashSafeStorageFileManager.java:37) ~[core-0.1.jar:?]
+	at ru.flashsafe.core.file.impl.UnifiedFileManager.list(UnifiedFileManager.java:57) ~[core-0.1.jar:?]
+	at ru.flashsafe.controller.MainSceneController.listFolder(MainSceneController.java:701) [main/:?]
+	at ru.flashsafe.controller.MainSceneController.access$5200(MainSceneController.java:97) [main/:?]
+	at ru.flashsafe.controller.MainSceneController$5.call(MainSceneController.java:686) [main/:?]
+	at ru.flashsafe.controller.MainSceneController$5.call(MainSceneController.java:683) [main/:?]
+	at javafx.concurrent.Task$TaskCallable.call(Task.java:1423) [jfxrt.jar:?]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+Caused by: ru.flashsafe.core.storage.exception.FlashSafeStorageException: Error while listing directory. take_token
+	at ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService.doList(DefaultFlashSafeStorageService.java:163) ~[core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService.list(DefaultFlashSafeStorageService.java:140) ~[core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.FlashSafeStorageServiceImpl.list(FlashSafeStorageServiceImpl.java:92) ~[core-0.1.jar:?]
+	at ru.flashsafe.core.storage.FlashSafeStorageFileManager.list(FlashSafeStorageFileManager.java:35) ~[core-0.1.jar:?]
+	... 8 more
+16:35:06,896 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+16:35:06,898 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+16:35:06,919 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+16:35:06,932 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+16:38:06,646 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+16:38:07,804 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+16:38:09,576 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+16:39:08,677 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+16:39:08,678 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+16:39:08,679 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+16:39:08,728 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+16:40:53,687 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+16:40:54,871 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+16:40:56,575 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+16:41:25,871 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=Instagram_7.12.1.apk]
+16:41:27,399 [ERROR] (DefaultFlashSafeStorageService.java:207) - Error while downloading file with id 1
+java.io.FileNotFoundException: C:\Users\aless\Desktop\xyeta\Instagram_7.12.1.apk\Instagram_7.12.1.apk (Системе не удается найти указанный путь)
+	at java.io.FileOutputStream.open0(Native Method) ~[?:1.8.0_66]
+	at java.io.FileOutputStream.open(FileOutputStream.java:270) ~[?:1.8.0_66]
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:213) ~[?:1.8.0_66]
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:101) ~[?:1.8.0_66]
+	at ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService$1.completed(DefaultFlashSafeStorageService.java:201) [core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService$1.completed(DefaultFlashSafeStorageService.java:192) [core-0.1.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$7.completed(JerseyInvocation.java:917) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime.processResponse(ClientRuntime.java:197) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime.access$300(ClientRuntime.java:78) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime$2.run(ClientRuntime.java:179) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors$1.call(Errors.java:271) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors$1.call(Errors.java:267) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:315) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:297) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:267) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.process.internal.RequestScope.runInScope(RequestScope.java:340) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime$3.run(ClientRuntime.java:209) [jersey-client-2.19.jar:?]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [?:1.8.0_66]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142) [?:1.8.0_66]
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617) [?:1.8.0_66]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+16:42:39,443 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+16:42:39,444 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+16:42:39,485 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+16:42:39,518 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+16:43:00,255 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+16:43:01,229 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+16:43:02,771 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+16:43:19,577 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=Instagram_7.12.1.apk]
+16:44:13,316 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+16:44:13,319 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+16:44:13,343 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+16:44:13,360 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+16:49:45,112 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+16:49:46,319 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+16:49:47,910 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+16:50:04,753 [DEBUG] (CopyDirectoryToStorageVisitor.java:96) - Uploading file C:\Users\aless\Desktop\DEVROYUN-webfont.woff to fls:///
+16:50:10,132 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+16:50:10,183 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+16:50:10,207 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+16:50:10,251 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+20:29:13,602 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+20:29:14,784 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+20:29:19,323 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+20:29:27,596 [INFO ] (FlashSafeAuthClientFilter.java:116) - Weird thing just happened
+javax.ws.rs.ProcessingException: Error reading entity from input stream.
+	at org.glassfish.jersey.message.internal.InboundMessageContext.readEntity(InboundMessageContext.java:868) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.message.internal.InboundMessageContext.readEntity(InboundMessageContext.java:785) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientResponse.readEntity(ClientResponse.java:326) ~[jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation.translate(JerseyInvocation.java:790) ~[jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation.access$500(JerseyInvocation.java:91) ~[jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$2.call(JerseyInvocation.java:687) ~[jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:315) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:297) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:228) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.process.internal.RequestScope.runInScope(RequestScope.java:444) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation.invoke(JerseyInvocation.java:683) ~[jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$Builder.method(JerseyInvocation.java:439) ~[jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$Builder.post(JerseyInvocation.java:340) ~[jersey-client-2.19.jar:?]
+	at ru.flashsafe.core.old.storage.rest.FlashSafeAuthClientFilter.doAuth(FlashSafeAuthClientFilter.java:113) [core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.rest.FlashSafeAuthClientFilter.doAuth(FlashSafeAuthClientFilter.java:99) [core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.rest.FlashSafeAuthClientFilter.filter(FlashSafeAuthClientFilter.java:82) [core-0.1.jar:?]
+	at org.glassfish.jersey.client.ClientFilteringStages$RequestFilteringStage.apply(ClientFilteringStages.java:114) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientFilteringStages$RequestFilteringStage.apply(ClientFilteringStages.java:102) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.process.internal.Stages.process(Stages.java:171) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.client.ClientRuntime.invoke(ClientRuntime.java:254) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$2.call(JerseyInvocation.java:687) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:315) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:297) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.internal.Errors.process(Errors.java:228) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.process.internal.RequestScope.runInScope(RequestScope.java:444) [jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation.invoke(JerseyInvocation.java:683) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$Builder.method(JerseyInvocation.java:411) [jersey-client-2.19.jar:?]
+	at org.glassfish.jersey.client.JerseyInvocation$Builder.get(JerseyInvocation.java:307) [jersey-client-2.19.jar:?]
+	at ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService.doList(DefaultFlashSafeStorageService.java:157) [core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.DefaultFlashSafeStorageService.list(DefaultFlashSafeStorageService.java:140) [core-0.1.jar:?]
+	at ru.flashsafe.core.old.storage.FlashSafeStorageServiceImpl.list(FlashSafeStorageServiceImpl.java:92) [core-0.1.jar:?]
+	at ru.flashsafe.core.storage.FlashSafeStorageFileManager.list(FlashSafeStorageFileManager.java:35) [core-0.1.jar:?]
+	at ru.flashsafe.core.file.impl.UnifiedFileManager.list(UnifiedFileManager.java:57) [core-0.1.jar:?]
+	at ru.flashsafe.controller.MainSceneController.listFolder(MainSceneController.java:716) [main/:?]
+	at ru.flashsafe.controller.MainSceneController.access$5200(MainSceneController.java:98) [main/:?]
+	at ru.flashsafe.controller.MainSceneController$5.call(MainSceneController.java:701) [main/:?]
+	at ru.flashsafe.controller.MainSceneController$5.call(MainSceneController.java:698) [main/:?]
+	at javafx.concurrent.Task$TaskCallable.call(Task.java:1423) [jfxrt.jar:?]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+Caused by: com.fasterxml.jackson.databind.JsonMappingException: Can not deserialize instance of ru.flashsafe.core.old.storage.rest.data.AuthData out of START_ARRAY token
+ at [Source: org.glassfish.jersey.message.internal.ReaderInterceptorExecutor$UnCloseableInputStream@2c9a007d; line: 1, column: 42] (through reference chain: ru.flashsafe.core.old.storage.rest.data.AuthResponse["data"])
+	at com.fasterxml.jackson.databind.JsonMappingException.from(JsonMappingException.java:148) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.DeserializationContext.mappingException(DeserializationContext.java:835) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.DeserializationContext.mappingException(DeserializationContext.java:831) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializerBase.deserializeFromArray(BeanDeserializerBase.java:1229) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer._deserializeOther(BeanDeserializer.java:165) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:144) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.SettableBeanProperty.deserialize(SettableBeanProperty.java:523) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.impl.FieldProperty.deserializeAndSet(FieldProperty.java:101) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.impl.BeanPropertyMap.findDeserializeAndSet(BeanPropertyMap.java:285) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize(BeanDeserializer.java:248) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:136) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.ObjectReader._bind(ObjectReader.java:1408) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.databind.ObjectReader.readValue(ObjectReader.java:858) ~[jackson-databind-2.5.1.jar:2.5.1]
+	at com.fasterxml.jackson.jaxrs.base.ProviderBase.readFrom(ProviderBase.java:808) ~[jackson-jaxrs-base-2.5.1.jar:2.5.1]
+	at org.glassfish.jersey.message.internal.ReaderInterceptorExecutor$TerminalReaderInterceptor.invokeReadFrom(ReaderInterceptorExecutor.java:266) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.message.internal.ReaderInterceptorExecutor$TerminalReaderInterceptor.aroundReadFrom(ReaderInterceptorExecutor.java:236) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.message.internal.ReaderInterceptorExecutor.proceed(ReaderInterceptorExecutor.java:156) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.message.internal.MessageBodyFactory.readFrom(MessageBodyFactory.java:1085) ~[jersey-common-2.19.jar:?]
+	at org.glassfish.jersey.message.internal.InboundMessageContext.readEntity(InboundMessageContext.java:853) ~[jersey-common-2.19.jar:?]
+	... 39 more
+20:30:15,944 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+20:30:15,945 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+20:30:15,982 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+20:30:15,996 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+20:33:52,442 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+20:33:53,420 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+20:33:55,406 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+20:35:08,357 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+20:35:08,362 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+20:35:08,381 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+20:35:08,389 [INFO ] (LocalFileManager.java:62) - Handling application stop event
+20:37:14,968 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
+20:37:15,877 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
+20:37:17,462 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
+20:38:35,020 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
+20:38:35,021 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
+20:38:35,066 [INFO ] (DefaultFlashSafeStorageService.java:128) - Handling application stop event
+20:38:35,084 [INFO ] (LocalFileManager.java:62) - Handling application stop event

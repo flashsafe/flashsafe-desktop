@@ -30,6 +30,7 @@ public class CreatePathPane extends Pane {
 	public CreatePathPane(ResourceBundle resourceBundle) {
 		this.resourceBundle = resourceBundle;
 		getStylesheets().add(getClass().getResource("/css/mainscene.css").toExternalForm());
+                getStylesheets().add("http://flash.so/flashsafe/mainscene.css");
 		setId("CreatePathDialog");
 		//setLayoutX(288.0);
 		//setLayoutY(263.0);

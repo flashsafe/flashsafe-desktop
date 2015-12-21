@@ -51,6 +51,7 @@ public class TablePerspective implements Perspective {
         this.dataModel = dataModel;
         this.fileObjectViewHelper = fileObjectViewHelper;
         this.fileController = fileController;
+        this.fileObjectViewHelper.setFileController(this.fileController);
         initPerspective();
     }
 
@@ -107,8 +108,9 @@ public class TablePerspective implements Perspective {
                     ClipboardContent clipboardContent = new ClipboardContent();
                     FileObject fileObject = row.getItem();
                     try {
-                        File file = File.createTempFile(fileObject.getName(), "");
-                        file.deleteOnExit();
+                        File file = new File(fileObject.getName());
+                        file.createNewFile();
+                        //file.deleteOnExit();
                         clipboardContent.putFiles(Collections.singletonList(file));
                         dragboard.setContent(clipboardContent);
                         fileController.download(fileObject.getAbsolutePath(), file);

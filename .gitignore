@@ -21,3 +21,4 @@ bin/
 .gradle/
 /token/.nb-gradle/
 /token-examples/.nb-gradle/
+/.nb-gradle/

@@ -61,7 +61,7 @@ task unpackNatives(){
 
 run {
     systemProperties = [
-        'java.library.path': file("build/natives/windows")
+        'java.library.path': file("./build/natives/windows")
     ]
 }
 

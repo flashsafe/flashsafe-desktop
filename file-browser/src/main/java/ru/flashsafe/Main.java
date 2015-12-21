@@ -1,5 +1,6 @@
 package ru.flashsafe;
 
+import com.sun.javafx.util.Utils;
 import static org.pkcs11.jacknji11.CK_SESSION_INFO.CKF_RW_SESSION;
 import static org.pkcs11.jacknji11.CK_SESSION_INFO.CKF_SERIAL_SESSION;
 
@@ -13,6 +14,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -22,7 +24,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import org.pkcs11.jacknji11.CE;
 import org.pkcs11.jacknji11.CKR;
@@ -64,38 +68,51 @@ public class Main extends Application {
 
     //private static String PIN = "00000000";
     
+    private boolean tokenInit = false;
+    
+    // Fix transparent windows on Linux OS
+    static {
+        System.setProperty("javafx.allowTransparentStage", String.valueOf(true));
+    }
+    
     @Override
     public void start(Stage stage) throws Exception {
-        //initToken(stage);
-        FlashSafeConfiguration configuration = createConfiguration();
-        FlashSafeApplication.setConfiguration(configuration);
-        FlashSafeApplication.run();
-        es.submit(() -> {
-            Platform.runLater(() -> {
-                _stage = stage;
-                stage.setTitle("Flashsafe");
-                stage.setMinWidth(975);
-                stage.setMinHeight(650);
-                //stage.initStyle(StageStyle.TRANSPARENT);
-                stage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
-                try {
-                    //fxmlLoader.setLocation(getClass().getResource("/fxml/MainScene.fxml"));
-                    //fxmlLoader.setResources(currentResourceBundle);
-                    //Parent root = fxmlLoader.load();
-                    CreatePathPane pathnameDialog = new CreatePathPane(currentResourceBundle);
-                    EnterPincodePane pincodeDialog = new EnterPincodePane(currentResourceBundle);
-                    MainPane mainPane = new MainPane(currentResourceBundle, FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX, stage, pathnameDialog, pincodeDialog);
-                    Scene scene = new Scene(/*root*/mainPane/*, Color.TRANSPARENT*/);
-                    _scene = scene;
-                    stage.setScene(scene);
-                    //ResizeHelper.addResizeListener(stage);
-                } catch (Exception e) {
-                    LOGGER.error("Error while building main window", e);
-                    e.printStackTrace();
-                }
-                stage.show();
+        //if(Utils.isWindows() && !tokenInit) {
+            //initToken(stage);
+        //} else {
+            FlashSafeConfiguration configuration = createConfiguration();
+            FlashSafeApplication.setConfiguration(configuration);
+            FlashSafeApplication.run();
+            es.submit(() -> {
+                Platform.runLater(() -> {
+                    _stage = stage;
+                    stage.setTitle("Flashsafe");
+                    stage.setMinWidth(975);
+                    stage.setMinHeight(650);
+                    if(!Utils.isUnix()) {
+                        stage.initStyle(StageStyle.TRANSPARENT);
+                    }
+                    stage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
+                    try {
+                        //fxmlLoader.setLocation(getClass().getResource("/fxml/MainScene.fxml"));
+                        //fxmlLoader.setResources(currentResourceBundle);
+                        //Parent root = fxmlLoader.load();
+                        CreatePathPane pathnameDialog = new CreatePathPane(currentResourceBundle);
+                        EnterPincodePane pincodeDialog = new EnterPincodePane(currentResourceBundle);
+                        MainPane mainPane = new MainPane(currentResourceBundle, FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX, stage, pathnameDialog, pincodeDialog);
+                        Scene scene = new Scene(/*root*/mainPane, Color.TRANSPARENT);
+                        _scene = scene;
+                        stage.setScene(scene);
+                        //ResizeHelper.addResizeListener(stage);
+                    } catch (Exception e) {
+                        LOGGER.error("Error while building main window", e);
+                        e.printStackTrace();
+                    }
+                    stage.show();
+                });
             });
-        });
+        //}
+        
 //        SystemTrayUtil.addToSystemTray(currentResourceBundle.getString("connection_established"),
 //                currentResourceBundle.getString("flashsafe_ready_to_use"));
     }
@@ -112,12 +129,20 @@ public class Main extends Application {
         es.shutdown();
     }
 
-    private static void initToken(Stage stage) {
+    private void initToken(Stage __stage) {
         try {
-            System.loadLibrary("jcPKCS11");
-            CE.Initialize();
-            session = CE.OpenSession(0, CKF_SERIAL_SESSION | CKF_RW_SESSION, null, null);
+            //System.loadLibrary("jcPKCS11");
+            //CE.Initialize();
+            TokenUtil.PKCS11Initialize();
+            long[] slotList = TokenUtil.getSlotList();
+            TokenUtil.closeAllSessions(slotList[0]);
+            //session = CE.OpenSession(0, CKF_SERIAL_SESSION | CKF_RW_SESSION, null, null);
+            session = TokenUtil.openSession(slotList[0]);
+            Stage stage = new Stage();
             _stage = stage;
+            if(!Utils.isUnix()) {
+                stage.initStyle(StageStyle.TRANSPARENT);
+            }
             stage.setTitle("Flashsafe Token");
             stage.setMinWidth(260);
             stage.setMinHeight(130);
@@ -128,6 +153,7 @@ public class Main extends Application {
             vbox.setSpacing(5);
             vbox.setPadding(new Insets(5));
             Label label = new Label(currentResourceBundle.getString("enter_pin_code"));
+            label.setTextFill(Color.valueOf("#ECEFF4"));
             PasswordField passwordField = new PasswordField();
             Button button = new Button("OK");
             final Label error = new Label(currentResourceBundle.getString("incorrect_pin_code"));
@@ -138,6 +164,14 @@ public class Main extends Application {
                 public void handle(ActionEvent event) {
                     try {
                         CE.LoginUser(session, passwordField.getText());
+                        stage.close();
+                        tokenInit = true;
+                        try {
+                            start(__stage);
+                        } catch(Exception ex) {
+                            LOGGER.error("Error while building main window", ex);
+                        }
+                        return;
                     } catch(CKRException ex) {
                         if(ex.getCKR() == CKR.PIN_INCORRECT) {
                             if(!vbox.getChildren().contains(error)) {
@@ -150,7 +184,13 @@ public class Main extends Application {
             vbox.getChildren().add(label);
             vbox.getChildren().add(passwordField);
             vbox.getChildren().add(button);
-            Scene scene = new Scene(vbox);
+            vbox.setStyle("-fx-background-color: #353F4B;");
+            Scene scene;
+            if(!Utils.isUnix()) {
+                scene = new Scene(vbox, Color.TRANSPARENT);
+            } else {
+                scene = new Scene(vbox);
+            }
             stage.setScene(scene);
             stage.show();
         } catch(ClassNotFoundException ex) {

@@ -19,13 +19,13 @@
 }
 
 .root {
-    /*-fx-background-color: transparent;*/
-    /*-fx-padding: 10px;*/
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
 }
 
 #MainPane {
-    /*-fx-background-color: transparent;*/
-    /*-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);*/
+    -fx-background-color: transparent;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
 }
 
 #TopToolbar {

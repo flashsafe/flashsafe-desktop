@@ -5,6 +5,7 @@
  */
 package ru.flashsafe.controller;
 
+import com.sun.javafx.util.Utils;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +55,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -221,6 +223,10 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
 		zero = pincode_dialog.zero;
     }
 
+    public Window getWindow() {
+        return this.stage;
+    }
+    
     private class AddHandlersTask implements Callable<Void> {
 
         @Override
@@ -296,14 +302,21 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                     settings.setOnMouseClicked(event -> {
                         //settings_pane.setVisible(true);
                     	if(settingsStage == null) {
+                            //if(!Utils.isUnix()) {
 	                    	settingsStage = new Stage(StageStyle.TRANSPARENT);
-	                    	settingsStage.setWidth(600.0);
-	                    	settingsStage.setHeight(500.0);
-                                settingsStage.setResizable(false);
-	                    	Scene scene = new Scene(settings_pane, Color.TRANSPARENT);
-	                    	settingsStage.setScene(scene);
-                                settingsStage.initModality(Modality.WINDOW_MODAL);
-                                settingsStage.initOwner(stage);
+                            //}
+                            settingsStage.setWidth(600.0);
+                            settingsStage.setHeight(500.0);
+                            settingsStage.setResizable(false);
+                            Scene scene;
+                            //if(!Utils.isUnix()) {
+                                scene = new Scene(settings_pane, Color.TRANSPARENT);
+                            //} else {
+                                //scene = new Scene(settings_pane);
+                            //}
+                            settingsStage.setScene(scene);
+                            settingsStage.initModality(Modality.WINDOW_MODAL);
+                            settingsStage.initOwner(stage);
                     	}
                     	settingsStage.show();
                     });
@@ -585,16 +598,23 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     private void showPathDialog() {
         pathname_dialog.setVisible(true);
     	if(createPathStage == null) {
+            if(!Utils.isUnix()) {
 	    	createPathStage = new Stage(StageStyle.TRANSPARENT);
-	    	createPathStage.setWidth(325.0);
-	    	createPathStage.setHeight(150.0);
-                createPathStage.setResizable(false);
-    		createPathStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
-	    	Scene scene = new Scene(pathname_dialog, Color.TRANSPARENT);
-	    	createPathStage.setScene(scene);
-	    	createPathStage.setAlwaysOnTop(true);
-                createPathStage.initModality(Modality.WINDOW_MODAL);
-                createPathStage.initOwner(stage);
+            }
+            createPathStage.setWidth(325.0);
+            createPathStage.setHeight(150.0);
+            createPathStage.setResizable(false);
+            createPathStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
+            Scene scene;
+            if(!Utils.isUnix()) {
+                scene = new Scene(pathname_dialog, Color.TRANSPARENT);
+            } else {
+                scene = new Scene(pathname_dialog);
+            }
+            createPathStage.setScene(scene);
+            createPathStage.setAlwaysOnTop(true);
+            createPathStage.initModality(Modality.WINDOW_MODAL);
+            createPathStage.initOwner(stage);
     	}
     	createPathStage.show();
         pathname_textfield.requestFocus();
@@ -718,16 +738,23 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
         Platform.runLater(() -> {
         	//pincode_dialog.setVisible(true);
         	if(enterPincodeStage == null) {
+                    if(!Utils.isUnix()) {
 	        	enterPincodeStage = new Stage(StageStyle.TRANSPARENT);
-	        	enterPincodeStage.setWidth(300.0);
-	        	enterPincodeStage.setHeight(340.0);
-                        enterPincodeStage.setResizable(false);
-        		enterPincodeStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
-	        	Scene scene = new Scene(pincode_dialog, Color.TRANSPARENT);
-	        	enterPincodeStage.setScene(scene);
-	        	//enterPincodeStage.setAlwaysOnTop(true);
-                        enterPincodeStage.initModality(Modality.WINDOW_MODAL);
-                        enterPincodeStage.initOwner(stage);
+                    }
+                    enterPincodeStage.setWidth(300.0);
+                    enterPincodeStage.setHeight(340.0);
+                    enterPincodeStage.setResizable(false);
+                    enterPincodeStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
+                    Scene scene;
+                    if(!Utils.isUnix()) {
+                        scene = new Scene(pincode_dialog, Color.TRANSPARENT);
+                    } else {
+                        scene = new Scene(pincode_dialog);
+                    }
+                    enterPincodeStage.setScene(scene);
+                    //enterPincodeStage.setAlwaysOnTop(true);
+                    enterPincodeStage.initModality(Modality.WINDOW_MODAL);
+                    enterPincodeStage.initOwner(stage);
         	}
         	enterPincodeStage.show();
         });
@@ -752,14 +779,22 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
 
     @Override
     public void upload(File fileObject, String toPath) {
-        Stage copyFileStage = new Stage(StageStyle.TRANSPARENT);
+        Stage copyFileStage = new Stage();
+        if(!Utils.isUnix()) {
+            copyFileStage.initStyle(StageStyle.TRANSPARENT);
+        }
         copyFileStage.setWidth(420);
         copyFileStage.setHeight(220);
         copyFileStage.setResizable(false);
         //copyFileStage.initModality(Modality.WINDOW_MODAL);
         //copyFileStage.initOwner(stage);
         CopyFilePane copyFilePane = new CopyFilePane(fileObject.getAbsolutePath(), currentFolder, resourceBundle);
-        Scene scene = new Scene(copyFilePane, Color.TRANSPARENT);
+        Scene scene;
+        if(!Utils.isUnix()) {
+            scene = new Scene(copyFilePane, Color.TRANSPARENT);
+        } else {
+            scene = new Scene(copyFilePane);
+        }
         copyFileStage.setScene(scene);
         Task<Void> task = new Task<Void>() {
             @Override
@@ -811,23 +846,66 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
 
     @Override
     public void download(String fromPath, File toFile) {
-        //Task<Void> task = new Task<Void>() {
-        //@Override
-        //protected Void call() throws Exception {
-            try {
-                FileOperation downloadOperation = fileManager.copy(fromPath, toFile.getAbsolutePath());
-                //FileOperation uploadOperation = fileManager.copy(fromPath, toPath);
-                while (downloadOperation.getState() != OperationState.FINISHED) {
-                    //updateProgress(uploadOperation.getProgress(), 100);
-                    Thread.sleep(200);
+        Stage copyFileStage = new Stage();
+        if(!Utils.isUnix()) {
+            copyFileStage.initStyle(StageStyle.TRANSPARENT);
+        }
+        copyFileStage.setWidth(420);
+        copyFileStage.setHeight(220);
+        copyFileStage.setResizable(false);
+        //copyFileStage.initModality(Modality.WINDOW_MODAL);
+        //copyFileStage.initOwner(stage);
+        CopyFilePane copyFilePane = new CopyFilePane(fromPath, toFile.getAbsolutePath(), resourceBundle);
+        Scene scene;
+        if(!Utils.isUnix()) {
+            scene = new Scene(copyFilePane, Color.TRANSPARENT);
+        } else {
+            scene = new Scene(copyFilePane);
+        }
+        copyFileStage.setScene(scene);
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    FileOperation downloadOperation = fileManager.copy(fromPath, toFile.getAbsolutePath());
+                    Platform.runLater(() -> {
+                        /*progress.setVisible(true);*/
+                        copyFileStage.show();
+                        copyFilePane.getCancel().setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent event) {
+                                downloadOperation.stop();
+                                copyFileStage.close();
+                            }
+                        });
+                    });
+                    while (downloadOperation.getState() != OperationState.FINISHED) {
+                        updateProgress(downloadOperation.getProgress(), 100);
+                        Thread.sleep(200);
+                    }
+                    // FIXME dirty hack - should add loaded objects to
+                    // fileOperation
+                    Platform.runLater(() -> {
+                        //progress.setVisible(false);
+                        copyFileStage.close();
+                        //refresh();
+                    });
+                } catch (FileOperationException e) {
+                    LOGGER.warn("Error while downloading file " + fromPath, e);
                 }
-            } catch (FileOperationException | InterruptedException e) {
-                LOGGER.warn("Error while downloading " + fromPath, e);
+                return null;
             }
-            //return null;
-        //}
-    //};
-    //new Thread(task).start();
+        };
+        //progress.progressProperty().bind(task.progressProperty());
+        copyFilePane.getBar().progressProperty().bind(task.progressProperty());
+        task.progressProperty().addListener(new ChangeListener<Number>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                copyFilePane.updateTimeRemaining(newValue.doubleValue());
+            }
+        });
+        new Thread(task).start();
     }
 
     @Override

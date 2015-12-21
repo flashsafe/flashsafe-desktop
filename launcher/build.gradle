@@ -41,7 +41,7 @@ launch4j {
     mainClassName = "ru.flashsafe.Main"
     outfile = 'Flashsafe.exe'
     icon = "$project.projectDir/resources/AppIcon.ico"
-    bundledJrePath = "C:/jre1.8.0_60"
+    bundledJrePath = "./jre1.8.0_66"
     version="0.0.0.1"
     copyright="ROFN, LLC"
     companyName="ROFN, LLC"

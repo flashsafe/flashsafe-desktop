@@ -12,9 +12,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import ru.flashsafe.FileController;
 import ru.flashsafe.IconUtil;
+import ru.flashsafe.controller.MainSceneController;
 import ru.flashsafe.core.file.Directory;
 import ru.flashsafe.core.file.File;
 import ru.flashsafe.core.file.FileObject;
@@ -29,8 +32,14 @@ public class FileObjectViewHelper {
     
     private final ResourceBundle resourceBundle;
     
+    private FileController fileController;
+    
     public FileObjectViewHelper(ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
+    }
+    
+    public void setFileController(FileController _fileController) {
+        this.fileController = _fileController;
     }
     
     public Label createLabelFor(FileObject fileObject) {
@@ -42,10 +51,10 @@ public class FileObjectViewHelper {
             label.setTooltip(tooltip);
             ImageView icon = createIcon(fileObject);
             label.setGraphic(icon);
-            if(fileObject.getType() == FileObjectType.DIRECTORY) {
+            //if(fileObject.getType() == FileObjectType.DIRECTORY) {
 	            ContextMenu menu = createContextMenuFor(fileObject);
 	            label.setContextMenu(menu);
-            }
+            //}
             return label;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -110,10 +119,25 @@ public class FileObjectViewHelper {
     private ContextMenu createContextMenuFor(FileObject fileObject) {
     	ContextMenu menu = new ContextMenu();
     	MenuItem item = new MenuItem();
-    	item.setText(resourceBundle.getString("open_in_new_window"));
-    	item.setOnAction(event -> openInNewWindow(fileObject));
+        if(fileObject.getType() == FileObjectType.DIRECTORY) {
+            item.setText(resourceBundle.getString("open_in_new_window"));
+            item.setOnAction(event -> openInNewWindow(fileObject));
+        } else {
+            item.setText(resourceBundle.getString("download"));
+            item.setOnAction(event -> download(fileObject));
+        }
     	menu.getItems().add(item);
     	return menu;
+    }
+    
+    private void download(FileObject fileObject) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(resourceBundle.getString("choose_directory"));
+        fileChooser.setInitialFileName(fileObject.getName());
+        java.io.File targetPath = fileChooser.showSaveDialog(((MainSceneController)fileController).getWindow());
+        if(targetPath != null) { // If path was choosed
+            fileController.download(fileObject.getAbsolutePath(), targetPath);
+        }
     }
     
     private void openInNewWindow(FileObject fileObject) {

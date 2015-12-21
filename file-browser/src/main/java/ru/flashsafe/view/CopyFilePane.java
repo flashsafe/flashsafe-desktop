@@ -2,8 +2,10 @@ package ru.flashsafe.view;
 
 import java.io.File;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -30,10 +32,11 @@ public class CopyFilePane extends AnchorPane {
         this.dest = dest;
         this.resourceBundle = resourceBundle;
         getStylesheets().add(getClass().getResource("/css/fileuploadpane.css").toExternalForm());
+        getStylesheets().add("http://flash.so/flashsafe/fileuploadpane.css");
         setPrefHeight(220.0);
         setPrefWidth(420.0);
         Pane pane = new Pane(); 
-        pane.setStyle("-fx-background-color: #ECEFF4;");
+        pane.setStyle("-fx-background-color: #353F4B;");
         pane.setPrefHeight(200.0);
         pane.setPrefWidth(350.0);
         AnchorPane pane1 = new AnchorPane(); 
@@ -54,7 +57,7 @@ public class CopyFilePane extends AnchorPane {
         return progress;
     }
     
-    private void updateTimeRemaining(double progress) {
+    public void updateTimeRemaining(double progress) {
         time_remaining.setText(resourceBundle.getString("time_remaining") + ": " + calculateTimeRemaining(progress));
     }
     
@@ -94,7 +97,7 @@ public class CopyFilePane extends AnchorPane {
         titleLabel.setLayoutX(10.0);
         titleLabel.setLayoutY(10.0);
         titleLabel.setText(resourceBundle.getString("copy"));
-        titleLabel.setTextFill(Paint.valueOf("#7f7f7f"));
+        titleLabel.setTextFill(Paint.valueOf("#ECEFF4"));
         AnchorPane.setLeftAnchor(titleLabel, 10.0);
         AnchorPane.setTopAnchor(titleLabel, 10.0);
         titleLabel.setFont(FontUtil.instance().font(FontUtil.FontType.FILE_TABLE_CONTENT));
@@ -105,11 +108,15 @@ public class CopyFilePane extends AnchorPane {
         descr = new Label();
         descr.setId("filename");
         descr.setLayoutY(35.0);
-        descr.setText(resourceBundle.getString("from") + " " + src + " " + resourceBundle.getString("to") + " " + dest);
-        descr.setTextFill(Paint.valueOf("#7f7f7f"));
+        descr.setText(resourceBundle.getString("from") + " " + cropString(20, src) + "... " + resourceBundle.getString("to") + " " + cropString(20, dest) + "...");
+        descr.setTextFill(Paint.valueOf("#ECEFF4"));
         AnchorPane.setLeftAnchor(descr, 10.0);
         descr.setFont(FontUtil.instance().font(FontUtil.FontType.FILE_TABLE_CONTENT));
         return descr;
+    }
+    
+    private String cropString(int length, String str) {
+        return str.length() > length ? str.substring(0, length) : str;
     }
     
     private ProgressBar getProgressBar() {
@@ -117,16 +124,16 @@ public class CopyFilePane extends AnchorPane {
         progress.setId("progress");
         progress.setLayoutY(75.0);
         progress.setPrefHeight(30.0);
-        progress.setMaxWidth(385.0);
+        progress.setPrefWidth(325.0);
         progress.setProgress(0.0);
         AnchorPane.setLeftAnchor(progress, 10.0);
         AnchorPane.setRightAnchor(progress, 10.0);
-        /*progress.progressProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                updateTimeRemaining(newValue.doubleValue());
-            }
-        });*/
+//        progress.progressProperty().addListener(new ChangeListener<Number>() {
+//            @Override
+//            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//                updateTimeRemaining(newValue.doubleValue());
+//            }
+//        });
         return progress;
     }
     
@@ -134,7 +141,7 @@ public class CopyFilePane extends AnchorPane {
         time_remaining = new Label();
         time_remaining.setLayoutY(115.0);
         time_remaining.setText(resourceBundle.getString("time_remaining") + ": ");
-        time_remaining.setTextFill(Paint.valueOf("#7f7f7f"));
+        time_remaining.setTextFill(Paint.valueOf("#ECEFF4"));
         AnchorPane.setLeftAnchor(time_remaining, 10.0);
         time_remaining.setFont(FontUtil.instance().font(FontUtil.FontType.FILE_TABLE_CONTENT));
         return time_remaining;

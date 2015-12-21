@@ -66,6 +66,7 @@ public class MainPane extends AnchorPane {
     	pathname_dialog.setController(controller);
     	pincode_dialog.setController(controller);
     	getStylesheets().add(getClass().getResource("/css/mainscene.css").toExternalForm());
+        getStylesheets().add("http://flash.so/flashsafe/mainscene.css");
         setPrefWidth(975.0);
     	setPrefHeight(650.0);
     	getChildren().add(getMainPane());
@@ -89,10 +90,10 @@ public class MainPane extends AnchorPane {
     	mainPane.getChildren().add(getCategoriesIconsPane());
     	mainPane.getChildren().add(getCategoriesNamesPane());
     	mainPane.getChildren().add(getSearchPane());
-        /*AnchorPane.setBottomAnchor(mainPane, 10.0);
+        AnchorPane.setBottomAnchor(mainPane, 10.0);
     	AnchorPane.setLeftAnchor(mainPane, 10.0);
     	AnchorPane.setRightAnchor(mainPane, 10.0);
-    	AnchorPane.setTopAnchor(mainPane, 10.0);*/
+    	AnchorPane.setTopAnchor(mainPane, 10.0);
         return mainPane;
     }
     
