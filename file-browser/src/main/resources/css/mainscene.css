@@ -29,7 +29,7 @@
 }
 
 #TopToolbar {
-    -fx-background-color: #353F4B;
+    -fx-background-color: #2E3335;
     -fx-padding: 0;
 }
 
@@ -54,7 +54,7 @@
 }
 
 .content {
-    -fx-background-color: #959595;
+    -fx-background-color: #2E3335;
 }
 
 #MyFilesPane:collapsed > .title {
@@ -130,15 +130,15 @@
 }
 
 #Settings {
-    -fx-graphic: url("../img/sttngs.png");
+    -fx-graphic: url("../img/setting.png");
 }
 
 #Refresh {
-    -fx-graphic: url("../img/rfrsh.png");
+    -fx-graphic: url("../img/minimize.png");
 }
 
 #Exit {
-    -fx-graphic: url("../img/exit.png");
+    -fx-graphic: url("../img/close.png");
 }
 
 .settins_opened {
@@ -264,4 +264,98 @@
 #SearchField {
     -fx-text-fill: #ECEFF4;
     -fx-background-color: transparent;
+}
+
+/* Стилизуем ВСЕ скроллбары сцены */
+.scroll-bar {
+	-fx-background-color: #3F4445;
+	-fx-pref-width: 8px;
+	-fx-background-radius: 3, 2, 1;
+	-fx-padding: 0;
+}
+
+.scroll-bar > .track {
+	-fx-background-color: #3F4445;
+}
+
+.scroll-bar > .thumb {
+	-fx-background-color: #252B2D;
+	-fx-background-insets: 0;
+	-fx-padding: 0;
+}
+
+.scroll-bar > .decrement-button, .scroll-bar > .increment-button {
+	-fx-background-color: #3F4445;
+	visibility: hidden;
+}
+
+.scroll-bar > .decrement-button > .decrement-arrow, .scroll-bar > .increment-button > .increment-arrow {
+	-fx-shape: "";
+	-fx-padding: 0;
+	visibility: hidden;
+}
+
+.gfiles {
+	-fx-background-color: #2E3335;
+	-fx-background-insets: 0;
+	-fx-border-width: 0;
+}
+
+.search {
+	-fx-background-color: #2E3335;
+	-fx-prompt-text-fill: #515354;
+}
+
+.divider > .line {
+	-fx-border-style: solid;
+	-fx-border-width: 0 0 1 0;
+	-fx-border-color: #515354;
+}
+
+.table-view {
+	-fx-text-fill: #DDD;
+	-fx-background-color: #2E3335;
+}
+
+.column-header-background {
+	-fx-background-color: #2E3335;
+	-fx-text-fill: #DDD;
+	-fx-color: #DDD;
+}
+
+.column-overlay {
+	-fx-background-color: #2E3335;
+	-fx-text-fill: #DDD;
+	-fx-color: #DDD;
+}
+
+.filler {
+	-fx-background-color: #2E3335;
+}
+
+.table-column {
+	-fx-background-color: #2E3335;
+	-fx-background-insets: 0;
+	-fx-border-width: 0;
+}
+
+.column-resize-line {
+	-fx-background-color: #2E3335;
+}
+
+.corner {
+	-fx-background-color: #2E3335;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #DDD;
+    -fx-font-weight: bold;
+}
+
+.list-cell {
+	-fx-background-color: #252B2D;
+}
+
+.column-header {
+	-fx-background-color: #2E3335;
 }

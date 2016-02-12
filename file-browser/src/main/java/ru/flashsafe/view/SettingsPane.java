@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Paint;
 import ru.flashsafe.util.FontUtil;
@@ -31,14 +32,13 @@ public class SettingsPane extends Pane {
 	public SettingsPane(ResourceBundle resourceBundle) {
 		this.resourceBundle = resourceBundle;
 		getStylesheets().add(getClass().getResource("/css/mainscene.css").toExternalForm());
-                getStylesheets().add("http://flash.so/flashsafe/mainscene.css");
 		setPrefHeight(500.0);
 		setPrefWidth(600.0);
 		setStyle("-fx-background-color: #ECEFF4;");
 		AnchorPane.setLeftAnchor(this, 200.0);
 		AnchorPane.setTopAnchor(this, 75.0);
 		getChildren().add(getContentPane());
-		getChildren().add(getCloseLabel());
+		//getChildren().add(getCloseLabel());
 	}
 
 	private Pane getContentPane() {
@@ -88,10 +88,11 @@ public class SettingsPane extends Pane {
 		software_pane.getChildren().add(label);
 		link.setAlignment(Pos.CENTER);
 		link.setContentDisplay(ContentDisplay.CENTER);
-		link.setLayoutX(126.0);
-		link.setLayoutY(466.0);
+		link.setLayoutX(156.0);
+		link.setLayoutY(446.0);
 		link.setText("http://flashsafe.ru");
 		link.setFont(FontUtil.instance().font(FontType.FILE_TABLE_CONTENT));
+                link.setBorder(Border.EMPTY);
 		software_pane.getChildren().add(link);
 		return software_pane;
 	}

@@ -34,7 +34,7 @@ project(':file-browser') {
 
 project(':launcher') {
     dependencies {
-        compile project(':file-browser')
+        compile project(':starter')
     }
 }
 
@@ -45,5 +45,5 @@ project(':starter') {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
+    gradleVersion = '2.11'
 }

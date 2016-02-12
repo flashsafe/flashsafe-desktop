@@ -31,18 +31,17 @@ public class CopyFilePane extends AnchorPane {
         this.src = src;
         this.dest = dest;
         this.resourceBundle = resourceBundle;
-        getStylesheets().add(getClass().getResource("/css/fileuploadpane.css").toExternalForm());
-        getStylesheets().add("http://flash.so/flashsafe/fileuploadpane.css");
+        //getStylesheets().add(getClass().getResource("/css/fileuploadpane.css").toExternalForm());
         setPrefHeight(220.0);
         setPrefWidth(420.0);
         Pane pane = new Pane(); 
         pane.setStyle("-fx-background-color: #353F4B;");
-        pane.setPrefHeight(200.0);
-        pane.setPrefWidth(350.0);
+        pane.setPrefHeight(220.0);
+        pane.setPrefWidth(420.0);
         AnchorPane pane1 = new AnchorPane(); 
         pane1.setStyle("-fx-background-color: transparent;");
-        pane1.setPrefHeight(200.0);
-        pane1.setMaxWidth(385.0);
+        pane1.setPrefHeight(220.0);
+        pane1.setMaxWidth(420.0);
         pane1.getChildren().add(getTitleLabel());
         pane1.getChildren().add(getDescriptionLabel());
         pane1.getChildren().add(getProgressBar());
@@ -124,7 +123,7 @@ public class CopyFilePane extends AnchorPane {
         progress.setId("progress");
         progress.setLayoutY(75.0);
         progress.setPrefHeight(30.0);
-        progress.setPrefWidth(325.0);
+        progress.setPrefWidth(400.0);
         progress.setProgress(0.0);
         AnchorPane.setLeftAnchor(progress, 10.0);
         AnchorPane.setRightAnchor(progress, 10.0);
@@ -153,7 +152,7 @@ public class CopyFilePane extends AnchorPane {
         cancel.setCancelButton(true);
         cancel.setText(resourceBundle.getString("cancel"));
         cancel.setTextFill(Paint.valueOf("#5f5f5f"));
-        AnchorPane.setBottomAnchor(cancel, 10.0);
+        AnchorPane.setBottomAnchor(cancel, 35.0);
         AnchorPane.setRightAnchor(cancel, 10.0);
         return cancel;
     }

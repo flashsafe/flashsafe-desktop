@@ -30,11 +30,10 @@ public class CreatePathPane extends Pane {
 	public CreatePathPane(ResourceBundle resourceBundle) {
 		this.resourceBundle = resourceBundle;
 		getStylesheets().add(getClass().getResource("/css/mainscene.css").toExternalForm());
-                getStylesheets().add("http://flash.so/flashsafe/mainscene.css");
 		setId("CreatePathDialog");
 		//setLayoutX(288.0);
 		//setLayoutY(263.0);
-		setPrefHeight(150.0);
+		setPrefHeight(200.0);
 		setPrefWidth(325.0);
 		getChildren().add(getTitleLabel());
 		getChildren().add(getPane());
@@ -62,7 +61,7 @@ public class CreatePathPane extends Pane {
 		Pane pane = new Pane();
 		pane.setId("CreatePathPane");
 		pane.setLayoutY(20.0);
-		pane.setPrefHeight(130.0);
+		pane.setPrefHeight(180.0);
 		pane.setPrefWidth(325.0);
 		pathname_textfield.setId("CreatePathTextfield");
 		pathname_textfield.setLayoutX(40.0);

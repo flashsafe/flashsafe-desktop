@@ -15,8 +15,10 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -33,6 +35,7 @@ import org.pkcs11.jacknji11.CKR;
 import org.pkcs11.jacknji11.CKRException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.flashsafe.controller.MainSceneController;
 
 import ru.flashsafe.core.FlashSafeApplication;
 import ru.flashsafe.core.FlashSafeConfiguration;
@@ -62,7 +65,7 @@ public class Main extends Application {
 
     public static ExecutorService es = Executors.newFixedThreadPool(3);
     
-    //public static FXMLLoader fxmlLoader = new FXMLLoader();
+    public static FXMLLoader fxmlLoader = new FXMLLoader();
     
     private static long session;
 
@@ -94,13 +97,14 @@ public class Main extends Application {
                     }
                     stage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
                     try {
-                        //fxmlLoader.setLocation(getClass().getResource("/fxml/MainScene.fxml"));
-                        //fxmlLoader.setResources(currentResourceBundle);
-                        //Parent root = fxmlLoader.load();
-                        CreatePathPane pathnameDialog = new CreatePathPane(currentResourceBundle);
-                        EnterPincodePane pincodeDialog = new EnterPincodePane(currentResourceBundle);
-                        MainPane mainPane = new MainPane(currentResourceBundle, FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX, stage, pathnameDialog, pincodeDialog);
-                        Scene scene = new Scene(/*root*/mainPane, Color.TRANSPARENT);
+                        fxmlLoader.setLocation(getClass().getResource("/oldfs.fxml"));
+                        fxmlLoader.setResources(currentResourceBundle);
+                        //CreatePathPane pathnameDialog = new CreatePathPane(currentResourceBundle);
+                        //EnterPincodePane pincodeDialog = new EnterPincodePane(currentResourceBundle);
+                        //MainPane mainPane = new MainPane(currentResourceBundle, FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX, stage, pathnameDialog, pincodeDialog);
+                        fxmlLoader.setController(new MainSceneController(currentResourceBundle, FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX, stage));
+                        Parent root = fxmlLoader.load();
+                        Scene scene = new Scene(root/*mainPane*/, Color.TRANSPARENT);
                         _scene = scene;
                         stage.setScene(scene);
                         //ResizeHelper.addResizeListener(stage);

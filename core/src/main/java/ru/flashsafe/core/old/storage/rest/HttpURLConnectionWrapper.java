@@ -7,6 +7,18 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.security.Permission;
+import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * 
@@ -26,7 +38,39 @@ public class HttpURLConnectionWrapper extends HttpURLConnection {
     
     protected HttpURLConnectionWrapper(HttpURLConnection httpURLConnection) {
         super(null);
-        this.httpURLConnection = httpURLConnection;
+        this.httpURLConnection = /*(HttpsURLConnection)*/ httpURLConnection;
+        /*TrustManager[] trustCerts = new TrustManager[] { 
+            new X509TrustManager() {
+                public X509Certificate[] getAcceptedIssuers() {
+                    X509Certificate[] certs = new X509Certificate[1];
+                    try {
+                        InputStream in = getClass().getResourceAsStream("-.azurewebsites.net.pem");
+                        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+                        X509Certificate cer = (X509Certificate) certFactory.generateCertificate(in);
+                        in.close();
+                        certs[0] = cer;
+                    } catch(CertificateException | IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    return certs;
+                }
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+            }
+        };*/
+
+        /*HostnameVerifier hv = new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return session.getPeerHost().equals(hostname);
+            }
+        };*/
+
+        try {
+            //SSLContext sc = SSLContext.getInstance("SSL");
+            //sc.init(null, trustCerts, new SecureRandom());
+            //HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            //HttpsURLConnection.setDefaultHostnameVerifier(hv);
+        } catch (Exception e) {}
     }
     
     @Override

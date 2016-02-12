@@ -62,15 +62,14 @@ public class MainPane extends AnchorPane {
     	this.resourceBundle = resourceBundle;
     	pathname_dialog = pathnameDialog;
     	pincode_dialog = pincodeDialog;
-    	controller = new MainSceneController(this, resourceBundle, currentFolder, stage);
+    	controller = new MainSceneController(/*this, */resourceBundle, currentFolder, stage);
     	pathname_dialog.setController(controller);
     	pincode_dialog.setController(controller);
     	getStylesheets().add(getClass().getResource("/css/mainscene.css").toExternalForm());
-        getStylesheets().add("http://flash.so/flashsafe/mainscene.css");
         setPrefWidth(975.0);
     	setPrefHeight(650.0);
     	getChildren().add(getMainPane());
-    	controller.init();
+    	controller.initialize();
     }
 
     private AnchorPane getMainPane() {

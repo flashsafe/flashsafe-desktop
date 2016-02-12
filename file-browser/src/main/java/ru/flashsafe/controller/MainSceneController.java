@@ -25,6 +25,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -66,6 +67,7 @@ import ru.flashsafe.core.FlashSafeApplication;
 import ru.flashsafe.core.FlashSafeSystem;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.core.file.FileObject;
+import ru.flashsafe.core.file.FileObjectType;
 import ru.flashsafe.core.file.FileOperation;
 import ru.flashsafe.core.file.event.FileObjectSecurityEvent;
 import ru.flashsafe.core.file.event.FileObjectSecurityEventResult;
@@ -128,13 +130,17 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     private Stage settingsStage, createPathStage, enterPincodeStage;
     
     private Stage stage;
-
-    private Pane topPane;
-    private AnchorPane window;
+    
+    @FXML
+    public Pane topPane;
+    @FXML
+    public AnchorPane window;
     private Label settings, refresh, exit;
     private Pane menu;
-    private EnterPincodePane pincode_dialog;
-    private TextField pincode_textfield;
+    @FXML
+    public /*EnterPincode*/Pane pincode_dialog;
+    @FXML
+    public TextField pincode_textfield;
     private Button backspace;
     private Button one;
     private Button two;
@@ -146,30 +152,51 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     private Button eight;
     private Button nine;
     private Button zero;
-    private TableView<FileObject> files;
-    private CreatePathPane pathname_dialog;
-    private TextField pathname_textfield;
-    private ProgressBar progress;
+    @FXML
+    public TableView<FileObject> files;
+    @FXML
+    public /*CreatePath*/Pane pathname_dialog;
+    @FXML
+    public TextField pathname_textfield;
+    @FXML
+    public ProgressBar progress;
     private Label flashsafe, myfiles, docs, pictures, sounds, videos, loads, contacts;
-    private SettingsPane settings_pane;
-    private Pane software_pane;
-    private Label rendering, caching, hardware, software, settings_close;
-    private Hyperlink link;
-    private Button display_choice;
-    private Slider display_slider;
-    private ListView<Label> display_list;
-    private HBox display_menu;
-    private AnchorPane files_area;
-    private GridPane gfiles;
-    private ListView<FileObject> lfiles;
-    private ScrollPane scroll_pane;
-    private TextField search_field;
+    @FXML
+    public /*Settings*/Pane settings_pane;
+    @FXML
+    public Pane software_pane;
+    @FXML
+    public Label rendering, caching, hardware, software, settings_close;
+    @FXML
+    public Hyperlink link;
+    @FXML
+    public Button display_choice;
+    @FXML
+    public Slider display_slider;
+    @FXML
+    public ListView<Label> display_list;
+    @FXML
+    public HBox display_menu;
+    @FXML
+    public AnchorPane files_area;
+    @FXML
+    public GridPane gfiles;
+    @FXML
+    public ListView<FileObject> lfiles;
+    @FXML
+    public ScrollPane scroll_pane;
+    @FXML
+    public TextField search_field;
+    @FXML
+    public Label breadcrumbs;
+    @FXML
+    public ListView papki;
 
-    public MainSceneController(MainPane mainPane, ResourceBundle resourceBundle, String currentFolder, Stage stage) {
+    public MainSceneController(/*MainPane mainPane, */ResourceBundle resourceBundle, String currentFolder, Stage stage) {
     	this.currentFolder = currentFolder;
     	this.stage = stage;
     	
-    	window = mainPane.window;
+    	/*window = mainPane.window;
     	scroll_pane = mainPane.scroll_pane;
     	files_area = mainPane.files_area;
     	files = mainPane.files;
@@ -192,24 +219,24 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
         videos = mainPane.videos;
         loads = mainPane.loads;
         contacts = mainPane.contacts;
-        search_field = mainPane.search_field;
+        search_field = mainPane.search_field;*/
         
         this.resourceBundle = resourceBundle;
         
-        settings_pane = new SettingsPane(resourceBundle);
+        /*settings_pane = new SettingsPane(resourceBundle);
     	rendering = settings_pane.rendering;
     	caching = settings_pane.caching;
     	hardware = settings_pane.hardware;
     	software = settings_pane.software;
     	settings_close = settings_pane.settings_close;
     	software_pane = settings_pane.software_pane;
-    	link = settings_pane.link;
+    	link = settings_pane.link;*/
     	
-    	pathname_dialog = mainPane.pathname_dialog;
-    	pathname_textfield = pathname_dialog.pathname_textfield;
+    	//pathname_dialog = mainPane.pathname_dialog;
+    	//pathname_textfield = pathname_dialog.pathname_textfield;
     	
-    	pincode_dialog = mainPane.pincode_dialog;
-		pincode_textfield = pincode_dialog.pincode_textfield;
+    	//pincode_dialog = mainPane.pincode_dialog;
+		/*pincode_textfield = pincode_dialog.pincode_textfield;
 		backspace = pincode_dialog.backspace;
 		one = pincode_dialog.one;
 		two = pincode_dialog.two;
@@ -220,7 +247,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
 		seven = pincode_dialog.seven;
 		eight = pincode_dialog.eight;
 		nine = pincode_dialog.nine;
-		zero = pincode_dialog.zero;
+		zero = pincode_dialog.zero;*/
     }
 
     public Window getWindow() {
@@ -243,7 +270,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                         }
                     });
 
-                    backspace.setOnMouseClicked(event -> backspace());
+                    //backspace.setOnMouseClicked(event -> backspace());
 
                     Label[] settings_categories = { rendering, caching, hardware, software };
                     for (Label l : settings_categories) {
@@ -263,7 +290,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
 
                     });
 
-                    one.setOnMouseClicked(getOnNumClick(one));
+                    /*one.setOnMouseClicked(getOnNumClick(one));
                     two.setOnMouseClicked(getOnNumClick(two));
                     three.setOnMouseClicked(getOnNumClick(three));
                     four.setOnMouseClicked(getOnNumClick(four));
@@ -272,7 +299,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                     seven.setOnMouseClicked(getOnNumClick(seven));
                     eight.setOnMouseClicked(getOnNumClick(eight));
                     nine.setOnMouseClicked(getOnNumClick(nine));
-                    zero.setOnMouseClicked(getOnNumClick(zero));
+                    zero.setOnMouseClicked(getOnNumClick(zero));*/
 
                     topPane.setOnMouseClicked(event -> {
                         switch (event.getClickCount()) {
@@ -280,7 +307,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                             display_menu.setVisible(false);
                             break;
                         case 2:
-                            stage.setMaximized(!stage.isMaximized());
+                            //stage.setMaximized(!stage.isMaximized());
                             break;
                         }
 
@@ -299,44 +326,47 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                         }
                     });
 
-                    settings.setOnMouseClicked(event -> {
+                    /*settings.setOnMouseClicked(event -> {*/
                         //settings_pane.setVisible(true);
-                    	if(settingsStage == null) {
+                    	/*if(settingsStage == null) {*/
                             //if(!Utils.isUnix()) {
-	                    	settingsStage = new Stage(StageStyle.TRANSPARENT);
+	                    	/*settingsStage = new Stage(*//*StageStyle.TRANSPARENT*//*);*/
                             //}
-                            settingsStage.setWidth(600.0);
+                            /*settingsStage.setWidth(600.0);
                             settingsStage.setHeight(500.0);
                             settingsStage.setResizable(false);
-                            Scene scene;
+                            Scene scene;*/
                             //if(!Utils.isUnix()) {
-                                scene = new Scene(settings_pane, Color.TRANSPARENT);
+                                /*scene = new Scene(settings_pane, Color.TRANSPARENT);*/
                             //} else {
                                 //scene = new Scene(settings_pane);
                             //}
-                            settingsStage.setScene(scene);
+                            /*settingsStage.setScene(scene);
                             settingsStage.initModality(Modality.WINDOW_MODAL);
                             settingsStage.initOwner(stage);
+                            settingsStage.setTitle("Settings");
+                            settingsStage.getIcons().add(stage.getIcons().get(0));
                     	}
                     	settingsStage.show();
-                    });
-                    settings_close.setOnMouseClicked(event -> {
+                    });*/
+                    //settings_close.setOnMouseClicked(event -> {
                     	//settings_pane.setVisible(false);
-                    	if(settingsStage != null) {
+                    	/*if(settingsStage != null) {
                     		settingsStage.close();
-                    	}
-                    });
+                    	}*/
+                    //});
 
-                    attachWindowDragControlToElement(flashsafe);
-                    flashsafe.setCursor(Cursor.MOVE);
+                    //attachWindowDragControlToElement(flashsafe);
+                    //flashsafe.setCursor(Cursor.MOVE);
                     attachWindowDragControlToElement(topPane);
+                    topPane.setCursor(Cursor.MOVE);
 
-                    Font myriadPro = Font.loadFont(getClass().getResourceAsStream("/font/myriadpro_regular.ttf"), 20);
+                    /*Font myriadPro = Font.loadFont(getClass().getResourceAsStream("/font/myriadpro_regular.ttf"), 20);
                     Label[] categories = { myfiles, docs, pictures, sounds, videos, loads, contacts };
                     for (Label l : categories) {
                         l.setFont(myriadPro);
                         l.setOnMousePressed(getOnCategoryClickListener(l));
-                    }
+                    }*/
 
                     pincode_textfield.setOnKeyTyped(new EventHandler<KeyEvent>() {
                         @Override
@@ -351,12 +381,17 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                     search_field.textProperty().addListener(new ChangeListener<String>() {
                         @Override
                         public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                            List<FSObject> tmp = new ArrayList<>();
+                            for(FileObject fo : files.getItems()) {
+                                if(!fo.getName().contains(newValue)) {
+                                    files.getItems().remove(fo);
+                                }
+                            }
+                            /*List<FSObject> tmp = new ArrayList<>();
                             for (FSObject fso : content) {
                                 if (fso.name.contains(newValue)) {
                                     tmp.add(fso);
                                 }
-                            }
+                            }*/
                             // temp_content = new FSObject[tmp.size()];
                             // tmp.toArray(temp_content);
                             // switch (currentPerspective) {
@@ -436,9 +471,9 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
         display_slider.setMax(1);
         display_slider.setValue(0);
 
-        display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/itable.png"))));
+        /*display_choice.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/img/itable.png"))));
         display_choice.setOnAction(event -> display_menu.setVisible(!display_menu.isVisible()));
-        display_choice.setStyle("-fx-background-color: transparent");
+        display_choice.setStyle("-fx-background-color: transparent");*/
 
         display_slider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -469,15 +504,15 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     /**
      * Initializes the controller class.
      */
-    public void init() {
-        Font leftMenuFont = FontUtil.instance().font(FontType.LEFT_MENU);
+    public void initialize() {
+        /*Font leftMenuFont = FontUtil.instance().font(FontType.LEFT_MENU);
         Label[] leftMenuCategories = { myfiles, docs, pictures, sounds, videos, loads, contacts };
         for (Label categoryLabel : leftMenuCategories) {
             categoryLabel.setFont(leftMenuFont);
             categoryLabel.setOnMousePressed(getOnCategoryClickListener(categoryLabel));
-        }
-        myfiles.getStyleClass().remove(0);
-        myfiles.getStyleClass().add("category1");
+        }*/
+        //myfiles.getStyleClass().remove(0);
+        //myfiles.getStyleClass().add("category1");
 
         flashSafeSystem = FlashSafeApplication.flashSafeSystem();
         fileManager = flashSafeSystem.fileManager();
@@ -506,6 +541,10 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
         listFolder(currentFolder);
     }
 
+    public void minimize() {
+        stage.setIconified(true);
+    }
+    
     public void exit() {
         stage.close();
     }
@@ -599,10 +638,10 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
         pathname_dialog.setVisible(true);
     	if(createPathStage == null) {
             if(!Utils.isUnix()) {
-	    	createPathStage = new Stage(StageStyle.TRANSPARENT);
+	    	createPathStage = new Stage(/*StageStyle.TRANSPARENT*/);
             }
             createPathStage.setWidth(325.0);
-            createPathStage.setHeight(150.0);
+            createPathStage.setHeight(200.0);
             createPathStage.setResizable(false);
             createPathStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
             Scene scene;
@@ -615,6 +654,8 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
             createPathStage.setAlwaysOnTop(true);
             createPathStage.initModality(Modality.WINDOW_MODAL);
             createPathStage.initOwner(stage);
+            createPathStage.setTitle("Create path");
+            createPathStage.getIcons().add(stage.getIcons().get(0));
     	}
     	createPathStage.show();
         pathname_textfield.requestFocus();
@@ -670,6 +711,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                     String previousLocation = historyObject.previous();
                     if (listFolder(previousLocation)) {
                         currentFolder = previousLocation;
+                        Platform.runLater(() -> breadcrumbs.setText(currentFolder.replace("fls:/", "")));
                     }
                 }
                 return null;
@@ -686,6 +728,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                     String previousLocation = historyObject.next();
                     if (listFolder(previousLocation)) {
                         currentFolder = previousLocation;
+                        Platform.runLater(() -> breadcrumbs.setText(currentFolder.replace("fls:/", "")));
                     }
                 }
                 return null;
@@ -701,6 +744,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                 if (listFolder(folderPath)) {
                     currentFolder = folderPath;
                     historyObject.addObject(currentFolder);
+                    Platform.runLater(() -> breadcrumbs.setText(currentFolder.replace("fls:/", "")));
                 }
                 return null;
             }
@@ -712,8 +756,21 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
         try {
             Platform.runLater(() -> {
                 Main._scene.setCursor(Cursor.WAIT);
+                papki.getItems().clear();
             });
             List<FileObject> folderEntries = fileManager.list(path);
+            for(FileObject fo : folderEntries) {
+                if(fo.getType() == FileObjectType.DIRECTORY) {
+                    Label l = new Label(fo.getName());
+                    l.setStyle("-fx-padding: 0 0 0 -8px; -fx-text-fill: #999; -fx-font-size: 18px;");
+                    ImageView g = new ImageView(new Image(getClass().getResourceAsStream("/img/papka.png")));
+                    g.setFitHeight(20);
+                    g.setFitWidth(20);
+                    l.setGraphic(g);
+                    l.setOnMouseClicked((event) -> browseFolder(fo.getAbsolutePath()));
+                    Platform.runLater(() -> papki.getItems().add(l));
+                }
+            }
             Platform.runLater(() -> {
                 currentFolderEntries.clear();
                 currentFolderEntries.addAll(folderEntries);
@@ -739,7 +796,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
         	//pincode_dialog.setVisible(true);
         	if(enterPincodeStage == null) {
                     if(!Utils.isUnix()) {
-	        	enterPincodeStage = new Stage(StageStyle.TRANSPARENT);
+	        	enterPincodeStage = new Stage(/*StageStyle.TRANSPARENT*/);
                     }
                     enterPincodeStage.setWidth(300.0);
                     enterPincodeStage.setHeight(340.0);
@@ -755,6 +812,8 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                     //enterPincodeStage.setAlwaysOnTop(true);
                     enterPincodeStage.initModality(Modality.WINDOW_MODAL);
                     enterPincodeStage.initOwner(stage);
+                    enterPincodeStage.setTitle("Enter PIN-code");
+                    enterPincodeStage.getIcons().add(stage.getIcons().get(0));
         	}
         	enterPincodeStage.show();
         });
@@ -780,14 +839,16 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     @Override
     public void upload(File fileObject, String toPath) {
         Stage copyFileStage = new Stage();
-        if(!Utils.isUnix()) {
-            copyFileStage.initStyle(StageStyle.TRANSPARENT);
-        }
+//        if(!Utils.isUnix()) {
+//            copyFileStage.initStyle(StageStyle.TRANSPARENT);
+//        }
         copyFileStage.setWidth(420);
         copyFileStage.setHeight(220);
         copyFileStage.setResizable(false);
         //copyFileStage.initModality(Modality.WINDOW_MODAL);
         //copyFileStage.initOwner(stage);
+        copyFileStage.setTitle("Copy file");
+        copyFileStage.getIcons().add(stage.getIcons().get(0));
         CopyFilePane copyFilePane = new CopyFilePane(fileObject.getAbsolutePath(), currentFolder, resourceBundle);
         Scene scene;
         if(!Utils.isUnix()) {
@@ -847,14 +908,16 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     @Override
     public void download(String fromPath, File toFile) {
         Stage copyFileStage = new Stage();
-        if(!Utils.isUnix()) {
-            copyFileStage.initStyle(StageStyle.TRANSPARENT);
-        }
+//        if(!Utils.isUnix()) {
+//            copyFileStage.initStyle(StageStyle.TRANSPARENT);
+//        }
         copyFileStage.setWidth(420);
         copyFileStage.setHeight(220);
         copyFileStage.setResizable(false);
         //copyFileStage.initModality(Modality.WINDOW_MODAL);
         //copyFileStage.initOwner(stage);
+        copyFileStage.setTitle("Copy file");
+        copyFileStage.getIcons().add(stage.getIcons().get(0));
         CopyFilePane copyFilePane = new CopyFilePane(fromPath, toFile.getAbsolutePath(), resourceBundle);
         Scene scene;
         if(!Utils.isUnix()) {

@@ -34,7 +34,6 @@ public class EnterPincodePane extends Pane {
 	public EnterPincodePane(ResourceBundle resourceBundle) {
 		this.resourceBundle = resourceBundle;
 		getStylesheets().add(getClass().getResource("/css/mainscene.css").toExternalForm());
-                getStylesheets().add("http://flash.so/flashsafe/mainscene.css");
 		setId("PincodeDialog");
 		//setLayoutX(288.0);
 		//setLayoutY(150.0);

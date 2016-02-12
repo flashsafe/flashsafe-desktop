@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 
 import ru.flashsafe.FileController;
+import ru.flashsafe.controller.MainSceneController;
 import ru.flashsafe.core.file.FileObject;
 import ru.flashsafe.core.file.FileObjectType;
 import ru.flashsafe.util.FileObjectViewHelper;
@@ -62,6 +63,7 @@ public class TablePerspective implements Perspective {
             FileObject value = cellData.getValue();
             return new ReadOnlyObjectWrapper<Label>(fileObjectViewHelper.createLabelFor(value));
         });
+        nameColumn.setStyle("-fx-background-color: #2E3335; -fx-text-fill: #DDD;");
 
         TableColumn<FileObject, String> createDateColumn = (TableColumn<FileObject, String>) tableView.getColumns().get(1);
         createDateColumn.setCellValueFactory(cellData -> {
@@ -70,18 +72,22 @@ public class TablePerspective implements Perspective {
             // FIXME switch to Java8 API
                 return new SimpleStringProperty(new Date(timeInMilliseconds).toLocaleString());
             });
-
+        createDateColumn.setStyle("-fx-background-color: #2E3335; -fx-text-fill: #DDD;");
+        
         ((TableColumn<FileObject, String>) tableView.getColumns().get(2)).setCellValueFactory(cellData -> {
             FileObject value = cellData.getValue();
             return new SimpleStringProperty(fileObjectViewHelper.getTypeDescriptionFor(value));
         });
 
+        ((TableColumn<FileObject, String>) tableView.getColumns().get(2)).setStyle("-fx-background-color: #2E3335; -fx-text-fill: #DDD;");
+        
         TableColumn<FileObject, String> sizeColumn = (TableColumn<FileObject, String>) tableView.getColumns().get(3);
         sizeColumn.setCellValueFactory(cellData -> {
             FileObject value = cellData.getValue();
             return new SimpleStringProperty(fileObjectViewHelper.getSizeDescriptionFor(value));
         });
-
+        sizeColumn.setStyle("-fx-background-color: #2E3335; -fx-text-fill: #DDD;");
+        
         tableView.setOnMouseClicked(event -> {
             if (event.getButton() != MouseButton.PRIMARY) {
                 return;
@@ -91,7 +97,7 @@ public class TablePerspective implements Perspective {
                 FileObject fileObject = tableView.getSelectionModel().getSelectedItem();
                 if (fileObject != null) {
                     if (fileObject.getType() == FileObjectType.DIRECTORY) {
-                        fileController.loadContent(fileObject.getAbsolutePath());
+                        Platform.runLater(() -> ((MainSceneController) fileController).browseFolder(fileObject.getAbsolutePath()));
                     }
                 }
             }

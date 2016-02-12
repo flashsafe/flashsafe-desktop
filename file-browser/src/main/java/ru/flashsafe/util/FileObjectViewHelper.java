@@ -2,6 +2,7 @@ package ru.flashsafe.util;
 
 import java.io.IOException;
 import java.util.ResourceBundle;
+import javafx.geometry.Pos;
 
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -12,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -45,7 +47,8 @@ public class FileObjectViewHelper {
     public Label createLabelFor(FileObject fileObject) {
         Label label = new Label(fileObject.getName());
         label.setFont(new Font("Ubuntu Condensed", 14));
-        label.setTextFill(Paint.valueOf("#000"));
+        label.setTextFill(Paint.valueOf("#DDD"));
+        label.setTextAlignment(TextAlignment.CENTER);
         try {
             Tooltip tooltip = createTooltipFor(fileObject);
             label.setTooltip(tooltip);

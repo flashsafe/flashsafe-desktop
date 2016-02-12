@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-mainClassName = 'ru.flashsafe.starter.Main'
+mainClassName = 'ru.flashsafe.update.Main'
 
 repositories {
     mavenCentral()
@@ -9,7 +9,11 @@ repositories {
 }
 
 dependencies {
-    compile group: 'ru.flashsafe', name: 'file-browser', version: '0.1'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.2.4'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.12'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.3'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.3'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.3'
 }
 
 task wrapper(type: Wrapper) {
