@@ -2,6 +2,8 @@ apply plugin: 'java'
 apply plugin: 'edu.sc.seis.launch4j'
 apply plugin: 'edu.sc.seis.macAppBundle'
 
+import org.gradle.internal.os.OperatingSystem;
+
 buildscript {
 
     repositories {
@@ -23,7 +25,7 @@ macAppBundle {
     appName = 'Flashsafe'
     appOutputDir = 'launch4mac'
     icon = "$project.projectDir/resources/AppMacIcon.icns"
-    bundleJRE = true
+    bundleJRE = OperatingSystem.current().isMacOsX()
     //jreHome = '/Users/alex_xpert/Downloads/jre1.8.0_60.jre'
 }
 
@@ -62,7 +64,7 @@ task wrapper(type: Wrapper) {
 
 import com.badlogicgames.packr.Packr
 import com.badlogicgames.packr.Packr.Config
-import com.badlogicgames.packr.Packr.Platform 
+import com.badlogicgames.packr.Packr.Platform
 
 class PackrTask extends DefaultTask {
 
