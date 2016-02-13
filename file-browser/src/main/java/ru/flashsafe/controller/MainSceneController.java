@@ -5,7 +5,6 @@
  */
 package ru.flashsafe.controller;
 
-import com.sun.javafx.util.Utils;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -50,12 +49,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
 import org.slf4j.Logger;
@@ -82,15 +79,10 @@ import ru.flashsafe.perspective.PerspectiveManager;
 import ru.flashsafe.perspective.PerspectiveType;
 import ru.flashsafe.perspective.TablePerspective;
 import ru.flashsafe.util.FileObjectViewHelper;
-import ru.flashsafe.util.FontUtil;
-import ru.flashsafe.util.FontUtil.FontType;
 import ru.flashsafe.util.HistoryObject;
+import ru.flashsafe.util.OSUtils;
 import ru.flashsafe.util.WaitForEvent;
 import ru.flashsafe.view.CopyFilePane;
-import ru.flashsafe.view.CreatePathPane;
-import ru.flashsafe.view.EnterPincodePane;
-import ru.flashsafe.view.MainPane;
-import ru.flashsafe.view.SettingsPane;
 
 /**
  * FXML Controller class
@@ -637,7 +629,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     private void showPathDialog() {
         pathname_dialog.setVisible(true);
     	if(createPathStage == null) {
-            if(!Utils.isUnix()) {
+            if(!OSUtils.isUnix()) {
 	    	createPathStage = new Stage(/*StageStyle.TRANSPARENT*/);
             }
             createPathStage.setWidth(325.0);
@@ -645,7 +637,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
             createPathStage.setResizable(false);
             createPathStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
             Scene scene;
-            if(!Utils.isUnix()) {
+            if(!OSUtils.isUnix()) {
                 scene = new Scene(pathname_dialog, Color.TRANSPARENT);
             } else {
                 scene = new Scene(pathname_dialog);
@@ -795,7 +787,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
         Platform.runLater(() -> {
         	//pincode_dialog.setVisible(true);
         	if(enterPincodeStage == null) {
-                    if(!Utils.isUnix()) {
+                    if(!OSUtils.isUnix()) {
 	        	enterPincodeStage = new Stage(/*StageStyle.TRANSPARENT*/);
                     }
                     enterPincodeStage.setWidth(300.0);
@@ -803,7 +795,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                     enterPincodeStage.setResizable(false);
                     enterPincodeStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
                     Scene scene;
-                    if(!Utils.isUnix()) {
+                    if(!OSUtils.isUnix()) {
                         scene = new Scene(pincode_dialog, Color.TRANSPARENT);
                     } else {
                         scene = new Scene(pincode_dialog);
@@ -851,7 +843,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
         copyFileStage.getIcons().add(stage.getIcons().get(0));
         CopyFilePane copyFilePane = new CopyFilePane(fileObject.getAbsolutePath(), currentFolder, resourceBundle);
         Scene scene;
-        if(!Utils.isUnix()) {
+        if(!OSUtils.isUnix()) {
             scene = new Scene(copyFilePane, Color.TRANSPARENT);
         } else {
             scene = new Scene(copyFilePane);
@@ -920,7 +912,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
         copyFileStage.getIcons().add(stage.getIcons().get(0));
         CopyFilePane copyFilePane = new CopyFilePane(fromPath, toFile.getAbsolutePath(), resourceBundle);
         Scene scene;
-        if(!Utils.isUnix()) {
+        if(!OSUtils.isUnix()) {
             scene = new Scene(copyFilePane, Color.TRANSPARENT);
         } else {
             scene = new Scene(copyFilePane);

@@ -22,7 +22,6 @@ import ru.flashsafe.token.exception.FlashSafeTokenNotFoundException;
 import ru.flashsafe.token.exception.TokenServiceInitializationException;
 import ru.flashsafe.token.service.FlashSafeTokenService;
 import ru.flashsafe.token.usb.USBClassTypes;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * 
@@ -52,7 +51,7 @@ public class FlashSafeHardwareTokenService extends FlashSafeTokenServiceBase imp
     }
     
     public static synchronized FlashSafeTokenService getTokenService() throws TokenServiceInitializationException {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not implemented yet!");
         /*if (instance == null) {
             instance = new FlashSafeHardwareTokenService();
             instance.initService();
@@ -100,7 +99,7 @@ public class FlashSafeHardwareTokenService extends FlashSafeTokenServiceBase imp
     }
     
     private static FlashSafeToken createTokenInstance() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
     
     @SuppressWarnings("unchecked")

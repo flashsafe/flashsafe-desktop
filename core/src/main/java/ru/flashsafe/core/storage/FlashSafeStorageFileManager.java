@@ -12,7 +12,6 @@ import ru.flashsafe.core.file.FileObject;
 import ru.flashsafe.core.file.FileOperation;
 import ru.flashsafe.core.file.exception.FileOperationException;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -40,7 +39,7 @@ public class FlashSafeStorageFileManager implements FileManager {
 
     @Override
     public File createFile(String path) throws FileOperationException {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
 
     @Override

@@ -1,6 +1,5 @@
 package ru.flashsafe.core.device;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * 
@@ -13,7 +12,7 @@ public interface FlashSafeDeviceService {
     FlashSafeDevice getDevice();
     
     default void updateClientApplication() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
     
 }

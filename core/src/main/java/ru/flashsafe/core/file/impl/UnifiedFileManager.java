@@ -19,7 +19,6 @@ import ru.flashsafe.core.localfs.LocalFileManager;
 import ru.flashsafe.core.storage.FlashSafeStorageFileManager;
 import ru.flashsafe.core.storage.FlashSafeStorageService;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -108,7 +107,7 @@ public class UnifiedFileManager implements FileManager {
             return fileManager.move(fromPath, toPath);
         } else {
             //TODO implement move to/from cloud storage
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException("Not implemented yet!");
         }
     }
 

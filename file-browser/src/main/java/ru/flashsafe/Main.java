@@ -1,9 +1,5 @@
 package ru.flashsafe;
 
-import com.sun.javafx.util.Utils;
-import static org.pkcs11.jacknji11.CK_SESSION_INFO.CKF_RW_SESSION;
-import static org.pkcs11.jacknji11.CK_SESSION_INFO.CKF_SERIAL_SESSION;
-
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -14,7 +10,6 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -26,7 +21,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -35,16 +29,14 @@ import org.pkcs11.jacknji11.CKR;
 import org.pkcs11.jacknji11.CKRException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.flashsafe.controller.MainSceneController;
 
+import ru.flashsafe.controller.MainSceneController;
 import ru.flashsafe.core.FlashSafeApplication;
 import ru.flashsafe.core.FlashSafeConfiguration;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.util.ApplicationProperties;
+import ru.flashsafe.util.OSUtils;
 import ru.flashsafe.util.SystemTrayUtil;
-import ru.flashsafe.view.CreatePathPane;
-import ru.flashsafe.view.EnterPincodePane;
-import ru.flashsafe.view.MainPane;
 
 /**
  * Main class of a FlashSafe Desktop Client
@@ -92,7 +84,7 @@ public class Main extends Application {
                     stage.setTitle("Flashsafe");
                     stage.setMinWidth(975);
                     stage.setMinHeight(650);
-                    if(!Utils.isUnix()) {
+                    if(!OSUtils.isUnix()) {
                         stage.initStyle(StageStyle.TRANSPARENT);
                     }
                     stage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
@@ -144,7 +136,7 @@ public class Main extends Application {
             session = TokenUtil.openSession(slotList[0]);
             Stage stage = new Stage();
             _stage = stage;
-            if(!Utils.isUnix()) {
+            if(!OSUtils.isUnix()) {
                 stage.initStyle(StageStyle.TRANSPARENT);
             }
             stage.setTitle("Flashsafe Token");
@@ -190,7 +182,7 @@ public class Main extends Application {
             vbox.getChildren().add(button);
             vbox.setStyle("-fx-background-color: #353F4B;");
             Scene scene;
-            if(!Utils.isUnix()) {
+            if(!OSUtils.isUnix()) {
                 scene = new Scene(vbox, Color.TRANSPARENT);
             } else {
                 scene = new Scene(vbox);

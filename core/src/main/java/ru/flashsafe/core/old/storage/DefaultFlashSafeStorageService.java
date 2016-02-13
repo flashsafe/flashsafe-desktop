@@ -64,7 +64,6 @@ import ru.flashsafe.core.storage.SingleFileStorageOperation;
 import ru.flashsafe.core.storage.StorageFileOperation;
 import ru.flashsafe.core.storage.StorageOperationType;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -268,19 +267,19 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
     @Override
     public void copy(long fileObjectId, long destinationDirectoryId) {
         // TODO Auto-generated method stub
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
 
     @Override
     public void move(long fileObjectId, long destinationDirectoryId) {
         // TODO Auto-generated method stub
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
 
     @Override
     public void delete(long fileObjectId) {
         // TODO Auto-generated method stub
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
 
     private static void setStatusToFinished(SingleFileStorageOperation operation, OperationResult result) {
