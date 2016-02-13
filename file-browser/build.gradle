@@ -72,7 +72,3 @@ task copyNatives( type:Copy ){
     from "natives/windows"
     into "build/natives/windows"
 }
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.11'
-}

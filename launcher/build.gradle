@@ -58,10 +58,6 @@ task copyAppLibs(type: Copy) {
 
 task execPackr(type: PackrTask, dependsOn: copyAppLibs) {}
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.11'
-}
-
 import com.badlogicgames.packr.Packr
 import com.badlogicgames.packr.Packr.Config
 import com.badlogicgames.packr.Packr.Platform
