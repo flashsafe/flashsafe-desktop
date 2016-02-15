@@ -16,7 +16,3 @@ repositories {
 dependencies {
     compile group: 'ru.flashsafe', name: 'token', version: '0.1'
 }
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
-}

@@ -1,0 +1,73 @@
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'java'
+apply plugin: 'application'
+
+compileJava.options.encoding = 'UTF-8'
+mainClassName = 'ru.flashsafe.Main'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.2.4'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.12'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.3'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.3'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.3'
+    compile group: 'ru.flashsafe', name: 'core', version: '0.1'
+    compile group: 'ru.flashsafe', name: 'token', version: '0.1'
+    compile group: 'net.java.dev.jna', name: 'jna', version: '3.3.0'
+    compile group: 'com.github.jnr', name: 'jnr-ffi', version: '0.6.0'
+    compile files('jacknji11-1.0.jar')
+    compile group: 'commons-logging', name: 'commons-logging', version: '1.1'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.5'
+}
+
+ext {
+    nativeJars = [
+        "jcPKCS11.jar"
+    ]
+}
+
+import java.util.jar.JarFile
+import java.util.jar.JarEntry
+
+task unpackNatives(){
+    mkdir file("build/natives/windows")
+    logger.lifecycle 'Unpacking ({}) native libraries into {}...', "windows", file("build/natives/windows")
+
+    // annoying side-effect of GStrings
+    def natives = project.nativeJars*.toString()
+
+    files( configurations.compile ).findAll { jf-> jf.name in natives }.each { njf->
+        logger.lifecycle 'Unpacking {}...', njf
+
+        JarFile jarFile = new JarFile(njf)
+        jarFile.entries().findAll { JarEntry je-> je.name.endsWith(nativeExt) }.each { JarEntry jef->
+            logger.lifecycle 'Unpacking: {}', jef.name
+            file("build/natives/windows/${jef.name}").bytes = jarFile.getInputStream(jef).bytes
+        }
+    }
+
+    logger.lifecycle 'Native libraries unpacked.'
+}
+
+run {
+    systemProperties = [
+        'java.library.path': file("./build/natives/windows")
+    ]
+}
+
+task copyNatives( type:Copy ){
+    logger.info 'Copying loose natives...'
+
+    from "natives/windows"
+    into "build/natives/windows"
+}

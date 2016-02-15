@@ -1,0 +1,49 @@
+subprojects {
+    apply plugin: 'java'
+    group = 'ru.flashsafe'
+    version = '0.1'
+}
+
+project(':core') {
+    dependencies {
+        compile project(':token')
+    }
+}
+
+project(':core-examples') {
+    dependencies {
+        compile project(':core')
+    }
+}
+
+project(':token') {
+}
+
+project(':token-examples') {
+    dependencies {
+        compile project(':token')
+    }
+}
+
+project(':file-browser') {
+    dependencies {
+        compile project(':core')
+        compile project(':token')
+    }
+}
+
+project(':launcher') {
+    dependencies {
+        compile project(':starter')
+    }
+}
+
+project(':starter') {
+    dependencies {
+        compile project(':file-browser')
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.11'
+}
