@@ -4,14 +4,11 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Date;
 
-
-
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
-import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -21,12 +18,8 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 
 import ru.flashsafe.FileController;
 import ru.flashsafe.controller.MainSceneController;

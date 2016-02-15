@@ -2,10 +2,7 @@ package ru.flashsafe.view;
 
 import java.io.File;
 import java.util.ResourceBundle;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -69,7 +66,8 @@ public class CopyFilePane extends AnchorPane {
         if(progress > 0) {
             long totalBytes = new File(src).length();
             long processedBytes = (long) (totalBytes * progress);
-            long speed = processedBytes / ((System.currentTimeMillis() - start_time) / 1000);
+            long divisor = ((System.currentTimeMillis() - start_time) / 1000);
+            long speed = processedBytes / (divisor == 0 ? 1 : divisor);
             if(speed > 0) {
                 long time = (totalBytes - processedBytes) / speed;
                 long h = 0, m = 0, s = 0;

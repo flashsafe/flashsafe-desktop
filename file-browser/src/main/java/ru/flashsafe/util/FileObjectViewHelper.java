@@ -2,7 +2,6 @@ package ru.flashsafe.util;
 
 import java.io.IOException;
 import java.util.ResourceBundle;
-import javafx.geometry.Pos;
 
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
