@@ -9,6 +9,7 @@ package ru.flashsafe.http;
  * Listener for upload file progress
  * @author alex_xpert
  */
+@Deprecated
 public interface UploadProgressListener {
     
     public void onUpdateProgress(double percent);

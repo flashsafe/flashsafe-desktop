@@ -34,6 +34,7 @@ import ru.flashsafe.model.FSObject;
  * Something like REST-client
  * @author alex_xpert
  */
+@Deprecated
 public class HttpAPI {
     //private static final Logger log = LogManager.getLogger(HttpAPI.class);
     private static final String API_URL = "https://flashsafe-alpha.azurewebsites.net";

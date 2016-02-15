@@ -9,6 +9,7 @@ package ru.flashsafe.model;
  * File System Object
  * @author alex_xpert
  */
+@Deprecated
 public class FSObject {
     public int id;
     public String type;

@@ -9,6 +9,7 @@ package ru.flashsafe.model;
  *
  * @author alex_xpert
  */
+@Deprecated
 public class FSData {
     public long timestamp;
     public String token;
