@@ -6,9 +6,6 @@ apply plugin: 'application'
 compileJava.options.encoding = 'UTF-8'
 mainClassName = 'ru.flashsafe.Main'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
 repositories {
     mavenCentral()
     mavenLocal()
@@ -20,8 +17,8 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.3'
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.3'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.3'
-    compile group: 'ru.flashsafe', name: 'core', version: '0.1'
-    compile group: 'ru.flashsafe', name: 'token', version: '0.1'
+    compile group: 'ru.flashsafe', name: 'core', version: productVersion
+    compile group: 'ru.flashsafe', name: 'token', version: productVersion
     compile group: 'net.java.dev.jna', name: 'jna', version: '3.3.0'
     compile group: 'com.github.jnr', name: 'jnr-ffi', version: '0.6.0'
     compile files('jacknji11-1.0.jar')

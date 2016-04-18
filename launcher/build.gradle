@@ -35,20 +35,20 @@ repositories {
 }
 
 dependencies {
-    compile group: 'ru.flashsafe', name: 'starter', version: '0.1'
+    compile group: 'ru.flashsafe', name: 'starter', version: productVersion
 }
 
 launch4j {
-    mainClassName = "ru.flashsafe.Main"
+    mainClassName = 'ru.flashsafe.Main'
     outfile = 'Flashsafe.exe'
     icon = "$project.projectDir/resources/AppIcon.ico"
     bundledJrePath = "./jre1.8.0_66"
-    version="0.0.0.1"
-    copyright="ROFN, LTD"
-    companyName="ROFN, LTD"
-    description="Infinite Flash Drive"
-    productName="Flashsafe"
-    opt="-Djava.library.path=./natives/windows"
+    version = productVersion
+    copyright = productCopyright
+    companyName = companyName
+    description = productDescription
+    productName = productName
+    opt = "-Djava.library.path=./natives/windows"
 }
 
 task copyAppLibs(type: Copy) {

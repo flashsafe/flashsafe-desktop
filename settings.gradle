@@ -1,1 +1,1 @@
-include 'file-browser', 'core', 'core-examples', 'token', 'token-examples', 'launcher', 'starter'
+include 'builtin-common', 'loader-utils', 'file-browser', 'core', 'core-examples', 'token', 'token-examples', 'updater', 'launcher', 'starter', 'version-checker', 'assembly'

@@ -1,0 +1,65 @@
+apply plugin: 'de.undercouch.download'
+
+buildscript {
+
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+
+    dependencies {
+        classpath group: 'de.undercouch', name: 'gradle-download-task', version: '2.0.0'
+    }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+task downloadJREs() << {
+    println 'Loading jre for Windows'
+    download {
+        header 'Cookie', 'oraclelicense=accept-securebackup-cookie'
+        onlyIfNewer true
+        quiet false
+        src windowsX86JREUrl
+        dest new File("$project.buildDir/jre", new File(src.getFile()).getName())
+    }
+    println 'Loading jre for Linux'
+    download {
+        header 'Cookie', 'oraclelicense=accept-securebackup-cookie'
+        onlyIfNewer true
+        quiet false
+        src linuxX86JREUrl
+        dest new File("$project.buildDir/jre", new File(src.getFile()).getName())
+    }
+    println 'Loading jre for Mac OS'
+    download {
+        header 'Cookie', 'oraclelicense=accept-securebackup-cookie'
+        onlyIfNewer true
+        quiet false
+        src macOSX64JREUrl
+        dest new File("$project.buildDir/jre", new File(src.getFile()).getName())
+    }
+}
+
+task unpackWindowsJRE(type: Copy, dependsOn: downloadJREs) {
+    from tarTree(new File("$project.buildDir/jre", new File("$project.buildDir/jre", windowsX86JREUrl).getName()))
+    into "$project.buildDir/jre/unpacked/Windows"
+}
+
+task unpackLinuxJRE(type: Copy, dependsOn: downloadJREs) {
+    from tarTree(new File("$project.buildDir/jre", new File("$project.buildDir/jre", linuxX86JREUrl).getName()))
+    into "$project.buildDir/jre/unpacked/Linux"
+}
+
+task unpackMacOSJRE(type: Copy, dependsOn: downloadJREs) {
+    from tarTree(new File("$project.buildDir/jre", new File("$project.buildDir/jre", macOSX64JREUrl).getName()))
+    into "$project.buildDir/jre/unpacked/MacOS"
+}
+
+task unpackJREs(dependsOn: ['unpackWindowsJRE', 'unpackLinuxJRE', 'unpackMacOSJRE']) << {
+}

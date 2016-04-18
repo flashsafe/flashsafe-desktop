@@ -14,5 +14,5 @@ repositories {
 }
 
 dependencies {
-    compile group: 'ru.flashsafe', name: 'token', version: '0.1'
+    compile group: 'ru.flashsafe', name: 'token', version: productVersion
 }
