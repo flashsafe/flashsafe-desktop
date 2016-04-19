@@ -9,7 +9,9 @@ public class ApplicationInfo {
     private static final String RUN_DIRECTORY;
     
     public static final String APPLICATIONS_DIRECTORY = "apps";
-
+    
+    public static final String BUILTIN_JRE_PATH = "java";
+    
     static {
         RUN_DIRECTORY = Paths.get(CURRENT_DIRECTORY_SYMBOL).toAbsolutePath().normalize().toString();
     }

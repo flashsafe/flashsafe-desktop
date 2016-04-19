@@ -20,8 +20,14 @@ public abstract class AbstractFileChecker implements FileChecker {
 
     @Override
     public boolean check(File file, String checksum) throws IOException {
+        String actualChecksum = checksum(file);
+        return checksum.equals(actualChecksum);
+    }
+    
+    @Override
+    public String checksum(File file) throws IOException {
         HashCode hashCode = Files.hash(file, getHashFunction());
-        return checksum.equals(convertToStringValue(hashCode));
+        return convertToStringValue(hashCode);
     }
 
     protected boolean checkInputStream(InputStream inputStream, String checksum) throws IOException {

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="body" stylesheets="@/css/updater.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ProgressBar layoutX="25.0" layoutY="320.0" prefHeight="30.0" prefWidth="550.0" progress="0.0" />
+      <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="225.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@/images/logo.png" />
+         </image>
+      </ImageView>
+      <Label fx:id="vendor" layoutX="233.0" layoutY="120.0" prefHeight="36.0" prefWidth="135.0" text="Flashsafe" textAlignment="CENTER" textFill="WHITE">
+         <font>
+            <Font name="Lekton" size="30.0" />
+         </font>
+      </Label>
+      <Label fx:id="status" alignment="CENTER" contentDisplay="CENTER" layoutX="115.0" layoutY="295.0" prefHeight="20.0" prefWidth="370.0" text="Проверка наличия обновлений..." textAlignment="CENTER" textFill="WHITE">
+         <font>
+            <Font name="Jura Regular" size="18.0" />
+         </font>
+      </Label>
+   </children>
+</Pane>

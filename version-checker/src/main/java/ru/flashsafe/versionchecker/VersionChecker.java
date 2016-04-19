@@ -1,7 +1,5 @@
 package ru.flashsafe.versionchecker;
 
-import ru.flashsafe.common.version.Version;
-
 public class VersionChecker {
     
     private static final String VERSION_CHECK_PATH = "update/"; 

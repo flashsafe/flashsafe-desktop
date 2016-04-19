@@ -3,6 +3,7 @@ package ru.flashsafe.partition;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +45,10 @@ public abstract class BasePartitionLocator implements PartitionLocator {
     protected Partition lookupDataPartition() throws PartitionDetectionException {
         List<USBStorageDevice> storageDevices = usbDriveDetector.getRemovableDevices();
         Map<Path, String> pathToIdentifier = new HashMap<>();
+        List<Path> availableRemovableDrives = new ArrayList<>();
         for (USBStorageDevice storageDevice : storageDevices) {
             Path dataPartitionRoot = storageDevice.getRootDirectory().toPath();
+            availableRemovableDrives.add(dataPartitionRoot);
             if (FlashSafeDataUtilities.partitonIdentifierFileExists(dataPartitionRoot)) {
                 String identifier = FlashSafeDataUtilities.readPartitonIdentifier(dataPartitionRoot);
                 if (verifyPartition(identifier, dataPartitionRoot)) {
@@ -54,13 +57,29 @@ public abstract class BasePartitionLocator implements PartitionLocator {
             }
         }
         if (pathToIdentifier.isEmpty()) {
-            throw new PartitionDetectionException(Type.NO_PARTITIONS);
+            Path availableRemovableDrive = null;
+            if (availableRemovableDrives.size() == 1) {
+                availableRemovableDrive = availableRemovableDrives.get(0);
+            }
+            throw new PartitionDetectionException(Type.NO_PARTITIONS, availableRemovableDrive);
         } else if (pathToIdentifier.size() > 1) {
             throw new PartitionDetectionException(Type.TOO_MANY_PARTITIONS);
         }
         Path partitionRootPath = pathToIdentifier.keySet().iterator().next();
         String partitionRootPathString = partitionRootPath.toAbsolutePath().normalize().toString();
         return new FlashsafeDataPartition(partitionRootPathString);
+    }
+    
+    @Override
+    public Partition createDataPartition(Path path) throws PartitionCreationException {
+        try {
+            Path dataDirectory = FlashSafeDataUtilities.createDataDirectory(path);
+            //TODO write partition identifier
+            FlashSafeDataUtilities.writePartitonIdentifier(path, "FIXED-IDENTIFIER");
+            return new FlashsafeDataPartition(path.toAbsolutePath().normalize().toString());
+        } catch (IOException e) {
+            throw new PartitionCreationException(e);
+        }
     }
     
     /**

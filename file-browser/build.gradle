@@ -56,6 +56,13 @@ task unpackNatives(){
     logger.lifecycle 'Native libraries unpacked.'
 }
 
+jar {
+    manifest {
+        attributes ('Main-Class': 'ru.flashsafe.Main',
+        'Class-Path': configurations.compile.collect { it.getName() }.join(' ') )
+    }
+}
+
 run {
     systemProperties = [
         'java.library.path': file("./build/natives/windows")

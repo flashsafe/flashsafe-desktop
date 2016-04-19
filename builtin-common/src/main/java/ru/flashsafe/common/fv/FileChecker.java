@@ -11,6 +11,8 @@ public interface FileChecker {
 
     boolean check(File file, String checksum) throws IOException;
     
+    String checksum(File file) throws IOException;
+    
     boolean check(FileInputStream fileInputStream, String checksum) throws IOException;
     
     Map<String, Boolean> check(Collection<Path> files, Map<String, String> fileToChecksum);

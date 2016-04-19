@@ -16,9 +16,6 @@ public class FlashSafeDataUtilities {
     public static final String PARTITION_ID_FILE_NAME = ".flsid";
     
     private static final String ATTRIBUTE_HIDDEN = "dos:hidden";
-
-    private FlashSafeDataUtilities() {
-    }
     
     public static boolean dataDirectoryExists(Path dataPartitionRoot) {
         requireNonNull(dataPartitionRoot);

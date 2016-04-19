@@ -4,6 +4,8 @@ import static java.util.Objects.requireNonNull;
 import ru.flashsafe.common.version.Version;
 
 public class Application {
+    
+    private final String id;
 
     private final String name;
 
@@ -11,22 +13,31 @@ public class Application {
 
     private final String shortDescription;
 
-    public Application(String applicationName, Version latestVersion, String shortDescription) {
+    public Application(String id, String applicationName, Version latestVersion, String shortDescription) {
+        this.id = requireNonNull(id);
         name = requireNonNull(applicationName);
         this.latestVersion = requireNonNull(latestVersion);
         this.shortDescription = requireNonNull(shortDescription);
     }
 
-    public Application(String applicationName, Version latestVersion) {
-        this(applicationName, latestVersion, "");
+    public Application(String id, String applicationName, Version latestVersion) {
+        this(id, applicationName, latestVersion, "");
     }
 
-    public Application(String applicationName, String shortDescription) {
-        this(applicationName, Version.UNDEFINED, shortDescription);
+    public Application(String id, String applicationName, String shortDescription) {
+        this(id, applicationName, Version.UNDEFINED, shortDescription);
     }
 
-    public Application(String applicationName) {
-        this(applicationName, Version.UNDEFINED);
+    public Application(String id, String applicationName) {
+        this(id, applicationName, Version.UNDEFINED);
+    }
+    
+    public Application(String id) {
+        this(id, "", Version.UNDEFINED);
+    }
+    
+    public String getId() {
+        return id;
     }
 
     public String getName() {
@@ -45,7 +56,7 @@ public class Application {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
         return result;
     }
 
@@ -58,17 +69,17 @@ public class Application {
         if (getClass() != obj.getClass())
             return false;
         Application other = (Application) obj;
-        if (name == null) {
-            if (other.name != null)
+        if (id == null) {
+            if (other.id != null)
                 return false;
-        } else if (!name.equals(other.name))
+        } else if (!id.equals(other.id))
             return false;
         return true;
     }
 
     @Override
     public String toString() {
-        return "Application [name=" + name + ", latestVersion=" + latestVersion + ", shortDescription=" + shortDescription + "]";
+        return "Application [id=" + id + ", name=" + name + ", latestVersion=" + latestVersion + ", shortDescription="
+                + shortDescription + "]";
     }
-
 }

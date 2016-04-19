@@ -10,15 +10,20 @@ public class InstalledApplication extends Application {
     private final Version currentVersion;
 
     private final Path applicationRootPath;
+    
+    private final ApplicationDescriptor applicationDescriptor;
 
-    public InstalledApplication(String applicationName, Version currentVersion, Path applicationRootPath) {
+    public InstalledApplication(String applicationName, Version currentVersion, Path applicationRootPath,
+            ApplicationDescriptor applicationDescriptor) {
         super(applicationName);
         this.currentVersion = requireNonNull(currentVersion);
         this.applicationRootPath = requireNonNull(applicationRootPath);
+        this.applicationDescriptor = requireNonNull(applicationDescriptor);
     }
 
-    public InstalledApplication(Application application, Version currentVersion, Path applicationRootPath) {
-        this(application.getName(), currentVersion, applicationRootPath);
+    public InstalledApplication(Application application, Version currentVersion, Path applicationRootPath,
+            ApplicationDescriptor applicationDescriptor) {
+        this(application.getName(), currentVersion, applicationRootPath, applicationDescriptor);
     }
 
     public Version getCurrentVersion() {
@@ -27,6 +32,10 @@ public class InstalledApplication extends Application {
 
     public Path getApplicationRootPath() {
         return applicationRootPath;
+    }
+
+    public ApplicationDescriptor getApplicationDescriptor() {
+        return applicationDescriptor;
     }
 
     @Override

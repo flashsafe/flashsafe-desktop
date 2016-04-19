@@ -1,10 +1,14 @@
 package ru.flashsafe.partition;
 
+import java.nio.file.Path;
+
 import ru.flashsafe.common.partition.Partition;
 import ru.flashsafe.common.partition.Partition.Type;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
 public final class PartitionService {
 
     private final PartitionLocator partitionLocator;
@@ -22,8 +26,8 @@ public final class PartitionService {
         return partitionLocator.lookup(Type.USER_DATA);
     }
     
-    public boolean configureDataPartition() {
-        
-        return true;
+    public Partition configureDataPartition(Path rootPath) {
+        partitionLocator.createDataPartition(rootPath);
+        return null;
     }
 }

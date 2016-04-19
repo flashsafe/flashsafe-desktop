@@ -66,6 +66,18 @@ project(':starter') {
 project(':assembly') {
 }
 
+project(':loader-utils') {
+    dependencies {
+        compile project(':builtin-common')
+    }
+}
+
+project(':update-test-service') {
+    dependencies {
+        compile project(':builtin-common')
+    }
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '2.11'
 }

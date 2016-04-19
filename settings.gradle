@@ -1,1 +1,1 @@
-include 'builtin-common', 'loader-utils', 'file-browser', 'core', 'core-examples', 'token', 'token-examples', 'updater', 'launcher', 'starter', 'version-checker', 'assembly'
+include 'builtin-common', 'loader-utils', 'file-browser', 'core', 'core-examples', 'token', 'token-examples', 'updater', 'launcher', 'starter', 'version-checker', 'update-test-service', 'assembly'

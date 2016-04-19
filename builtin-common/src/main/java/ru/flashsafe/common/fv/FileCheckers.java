@@ -15,7 +15,7 @@ public class FileCheckers {
     private FileCheckers() {
     }
 
-    FileChecker checkerFor(Algorithms algorithm) {
+    public static FileChecker checkerFor(Algorithms algorithm) {
         return ALGORITHM_TO_CHECKER.get(algorithm);
     }
 

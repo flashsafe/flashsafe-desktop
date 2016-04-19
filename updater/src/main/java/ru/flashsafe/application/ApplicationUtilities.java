@@ -29,14 +29,15 @@ public class ApplicationUtilities {
         Path applicationsDirectory = getApplicationsDirectoryPath();
         if (Files.exists(applicationsDirectory) && Files.isDirectory(applicationsDirectory)) {
             // TODO throw an exception
+            throw new IllegalStateException("Application directory already exists!");
         }
         Path applicationsDirectoryPath = Files.createDirectory(applicationsDirectory);
-        // set hidden attribute for Windows
+        // set "hidden" attribute for Windows
         Files.setAttribute(applicationsDirectory, ATTRIBUTE_HIDDEN, true);
         return applicationsDirectoryPath;
     }
 
-    private Path getApplicationsDirectoryPath() {
+    public Path getApplicationsDirectoryPath() {
         Partition dataPartition = partitionService.lookupDataPartition();
         Path partitionRoot = dataPartition.getPartitionPath();
         return partitionRoot.resolve(FlashSafeDataUtilities.FLASH_SAFE_DATA_DIRECTORY);

@@ -7,6 +7,14 @@ package ru.flashsafe.common.version;
  */
 public class Version implements Comparable<Version> {
     
+    private static final int VERSION_ELEMENTS_COUNT = 3;
+    
+    private static final int MAJOR_VERSION_ELEMENT = 0;
+    
+    private static final int MINOR_VERSION_ELEMENT = 1;
+    
+    private static final int PATCH_VERSION_ELEMENT = 2;
+    
     private static final int UNDEFINED_VERSION_NUMBER = -1;
     
     public static final Version UNDEFINED = new Version(UNDEFINED_VERSION_NUMBER);
@@ -87,8 +95,19 @@ public class Version implements Comparable<Version> {
 
     @Override
     public String toString() {
-        return "Version [majorVersion=" + majorVersion + ", minorVersion=" + minorVersion + ", patchVersion=" + patchVersion
-                + "]";
+        return majorVersion + "." + minorVersion + "." + patchVersion;
+    }
+    
+    public static Version fromString(String versionString) {
+        String[] vesrionElements = versionString.split("\\.", VERSION_ELEMENTS_COUNT);
+        if (vesrionElements.length > 2) {
+            return new Version(Integer.valueOf(vesrionElements[MAJOR_VERSION_ELEMENT]),
+                    Integer.valueOf(vesrionElements[MINOR_VERSION_ELEMENT]),
+                    Integer.valueOf(vesrionElements[PATCH_VERSION_ELEMENT]));
+        } else {
+            return new Version(Integer.valueOf(vesrionElements[MAJOR_VERSION_ELEMENT]),
+                    Integer.valueOf(vesrionElements[MINOR_VERSION_ELEMENT]));
+        }
     }
 
 }
