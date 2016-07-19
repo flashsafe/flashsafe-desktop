@@ -1,8 +1,0 @@
-14:24:13,905 [INFO ] (FlashSafeApplication.java:71) - Lookup FlashSafeSystem
-14:24:14,224 [INFO ] (DefaultFlashSafeSystem.java:26) - Using class ru.flashsafe.core.impl.DefaultFlashSafeSystem as an implementation of interface ru.flashsafe.core.FlashSafeSystem
-14:24:15,512 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=]
-14:28:17,519 [DEBUG] (ResourceResolver.java:65) - Loading resource ResourceCacheKey [parent=fls://, resourceName=image.jpg]
-14:33:06,979 [INFO ] (DefaultFlashSafeStorageService.java:127) - Handling application stop event
-14:33:06,987 [INFO ] (FlashSafeStorageServiceImpl.java:69) - Handling application stop event
-14:33:06,992 [INFO ] (LocalFileManager.java:62) - Handling application stop event
-14:33:06,996 [INFO ] (FlashSafeAuthClientFilter.java:72) - Handling application stop event
