@@ -21,6 +21,8 @@
 .root {
     -fx-background-color: transparent;
     -fx-padding: 10px;
+    -fx-font-family: Ubuntu Condensed;
+    -fx-font-size: 14px;
 }
 
 #MainPane {
@@ -152,7 +154,7 @@
 }
 
 #Path {
-    margin-top: 18px;
+    /*margin-top: 18px;*/
     -fx-background-color: #A2A2A2;
     -fx-text-fill: #F3F3F3;
 }
@@ -266,35 +268,6 @@
     -fx-background-color: transparent;
 }
 
-/* Стилизуем ВСЕ скроллбары сцены */
-.scroll-bar {
-	-fx-background-color: #3F4445;
-	-fx-pref-width: 8px;
-	-fx-background-radius: 3, 2, 1;
-	-fx-padding: 0;
-}
-
-.scroll-bar > .track {
-	-fx-background-color: #3F4445;
-}
-
-.scroll-bar > .thumb {
-	-fx-background-color: #252B2D;
-	-fx-background-insets: 0;
-	-fx-padding: 0;
-}
-
-.scroll-bar > .decrement-button, .scroll-bar > .increment-button {
-	-fx-background-color: #3F4445;
-	visibility: hidden;
-}
-
-.scroll-bar > .decrement-button > .decrement-arrow, .scroll-bar > .increment-button > .increment-arrow {
-	-fx-shape: "";
-	-fx-padding: 0;
-	visibility: hidden;
-}
-
 .gfiles {
 	-fx-background-color: #2E3335;
 	-fx-background-insets: 0;
@@ -313,8 +286,8 @@
 }
 
 .table-view {
-	-fx-text-fill: #DDD;
-	-fx-background-color: #2E3335;
+	/*-fx-text-fill: #DDDDDD;*/
+	/*-fx-background-color: #2E3335;*/
 }
 
 .column-header-background {
@@ -334,7 +307,7 @@
 }
 
 .table-column {
-	-fx-background-color: #2E3335;
+	/*-fx-background-color: #2E3335;*/
 	-fx-background-insets: 0;
 	-fx-border-width: 0;
 }
@@ -356,6 +329,105 @@
 	-fx-background-color: #252B2D;
 }
 
+.loads > .list-cell {
+	-fx-background-color: #252B2D;
+}
+
 .column-header {
 	-fx-background-color: #2E3335;
+}
+
+.table-row-cell {
+    -fx-background-color: #2E3335;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #515354;
+}
+
+.progress-bar > .bar {
+    -fx-background-insets: 1 1 2 1;
+    -fx-padding: 0.20em;
+}
+
+.slider .thumb {  
+    -fx-padding: 5px;
+}
+
+.slider .track {
+    -fx-background-insets: 0;
+	-fx-padding: 2px;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * PopupMenu                                                                   *
+ *                                                                             *
+ ******************************************************************************/
+
+.context-menu {
+    -fx-background-color: #252B2D;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0.5, 0, 0);
+}
+
+.context-menu .separator:horizontal .line {
+    -fx-border-color: -fx-box-border transparent transparent transparent;
+    -fx-border-insets: 1 0 0 0;
+}
+
+.context-menu > .scroll-arrow {
+    -fx-padding: 0.416667em 0.416667em 0.416667em 0.416667em; /* 5 */
+    -fx-background-color: transparent;
+}
+
+.context-menu > .scroll-arrow:hover {
+    -fx-background: -fx-selection-bar;
+    -fx-background-color: -fx-background;
+    -fx-text-fill: -fx-text-background-color;
+}
+
+.context-menu:show-mnemonics > .mnemonic-underline {
+    -fx-stroke: -fx-text-fill;
+}
+
+.menu-item .label {
+  -fx-text-fill: FFFFFF;
+}
+
+.menu-item:focused {
+	-fx-background-color: #515354; 
+}
+
+.menu-item:focused .label {
+  -fx-background-color: #515354;
+}
+
+.progress-bar {}
+
+.progress-bar > .track {
+	-fx-background-color: #515354;
+	-fx-background-insets: 0;
+    -fx-background-radius: 3.5px;
+    -fx-pref-height: 7px;
+}
+
+.progress-bar > .bar {
+	-fx-background-color: rgba(108,208,243,0.5);
+    -fx-background-insets: 0;
+    -fx-background-radius: 3.5px;
+    -fx-padding: 0;
+    -fx-pref-height: 7px;
+}
+
+.pprogress {
+	-fx-background-color: transparent;
+}
+
+.pprogress > .track {
+	-fx-background-color: transparent;
+}
+
+.pprogress > .thumb {
+	
 }

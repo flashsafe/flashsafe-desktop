@@ -35,6 +35,14 @@ public interface FlashSafeStorageIdBasedService {
     List<FlashSafeStorageFileObject> list(long directoryId, String pincode) throws FlashSafeStorageException;
     
     /**
+     * Retrieves list of file objects inside trash.
+     * 
+     * @return list of fileObjects in trash
+     * @throws FlashSafeStorageException
+     */
+    List<FlashSafeStorageFileObject> trashList() throws FlashSafeStorageException;
+    
+    /**
      * Creates directory with specified name in parent directory.
      * 
      * @param parentDirectoryId parent directory Id
@@ -43,6 +51,8 @@ public interface FlashSafeStorageIdBasedService {
      * @throws FlashSafeStorageException
      */
     FlashSafeStorageDirectory createDirectory(long parentDirectoryId, String name) throws FlashSafeStorageException;
+    
+    FlashSafeStorageFile createEmptyFile(long parentDirectoryId, String name) throws FlashSafeStorageException;
 
     StorageFileOperation downloadFile(long fileId, Path directory) throws FlashSafeStorageException;
 
@@ -54,4 +64,5 @@ public interface FlashSafeStorageIdBasedService {
 
     void delete(long fileObjectId) throws FlashSafeStorageException;
     
+    void rename(long fileObject, String name) throws FlashSafeStorageException;
 }

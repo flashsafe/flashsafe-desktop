@@ -1,7 +1,9 @@
 package ru.flashsafe.core.old.storage;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -95,6 +97,16 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
             throw new FlashSafeStorageException("Error while listing directory", e);
         }
     }
+    
+    @Override
+    public List<FlashSafeStorageFileObject> trashList() throws FlashSafeStorageException {
+        try {
+            FlashSafeStorageFileObject resource = resourceResolver.resolveResource(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
+            return addAbsolutePath(storageService.trashList(), resource.getAbsolutePath());
+        } catch (ResourceResolverException e) {
+            throw new FlashSafeStorageException("Error while listing directory", e);
+        }
+    }
 
     @Override
     public FlashSafeStorageDirectory createDirectory(String path) throws FlashSafeStorageException {
@@ -115,10 +127,30 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
             throw new FlashSafeStorageException("Error while creating directory " + path, e);
         }
     }
+    
+    @Override
+    public FlashSafeStorageFile createEmptyFile(String path) throws FlashSafeStorageException {
+        String resourcePath = path.replaceFirst( FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX, StringUtils.EMPTY);
+        int lastPathSeparatorIndex = resourcePath.lastIndexOf(PATH_SEPARATOR);
+        String parentDirectoryPath = FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX;
+        if (lastPathSeparatorIndex > 0) {
+            parentDirectoryPath = resourcePath.substring(0, lastPathSeparatorIndex);
+        }
+        try {
+            FlashSafeStorageFileObject parentDirectory = resourceResolver.resolveResource(parentDirectoryPath);
+            String newDirectoryName = path.substring(path.lastIndexOf(PATH_SEPARATOR) + 1);
+            FlashSafeStorageFile file = storageService.createEmptyFile(parentDirectory.getId(), newDirectoryName);
+            file.setAbsolutePath(path);
+            return file;
+        } catch (ResourceResolverException e) {
+            LOGGER.warn("Error while creating file " + path, e);
+            throw new FlashSafeStorageException("Error while creating file " + path, e);
+        }
+    }
 
     @Override
     public StorageFileOperation download(String remoteObjectPath, Path localDirectoryPath) throws FlashSafeStorageException {
-        String localDirectoryPathString = localDirectoryPath.toString();
+        //String localDirectoryPathString = localDirectoryPath.toString();
         try {
             FlashSafeStorageFileObject fromPathResource = resourceResolver.resolveResource(remoteObjectPath);
             if (fromPathResource.getType() == FileObjectType.DIRECTORY) {
@@ -201,6 +233,11 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
             LOGGER.warn("Error while deleting " + path, e);
             throw new FlashSafeStorageException("Error while deleting ", e);
         }
+    }
+    
+    @Override
+    public void rename(long fileObjectId, String name) throws FlashSafeStorageException {
+    	storageService.rename(fileObjectId, name);
     }
 
     private static List<FlashSafeStorageFileObject> addAbsolutePath(List<FlashSafeStorageFileObject> fileObjects,

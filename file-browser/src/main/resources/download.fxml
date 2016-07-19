@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="508.0" style="-fx-background-insets: 0; -fx-border-insets: 0; -fx-background-color: #252B2D;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <AnchorPane prefHeight="0.0" prefWidth="0.0" style="-fx-border-width: 0 0 1px 0; -fx-border-color: #515354;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+         <children>
+            <ImageView fx:id="download_enabled" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" visible="false" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+               <image>
+                  <Image url="@img/download_enabled.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="upload_enabled" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" visible="false" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+               <image>
+                  <Image url="@img/upload_enabled.png" />
+               </image>
+            </ImageView>
+            <ProgressBar fx:id="progress" prefWidth="0.0" progress="0.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="8.0" />
+            <Label fx:id="filename" prefWidth="430.0" text="filename" textFill="#eeeeee" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="16.0">
+               <font>
+                  <Font name="System Italic" size="12.0" />
+               </font>
+            </Label>
+            <ImageView fx:id="cancel_button" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="10.0">
+               <image>
+                  <Image url="@img/close1.png" />
+               </image>
+               <effect>
+                  <InnerShadow color="#eeeeee" />
+               </effect>
+            </ImageView>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import ru.flashsafe.core.old.storage.FlashSafeStorageDirectory;
+import ru.flashsafe.core.old.storage.FlashSafeStorageFile;
 import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 
@@ -17,6 +18,14 @@ public interface FlashSafeStorageService {
      * @throws FlashSafeStorageException
      */
     List<FlashSafeStorageFileObject> list(String path) throws FlashSafeStorageException;
+    
+    /**
+     * Retrieves list of file objects inside trash.
+     * 
+     * @return list of fileObjects in trash
+     * @throws FlashSafeStorageException
+     */
+    List<FlashSafeStorageFileObject> trashList() throws FlashSafeStorageException;
 
     /**
      * Creates directory with specified name in parent directory.
@@ -27,6 +36,8 @@ public interface FlashSafeStorageService {
      * @throws FlashSafeStorageException
      */
     FlashSafeStorageDirectory createDirectory(String path) throws FlashSafeStorageException;
+    
+    FlashSafeStorageFile createEmptyFile(String path) throws FlashSafeStorageException;
 
     StorageFileOperation download(String remoteObjectPath, Path localDirectoryPath) throws FlashSafeStorageException;
     
@@ -37,5 +48,7 @@ public interface FlashSafeStorageService {
     void move(String fromPath, String toPath) throws FlashSafeStorageException;
 
     void delete(String path) throws FlashSafeStorageException;
+    
+    void rename(long fileObjectId, String name) throws FlashSafeStorageException;
     
 }

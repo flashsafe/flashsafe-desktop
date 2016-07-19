@@ -1,7 +1,6 @@
 package ru.flashsafe;
 
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,6 +35,7 @@ import ru.flashsafe.core.FlashSafeConfiguration;
 import ru.flashsafe.core.file.FileManager;
 import ru.flashsafe.util.ApplicationProperties;
 import ru.flashsafe.util.OSUtils;
+import ru.flashsafe.util.ResizeHelper;
 import ru.flashsafe.util.SystemTrayUtil;
 
 /**
@@ -47,7 +47,8 @@ public class Main extends Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    private static Locale currentLocale;
+    @SuppressWarnings("unused")
+	private static Locale currentLocale;
 
     private static ResourceBundle currentResourceBundle;
 
@@ -63,7 +64,8 @@ public class Main extends Application {
 
     //private static String PIN = "00000000";
     
-    private boolean tokenInit = false;
+    @SuppressWarnings("unused")
+	private boolean tokenInit = false;
     
     // Fix transparent windows on Linux OS
     static {
@@ -84,9 +86,9 @@ public class Main extends Application {
                     stage.setTitle("Flashsafe");
                     stage.setMinWidth(975);
                     stage.setMinHeight(650);
-                    if(!OSUtils.isUnix()) {
+                    //if(!OSUtils.isUnix()) {
                         stage.initStyle(StageStyle.TRANSPARENT);
-                    }
+                    //}
                     stage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
                     try {
                         fxmlLoader.setLocation(getClass().getResource("/oldfs.fxml"));
@@ -99,7 +101,7 @@ public class Main extends Application {
                         Scene scene = new Scene(root/*mainPane*/, Color.TRANSPARENT);
                         _scene = scene;
                         stage.setScene(scene);
-                        //ResizeHelper.addResizeListener(stage);
+                        ResizeHelper.addResizeListener(stage);
                     } catch (Exception e) {
                         LOGGER.error("Error while building main window", e);
                         e.printStackTrace();
@@ -109,8 +111,8 @@ public class Main extends Application {
             });
         //}
         
-//        SystemTrayUtil.addToSystemTray(currentResourceBundle.getString("connection_established"),
-//                currentResourceBundle.getString("flashsafe_ready_to_use"));
+        //SystemTrayUtil.addToSystemTray(currentResourceBundle.getString("connection_established"),
+                 //currentResourceBundle.getString("flashsafe_ready_to_use"));
     }
     
     private static FlashSafeConfiguration createConfiguration() {
@@ -125,7 +127,8 @@ public class Main extends Application {
         es.shutdown();
     }
 
-    private void initToken(Stage __stage) {
+    @SuppressWarnings("unused")
+	private void initToken(Stage __stage) {
         try {
             //System.loadLibrary("jcPKCS11");
             //CE.Initialize();
@@ -200,15 +203,15 @@ public class Main extends Application {
      *            the command line arguments
      */
     public static void main(String[] args) {
-        String languageValue = ApplicationProperties.languageTag();
-        currentLocale = Locale.forLanguageTag(languageValue);
-        try {
-            currentResourceBundle = ResourceBundle.getBundle("bundles.interface", currentLocale);
-        } catch (NullPointerException | MissingResourceException e) {
-            LOGGER.warn("Unable to load resource bundle for locale:" + currentLocale + " . The application will use ENGLISH", e);
+        //String languageValue = ApplicationProperties.languageTag();
+        //currentLocale = Locale.forLanguageTag(languageValue);
+        //try {
+            //currentResourceBundle = ResourceBundle.getBundle("bundles.interface", currentLocale);
+        //} catch (NullPointerException | MissingResourceException e) {
+            //LOGGER.warn("Unable to load resource bundle for locale:" + currentLocale + " . The application will use ENGLISH", e);
             currentLocale = Locale.ENGLISH;
             currentResourceBundle = ResourceBundle.getBundle("bundles.interface", Locale.ENGLISH);
-        }
+        //}
         launch(args);
     }
 

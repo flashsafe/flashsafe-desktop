@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Random;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+//import org.apache.logging.log4j.LogManager;
+//import org.apache.logging.log4j.Logger;
 //import ru.flashsafe.controller.MainSceneController;
 import ru.flashsafe.model.FSData;
 import ru.flashsafe.model.FSMeta;
@@ -48,8 +48,8 @@ public class HttpAPI {
     private static volatile String token;
     private static volatile long timeout;
     
-    private static final HashMap<String, String> MIME = new HashMap();
-    private static final ArrayList<UploadProgressListener> LISTENERS = new ArrayList();
+    private static final HashMap<String, String> MIME = new HashMap<String, String>();
+    private static final ArrayList<UploadProgressListener> LISTENERS = new ArrayList<UploadProgressListener>();
     
     private static HttpAPI API;
     
@@ -182,7 +182,7 @@ public class HttpAPI {
             readProperties();
             //FlashSafeToken fstoken = MainSceneController.rets.lookup("1");
             // Step 1
-            HashMap<String, String> form = new HashMap();
+            HashMap<String, String> form = new HashMap<>();
             form.put("id", PROPERTIES.getProperty("id")/*fstoken.getId()*/);
             JsonObject result = post("/auth.php", form, null);
             if(result != null) {
@@ -294,7 +294,7 @@ public class HttpAPI {
         if (timeout - System.currentTimeMillis() <= 0) {
             auth();
         }
-        HashMap<String, String> form = new HashMap();
+        HashMap<String, String> form = new HashMap<>();
         form.put("dir_id", String.valueOf(dir_id));
         if(!pincode.equals("")) {
            form.put("pincode", pincode); 

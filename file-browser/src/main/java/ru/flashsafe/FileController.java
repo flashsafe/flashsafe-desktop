@@ -10,6 +10,14 @@ public interface FileController {
     
     void loadContent(String path);
     
+    void move(String fromPath, String toPath);
+    
+    void copy(String fromPath, String toPath);
+    
+    void rename(long fileObjectId, String name);
+    
+    void delete(String path);
+    
     String getCurrentLocation();
     
 }

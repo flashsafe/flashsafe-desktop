@@ -1,0 +1,29 @@
+/* Стилизуем ВСЕ скроллбары сцены */
+.scroll-bar {
+	-fx-background-color: #3F4445;
+	-fx-pref-width: 8px;
+	-fx-background-radius: 3, 2, 1;
+	-fx-padding: 0;
+}
+
+.scroll-bar > .track {
+	-fx-background-color: #3F4445;
+	-fx-padding: 0;
+}
+
+.scroll-bar > .thumb {
+	-fx-background-color: #252B2D;
+	-fx-background-insets: 0;
+	-fx-padding: 0;
+}
+
+.scroll-bar > .decrement-button, .scroll-bar > .increment-button {
+	-fx-background-color: #3F4445;
+	visibility: hidden;
+}
+
+.scroll-bar > .decrement-button > .decrement-arrow, .scroll-bar > .increment-button > .increment-arrow {
+	-fx-shape: "";
+	-fx-padding: 0;
+	visibility: hidden;
+}

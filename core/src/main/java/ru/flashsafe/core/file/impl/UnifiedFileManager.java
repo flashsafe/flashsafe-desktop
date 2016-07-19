@@ -56,6 +56,13 @@ public class UnifiedFileManager implements FileManager {
         List<FileObject> fileObjects = fileManager.list(path);
         return (fileObjects == null) ? Collections.<FileObject> emptyList() : fileObjects;
     }
+    
+    @Override
+    public List<FileObject> trashList() throws FileOperationException {
+        FileManager fileManager = getFileManagerForPath(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
+        List<FileObject> fileObjects = fileManager.trashList();
+        return (fileObjects == null) ? Collections.<FileObject> emptyList() : fileObjects;
+    }
 
     @Override
     public File createFile(String path) throws FileOperationException {
@@ -116,6 +123,13 @@ public class UnifiedFileManager implements FileManager {
         requireNonNull(path);
         FileManager fileManager = getFileManagerForPath(path);
         return fileManager.delete(path);
+    }
+    
+    @Override
+    public FileOperation rename(long fileObjectId, String name) throws FileOperationException {
+    	requireNonNull(fileObjectId);
+    	requireNonNull(name);
+        return flashSafeStorageFileManager.rename(fileObjectId, name);
     }
 
     private static boolean pathsRelateToSameStorage(String firstPath, String secondPath) {

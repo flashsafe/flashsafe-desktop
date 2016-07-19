@@ -2,11 +2,14 @@ package ru.flashsafe.view;
 
 import java.util.ResourceBundle;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Paint;
 
@@ -25,6 +28,7 @@ public class CreatePathPane extends Pane {
 
 	private ResourceBundle resourceBundle;
 
+	@SuppressWarnings("unused")
 	private MainSceneController controller;
 
 	public CreatePathPane(ResourceBundle resourceBundle) {
@@ -42,6 +46,20 @@ public class CreatePathPane extends Pane {
 	public void setController(MainSceneController controller) {
 		this.controller = controller;
 		pathname_submit.setOnAction(event -> controller.onPathnameSubmit());
+		pathname_textfield.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> val, String oldval, String newval) {
+				System.out.println("VAL: " + val + "\nOLDVAL: " + oldval + "\nNEWVAL: " + newval);
+				if(oldval.equals("")) pathname_submit.setStyle("-fx-effect: dropshadow(three-pass-box, #6CD0F3, 2, 5,0, 0);");
+				if(newval.equals("")) pathname_submit.setStyle("-fx-effect: null;");
+			}
+		});
+		pathname_textfield.setOnAction(event -> controller.onPathnameSubmit());
+		pathname_textfield.setOnKeyPressed(event -> {
+			if (event.getCode() == KeyCode.ESCAPE) {
+				controller.hidePathDialog();
+			}
+		});
 	}
 
 	private Label getTitleLabel() {

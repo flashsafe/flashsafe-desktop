@@ -36,10 +36,24 @@ public class FlashSafeStorageFileManager implements FileManager {
             throw new FileOperationException("Error while listing directory", e);
         }
     }
+    
+    @Override
+    public List<FileObject> trashList() throws FileOperationException {
+        try {
+            return cast(storageService.trashList());
+        } catch (FlashSafeStorageException e) {
+            throw new FileOperationException("Error while listing trash", e);
+        }
+    }
 
     @Override
     public File createFile(String path) throws FileOperationException {
-        throw new UnsupportedOperationException("Not implemented yet!");
+    	try {
+            return storageService.createEmptyFile(path);
+        } catch (FlashSafeStorageException e) {
+            LOGGER.warn("Error while creating directory " + path, e);
+            throw new FileOperationException("Error while creating directory " + path, e);
+        }
     }
 
     @Override
@@ -82,6 +96,17 @@ public class FlashSafeStorageFileManager implements FileManager {
         } catch (FlashSafeStorageException e) {
             LOGGER.warn("Error while deleting " + path, e);
             throw new FileOperationException("Error while deleting ", e);
+        }
+    }
+    
+    @Override
+    public FileOperation rename(long fileObjectId, String name) throws FileOperationException {
+        try {
+            storageService.rename(fileObjectId, name);
+            return null;
+        } catch (FlashSafeStorageException e) {
+            LOGGER.warn("Error while rename to " + name, e);
+            throw new FileOperationException("Error while rename ", e);
         }
     }
     

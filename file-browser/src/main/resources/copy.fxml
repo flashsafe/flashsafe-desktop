@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="510.0" style="-fx-background-insets: 0; -fx-background-color: #252B2D;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  <content>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="428.0" prefWidth="508.0" style="-fx-background-insets: 0; -fx-background-color: #252B2D;">
+         <children>
+            <Pane fx:id="topbar" prefHeight="38.0" prefWidth="508.0" style="-fx-background-color: #252B2D; -fx-background-insets: 0;">
+               <children>
+                  <Label fx:id="title_text" layoutX="35.0" layoutY="8.0" prefHeight="18.0" text="Загрузка файлов" textFill="#eeeeee">
+                     <font>
+                        <Font name="Tahoma" size="16.0" />
+                     </font>
+                  </Label>
+                  <ImageView fitHeight="12.0" layoutX="10.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@img/infinite_icon.png" />
+                     </image>
+                     <effect>
+                        <InnerShadow color="WHITE" />
+                     </effect>
+                  </ImageView>
+                  <ImageView fitHeight="12.0" fitWidth="30.0" layoutX="464.0" layoutY="12.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@img/minimize.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+                  <Pane fx:id="minimize_button" layoutX="460.0" layoutY="6.0" prefHeight="20.0" prefWidth="20.0">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Pane>
+                  <ImageView fitHeight="14.0" fitWidth="14.0" layoutX="484.0" layoutY="10.0" pickOnBounds="truenew" preserveRatio="true">
+                     <image>
+                        <Image url="@img/close.png" />
+                     </image>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+                  <Pane fx:id="close_button" layoutX="480.0" layoutY="6.0" prefHeight="20.0" prefWidth="20.0">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Pane>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="MOVE" />
+               </cursor>
+            </Pane>
+            <ListView fx:id="downloads_list" layoutY="38.0" prefHeight="390.0" prefWidth="508.0" style="-fx-background-insets: 0; -fx-padding: 0; -fx-background-color: #252B2D;" styleClass="loads" />
+         </children></AnchorPane>
+  </content>
+</ScrollPane>

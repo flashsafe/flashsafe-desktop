@@ -1,0 +1,82 @@
+.root {
+	-fx-background-color: transparent;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * ProgressBar                                                                 *
+ *                                                                             *
+ ******************************************************************************/
+
+.progress-bar {}
+
+.progress-bar > .bar {
+    -fx-background-color: #6CD0F3;
+    -fx-background-insets: 0;
+    -fx-background-radius: 3px;
+    -fx-padding: 0;
+    -fx-pref-height: 6px;
+}
+
+.progress-bar > .track {
+    -fx-background-insets: 0;
+    -fx-background-radius: 4px;
+    -fx-pref-height: 8px;
+    /*-fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 0.25), 2, 0.1, 0, 0);*/
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * List, Tree, Table COMMON                                                    *
+ *                                                                             *
+ ******************************************************************************/
+
+.list-view {
+    -fx-background-color: #252B2D;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.list-view:focused {
+    -fx-background-color: #252B2D;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+/* remove double borders from scrollbars */
+.list-view > .virtual-flow > .scroll-bar:vertical {
+    -fx-background-insets: 0, 0 0 0 1;
+    -fx-padding: -1 -1 -1 0;
+}
+.list-view > .virtual-flow > .scroll-bar:horizontal {
+    -fx-background-insets: 0, 1 0 0 0;
+    -fx-padding: 0 -1 -1 -1;
+}
+.list-view > .virtual-flow > .corner {
+    -fx-background-color: #6CD0F3;
+}
+
+/* standard cell */
+.list-cell {
+    -fx-background: #252B2D;
+    -fx-background-color: #252B2D;
+    -fx-text-fill: #515354;
+    -fx-padding: 0;
+}
+
+/* Selected rows */
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
+    -fx-background: #6CD0F3;
+}
+
+/* Selected when control is not focused */
+.list-cell:filled:selected {
+    -fx-background: #2E3335;
+}
+
+/* focused cell (keyboard navigation) */
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:focused {
+    -fx-background-color: #2E3335;
+    -fx-background-insets: 0;
+}

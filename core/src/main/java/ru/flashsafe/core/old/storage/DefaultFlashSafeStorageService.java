@@ -52,9 +52,17 @@ import ru.flashsafe.core.old.storage.rest.ContentTypeFixerFilter;
 import ru.flashsafe.core.old.storage.rest.CustomMultipart;
 import ru.flashsafe.core.old.storage.rest.ExternalExecutorProvider;
 import ru.flashsafe.core.old.storage.rest.FlashSafeAuthClientFilter;
+import ru.flashsafe.core.old.storage.rest.data.CopyResponse;
+import ru.flashsafe.core.old.storage.rest.data.CopyResponse.CopyResponseMeta;
 import ru.flashsafe.core.old.storage.rest.data.CreateDirectoryResponse;
 import ru.flashsafe.core.old.storage.rest.data.CreateDirectoryResponse.CreateDirectoryResponseMeta;
+import ru.flashsafe.core.old.storage.rest.data.DeleteResponse;
+import ru.flashsafe.core.old.storage.rest.data.DeleteResponse.DeleteResponseMeta;
 import ru.flashsafe.core.old.storage.rest.data.DirectoryListResponse;
+import ru.flashsafe.core.old.storage.rest.data.MoveResponse;
+import ru.flashsafe.core.old.storage.rest.data.MoveResponse.MoveResponseMeta;
+import ru.flashsafe.core.old.storage.rest.data.RenameResponse;
+import ru.flashsafe.core.old.storage.rest.data.RenameResponse.RenameResponseMeta;
 import ru.flashsafe.core.old.storage.rest.data.ResponseMeta;
 import ru.flashsafe.core.operation.OperationIDGenerator;
 import ru.flashsafe.core.operation.OperationResult;
@@ -75,26 +83,52 @@ import com.google.inject.Singleton;
  * @author Andrew
  *
  */
+@SuppressWarnings("deprecation")
 @Singleton
 public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedService {
 
     private static final int IO_BUFFER_SIZE = 8192;
 
-    private static final String DIRECTORY_API_PATH = "dir.php";
+    private static final String DIRECTORY_API_PATH = "dir"; 
 
     private static final String DIRECTORY_ID_PARAMETER = "dir_id";
     
+    private static final String MOVE_API_PATH = "move.php";
+    
+    private static final String NEW_DIR_PARAMETER = "new_dir_id";
+    
+    private static final String COPY_API_PATH = "copy.php";
+    
+    private static final String RENAME_API_PATH = "rename.php";
+    
+    private static final String NEW_NAME_PARAMETER = "new_name";
+    
+    private static final String DELETE_API_PATH = "delete";
+    
+    private static final String TRASH_API_PATH = "trash";
+    
     private static final String PINCODE_PARAMETER = "pincode";
 
-    private static final String FILE_ID_PARAMETER = "file_id";
+    @SuppressWarnings("unused")
+	private static final String FILE_ID_PARAMETER = "file_id";
     
-    private static final String FILE_API_PATH = "download.php";
+    private static final String FILE_API_PATH = "download";
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFlashSafeStorageService.class);
     
     private final Client restClient;
 
     private final WebTarget directoryTarget;
+    
+    private final WebTarget moveTarget;
+    
+    private final WebTarget copyTarget;
+    
+    private final WebTarget renameTarget;
+    
+    private final WebTarget deleteTarget;
+    
+    private final WebTarget trashTarget;
     
     private final WebTarget fileTarget;
     
@@ -118,6 +152,11 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
         restClient = ClientBuilder.newClient(clientConfig);
         String storageAddress = FlashSafeRegistry.getStorageAddress();
         directoryTarget = restClient.target(storageAddress).path(DIRECTORY_API_PATH);
+        moveTarget = restClient.target(storageAddress).path(MOVE_API_PATH);
+        copyTarget = restClient.target(storageAddress).path(COPY_API_PATH);
+        renameTarget = restClient.target(storageAddress).path(RENAME_API_PATH);
+        deleteTarget = restClient.target(storageAddress).path(DELETE_API_PATH);
+        trashTarget = restClient.target(storageAddress).path(TRASH_API_PATH);
         fileTarget = restClient.target(storageAddress).path(FILE_API_PATH);
         eventService.registerSubscriber(this);
     }
@@ -161,6 +200,19 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
         }
         throw new FlashSafeStorageException("Error while listing directory. " + responseMeta.getResponseMessage(), null);
     }
+    
+    @Override
+    public List<FlashSafeStorageFileObject> trashList() throws FlashSafeStorageException {
+        /*DirectoryListResponse listResponse = trashTarget
+                .request(MediaType.APPLICATION_JSON_TYPE).get(DirectoryListResponse.class);
+        ResponseMeta responseMeta = listResponse.getResponseMeta();
+        if (responseMeta.getResponseCode() == HTTP_OK) {
+            List<FlashSafeStorageFileObject> fileObjects = listResponse.getFileObjects();
+            return fileObjects == null ? Collections.emptyList() : fileObjects;
+        }
+        throw new FlashSafeStorageException("Error while listing trash. " + responseMeta.getResponseMessage(), null);*/
+    	return doList(-1, null);
+    }
 
     @Override
     public FlashSafeStorageDirectory createDirectory(long parentDirectoryId, String name) throws FlashSafeStorageException {
@@ -172,7 +224,20 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
         if (responseMeta.getResponseCode() == HTTP_OK) {
             return createLocalRepresentation(responseMeta.getDirectoryId(), name);
         }
-        throw new FlashSafeStorageException("Error while creating directory. " + responseMeta.getResponseMessage(), null);
+        throw new FlashSafeStorageException("Error while creating directory. " + responseMeta.getResponseCode() + " " + responseMeta.getResponseMessage(), null);
+    }
+    
+    @Override
+    public FlashSafeStorageFile createEmptyFile(long parentDirectoryId, String name) throws FlashSafeStorageException {
+        Objects.requireNonNull(name);
+        Response response = directoryTarget.queryParam(DIRECTORY_ID_PARAMETER, parentDirectoryId)
+                .request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(new Form("create_file", name)));
+        CreateDirectoryResponse createDirectoryRespose = response.readEntity(CreateDirectoryResponse.class);
+        CreateDirectoryResponseMeta responseMeta = createDirectoryRespose.getResponseMeta();
+        if (responseMeta.getResponseCode() == HTTP_OK) {
+            return createLocalRepresentationForFile(responseMeta.getDirectoryId(), name);
+        }
+        throw new FlashSafeStorageException("Error while creating directory. " + responseMeta.getResponseCode() + " " + responseMeta.getResponseMessage(), null);
     }
 
     // TODO get directory attributes from back-end
@@ -181,6 +246,13 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
         directory.setId(directoryId);
         directory.setName(name);
         return directory;
+    }
+    
+    private static FlashSafeStorageFile createLocalRepresentationForFile(long fileId, String name) {
+        FlashSafeStorageFile file = new FlashSafeStorageFile();
+        file.setId(fileId);
+        file.setName(name);
+        return file;
     }
 
     @Override
@@ -265,21 +337,54 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
     }
 
     @Override
-    public void copy(long fileObjectId, long destinationDirectoryId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Not implemented yet!");
+    public void copy(long fileObjectId, long destinationDirectoryId) throws FlashSafeStorageException {
+    	Objects.requireNonNull(fileObjectId);
+    	Objects.requireNonNull(destinationDirectoryId);
+        Response response = copyTarget.queryParam(FILE_ID_PARAMETER, fileObjectId).queryParam(NEW_DIR_PARAMETER, destinationDirectoryId)
+                .request(MediaType.APPLICATION_JSON_TYPE).get();
+        CopyResponse copyRespose = response.readEntity(CopyResponse.class);
+        CopyResponseMeta responseMeta = copyRespose.getResponseMeta();
+        if (responseMeta.getResponseCode() != HTTP_OK) {
+        	throw new FlashSafeStorageException("Error while copy object. " + responseMeta.getResponseMessage(), null);
+        }
     }
 
     @Override
-    public void move(long fileObjectId, long destinationDirectoryId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Not implemented yet!");
+    public void move(long fileObjectId, long destinationDirectoryId) throws FlashSafeStorageException {
+    	Objects.requireNonNull(fileObjectId);
+    	Objects.requireNonNull(destinationDirectoryId);
+        Response response = moveTarget.queryParam(FILE_ID_PARAMETER, fileObjectId).queryParam(NEW_DIR_PARAMETER, destinationDirectoryId)
+                .request(MediaType.APPLICATION_JSON_TYPE).get();
+        MoveResponse moveRespose = response.readEntity(MoveResponse.class);
+        MoveResponseMeta responseMeta = moveRespose.getResponseMeta();
+        if (responseMeta.getResponseCode() != HTTP_OK) {
+        	throw new FlashSafeStorageException("Error while move object. " + responseMeta.getResponseMessage(), null);
+        }
     }
 
     @Override
-    public void delete(long fileObjectId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Not implemented yet!");
+    public void delete(long fileObjectId) throws FlashSafeStorageException {
+    	Objects.requireNonNull(fileObjectId);
+        Response response = deleteTarget.queryParam(FILE_ID_PARAMETER, fileObjectId)
+                .request(MediaType.APPLICATION_JSON_TYPE).get();
+        DeleteResponse deleteRespose = response.readEntity(DeleteResponse.class);
+        DeleteResponseMeta responseMeta = deleteRespose.getResponseMeta();
+        if (responseMeta.getResponseCode() != HTTP_OK) {
+        	throw new FlashSafeStorageException("Error while delete object. " + responseMeta.getResponseMessage(), null);
+        }
+    }
+    
+    @Override
+    public void rename(long fileObjectId, String name) throws FlashSafeStorageException {
+    	Objects.requireNonNull(fileObjectId);
+    	Objects.requireNonNull(name);
+        Response response = renameTarget.queryParam(FILE_ID_PARAMETER, fileObjectId).queryParam(NEW_NAME_PARAMETER, name)
+                .request(MediaType.APPLICATION_JSON_TYPE).get();
+        RenameResponse moveRespose = response.readEntity(RenameResponse.class);
+        RenameResponseMeta responseMeta = moveRespose.getResponseMeta();
+        if (responseMeta.getResponseCode() != HTTP_OK) {
+        	throw new FlashSafeStorageException("Error while rename object. " + responseMeta.getResponseMessage(), null);
+        }
     }
 
     private static void setStatusToFinished(SingleFileStorageOperation operation, OperationResult result) {

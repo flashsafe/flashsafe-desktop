@@ -34,7 +34,8 @@ public class FlashSafeHardwareTokenService extends FlashSafeTokenServiceBase imp
 
     private static final Logger LOGGER = LogManager.getLogger(FlashSafeHardwareTokenService.class);
     
-    private static FlashSafeHardwareTokenService instance;
+    @SuppressWarnings("unused")
+	private static FlashSafeHardwareTokenService instance;
     
     private final Map<String, FlashSafeToken> availableTokens = new HashMap<>();
     
@@ -59,7 +60,8 @@ public class FlashSafeHardwareTokenService extends FlashSafeTokenServiceBase imp
         return instance;*/
     }
     
-    private void initService() throws TokenServiceInitializationException {
+    @SuppressWarnings("unused")
+	private void initService() throws TokenServiceInitializationException {
         try {
             UsbServices usbServices = UsbHostManager.getUsbServices();
             attachHandlers(usbServices);

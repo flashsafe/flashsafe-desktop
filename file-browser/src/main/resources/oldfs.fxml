@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.media.*?>
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.web.*?>
 <?import javafx.scene.effect.*?>
@@ -12,19 +14,38 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="MainPane" fx:id="window" prefHeight="650.0" prefWidth="975.0" stylesheets="@/css/mainscene.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="MainPane" fx:id="window" prefHeight="650.0" prefWidth="975.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ScrollPane fx:id="scroll_pane" fitToHeight="true" fitToWidth="true" layoutX="265.0" layoutY="100.0" prefHeight="373.0" prefWidth="670.0" style="-fx-background-color: #2E3335;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="210.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
+      <ScrollPane fx:id="scroll_pane" fitToHeight="true" fitToWidth="true" layoutX="265.0" layoutY="100.0" style="-fx-background-color: #2E3335;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="210.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
         <content>
-          <AnchorPane fx:id="files_area" prefHeight="373.0" prefWidth="670.0" style="-fx-background-color: #2E3335;">
+          <AnchorPane fx:id="files_area" style="-fx-background-color: #2E3335;">
                <children>
-                  <TableView fx:id="files" prefHeight="373.0" prefWidth="670.0" style="-fx-background-insets: 0; -fx-padding: 0; -fx-background-color: #2E3335;" styleClass="files" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
+                  <TableView fx:id="files" minHeight="373.0" minWidth="660.0" onDragDropped="#onDragDropped" onDragOver="#onDragOver" prefHeight="373.0" prefWidth="660.0" style="-fx-background-insets: 0; -fx-padding: 0; -fx-background-color: #2E3335;" styleClass="files" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
                     <columns>
-                      <TableColumn prefWidth="300.0" text="%name" />
-                      <TableColumn minWidth="0.0" prefWidth="141.0" text="%creation_date" />
-                      <TableColumn prefWidth="125.0" text="%type" />
-                      <TableColumn minWidth="0.0" prefWidth="179.0" text="%size" />
+                      <TableColumn fx:id="name_column" prefWidth="300.0" text="%name" />
+                      <TableColumn fx:id="creation_date_column" minWidth="0.0" prefWidth="141.0" text="%creation_date" />
+                      <TableColumn fx:id="type_column" prefWidth="125.0" text="%type" />
+                      <TableColumn fx:id="size_column" minWidth="0.0" prefWidth="169.0" text="%size" />
                     </columns>
+                     <contextMenu>
+                        <ContextMenu>
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#showPathDialog" text="Create folder" />
+                              <MenuItem mnemonicParsing="false" onAction="#refresh" text="Refresh" />
+                              <Menu mnemonicParsing="false" text="Sorted by">
+                                 <items>
+                                    <RadioMenuItem fx:id="sorted_name" mnemonicParsing="false" onAction="#sortedByName" selected="true" text="Name" />
+                                    <RadioMenuItem fx:id="sorted_creation_date" mnemonicParsing="false" onAction="#sortedByCreationDate" text="Creation date" />
+                                    <RadioMenuItem fx:id="sorted_type" mnemonicParsing="false" onAction="#sortedByType" text="Type" />
+                                    <RadioMenuItem fx:id="sorted_size" mnemonicParsing="false" onAction="#sortedBySize" text="Size" />
+                                    <SeparatorMenuItem mnemonicParsing="false" />
+                                    <RadioMenuItem fx:id="sorted_asc" mnemonicParsing="false" onAction="#ascSorted" selected="true" text="Ascending" />
+                                    <RadioMenuItem fx:id="sorted_desc" mnemonicParsing="false" onAction="#descSorted" text="Descending" />
+                                 </items>
+                              </Menu>
+                          </items>
+                        </ContextMenu>
+                     </contextMenu>
                   </TableView>
                   <GridPane fx:id="gfiles" alignment="CENTER" prefHeight="589.0" prefWidth="702.0" styleClass="gfiles" visible="false" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <columnConstraints>
@@ -39,97 +60,163 @@
                     </rowConstraints>
                   </GridPane>
                   <ListView fx:id="lfiles" layoutY="18.0" prefHeight="550.0" prefWidth="763.0" style="-fx-background-color: #2E3335;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="18.0" />
+                  <AnchorPane fx:id="upload_hint" onDragDropped="#onDragDropped" onDragExited="#onDragExited" onDragOver="#onDragOver" prefHeight="520.0" style="-fx-background-color: #EEEEEE76;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Label alignment="CENTER" contentDisplay="CENTER" text="Drop files here" textFill="#0e0e8280" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <font>
+                              <Font size="48.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
                </children>
             </AnchorPane>
         </content>
       </ScrollPane>
-      <Pane id="TopToolbar" fx:id="topPane" maxHeight="55.0" minHeight="100.0" minWidth="975.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane id="TopToolbar" fx:id="topPane" maxHeight="55.0" minHeight="100.0" minWidth="975.0" style="-fx-background-color: #313637;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <ImageView fx:id="back" fitHeight="25.0" fitWidth="25.0" layoutX="220.0" layoutY="25.0" onMouseClicked="#navigateBackward" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@img/back.png" />
+                  <Image url="@img/backward_disabled.png" />
                </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </ImageView>
             <ImageView fx:id="forward" fitHeight="25.0" fitWidth="25.0" layoutX="250.0" layoutY="25.0" onMouseClicked="#navigateForward" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@img/forward.png" />
+                  <Image url="@img/forward_disabled.png" />
                </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </ImageView>
             <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="290.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@img/list.png" />
+                  <Image url="@img/list_inactive.png" />
                </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </ImageView>
             <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="320.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@img/grid.png" />
+                  <Image url="@img/table_active.png" />
                </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </ImageView>
             <ImageView fitHeight="25.0" fitWidth="25.0" layoutX="360.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@img/filter.png" />
+                  <Image url="@img/filter_inactive.png" />
                </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </ImageView>
-            <TextField id="SearchField" fx:id="search_field" layoutX="861.0" layoutY="58.0" maxWidth="100.0" promptText="%search" styleClass="search">
+            <TextField id="SearchField" fx:id="search_field" maxWidth="100.0" promptText="%search" style="-fx-background-color: #313637; -fx-border-width: 0 0 1px 0; -fx-border-color: #515354;" styleClass="search" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="58.0">
                <font>
                   <Font name="Tahoma" size="14.0" />
                </font>
             </TextField>
-            <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="844.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="110.0" AnchorPane.topAnchor="62.0">
                <image>
                   <Image url="@img/search.png" />
                </image>
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
             </ImageView>
-            <Separator layoutX="220.0" layoutY="100.0" prefHeight="0.0" prefWidth="745.0" styleClass="divider" />
-            <Label fx:id="breadcrumbs" layoutX="219.0" layoutY="64.0" prefHeight="17.0" prefWidth="614.0" textFill="#dddddd">
+            <Separator prefHeight="0.0" prefWidth="745.0" styleClass="divider" AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="100.0" />
+            <Label fx:id="breadcrumbs" prefHeight="17.0" prefWidth="614.0" textFill="#dddddd" AnchorPane.leftAnchor="219.0" AnchorPane.topAnchor="58.0">
                <font>
                   <Font size="18.0" />
                </font>
             </Label>
-         </children></Pane>
-      <HBox id="DisplayMenu" fx:id="display_menu" alignment="CENTER" maxHeight="60.0" maxWidth="195.0" minHeight="60.0" minWidth="195.0" visible="false" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="15.0">
-         <children>
-            <Slider id="DisplaySlider" fx:id="display_slider" maxHeight="50.0" orientation="VERTICAL" AnchorPane.topAnchor="5.0" />
-            <ListView id="DisplayList" fx:id="display_list" prefHeight="50.0" prefWidth="200.0" />
+            <Button fx:id="play" layoutX="450.0" layoutY="22.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #717374;" text="►" textAlignment="CENTER" textFill="#252b2d" visible="false">
+               <font>
+                  <Font name="Arial" size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="pause" layoutX="450.0" layoutY="22.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #717374;" text="‖" textAlignment="CENTER" textFill="#252b2d" visible="false">
+               <font>
+                  <Font name="Arial" size="18.0" />
+               </font>
+            </Button>
+            <Label fx:id="track" layoutX="500.0" layoutY="20.0" prefHeight="30.0" prefWidth="430.0" textFill="#717374" visible="false">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <ProgressBar fx:id="buffered_progress" layoutX="501.0" layoutY="47.0" prefHeight="7.0" prefWidth="429.0" progress="0.0" visible="false" />
+            <Slider fx:id="pprogress" layoutX="500.0" layoutY="43.0" prefHeight="14.0" prefWidth="430.0" styleClass="pprogress" visible="false" />
+            <Pane prefHeight="25.0" prefWidth="75.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Circle fx:id="green_circle" centerX="20.0" centerY="13.0" fill="#33dd00" onMouseClicked="#maximize" onMouseEntered="#showMaximizeIcon" onMouseExited="#hideMaximizeIcon" opacity="0.75" radius="7.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0">
+                     <effect>
+                        <InnerShadow blurType="GAUSSIAN" choke="0.1" height="5.0" radius="2.0" width="5.0" />
+                     </effect>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Circle>
+                  <ImageView fx:id="maximize_icon" fitHeight="8.0" fitWidth="8.0" layoutX="16.0" layoutY="9.0" onMouseClicked="#maximize" onMouseEntered="#showMaximizeIcon" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@img/maximize.png" />
+                     </image>
+                     <effect>
+                        <InnerShadow height="2.0" radius="0.5" width="2.0" />
+                     </effect>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </ImageView>
+                  <Circle fx:id="yellow_circle" centerX="40.0" centerY="13.0" fill="#ccff00" onMouseClicked="#minimize" onMouseEntered="#showMinimizeIcon" onMouseExited="#hideMinimizeIcon" opacity="0.75" radius="7.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0">
+                     <effect>
+                        <InnerShadow blurType="GAUSSIAN" choke="0.1" height="5.0" radius="2.0" width="5.0" />
+                     </effect>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Circle>
+                  <ImageView id="Refresh" fx:id="minimize_icon" fitHeight="8.0" fitWidth="8.0" layoutX="36.0" layoutY="9.0" onMouseClicked="#minimize" onMouseEntered="#showMinimizeIcon" visible="false">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <image>
+                        <Image url="@img/minimize.png" />
+                     </image>
+                     <effect>
+                        <InnerShadow height="2.0" radius="0.5" width="2.0" />
+                     </effect>
+                  </ImageView>
+                  <Circle fx:id="red_circle" centerX="60.0" centerY="13.0" fill="#cc0033" onMouseClicked="#exit" onMouseEntered="#showExitIcon" onMouseExited="#hideExitIcon" opacity="0.75" radius="7.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0">
+                     <effect>
+                        <InnerShadow blurType="GAUSSIAN" choke="0.1" height="5.0" radius="2.0" width="5.0" />
+                     </effect>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Circle>
+                  <ImageView id="Exit" fx:id="exit_icon" fitHeight="8.0" fitWidth="8.0" layoutX="56.0" layoutY="9.0" onMouseClicked="#exit" onMouseEntered="#showExitIcon" onMousePressed="#exit" visible="false">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <image>
+                        <Image url="@img/close.png" />
+                     </image>
+                     <effect>
+                        <InnerShadow height="2.0" radius="0.5" width="2.0" />
+                     </effect>
+                  </ImageView>
+               </children>
+            </Pane>
          </children>
-      </HBox>
-      <Label id="Refresh" fx:id="minimize" alignment="CENTER" contentDisplay="CENTER" minHeight="7.0" minWidth="7.0" onMouseClicked="#refresh" prefHeight="7.0" prefWidth="7.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="10.0" />
-      <Label id="Exit" fx:id="exit" alignment="CENTER" contentDisplay="CENTER" minHeight="7.0" minWidth="7.0" onMousePressed="#exit" prefHeight="7.0" prefWidth="7.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-      <Pane id="Menu" fx:id="menu" layoutX="700.0" layoutY="77.0" prefHeight="172.0" prefWidth="200.0" visible="false">
-         <children>
-            <Label id="TopTriangle" prefHeight="5.0" prefWidth="200.0" />
-            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="12.0" prefHeight="40.0" prefWidth="200.0" text="%settings" textFill="#7c7c7c">
-               <font>
-                  <Font name="Ubuntu" size="18.0" />
-               </font>
-            </Label>
-            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="52.0" prefHeight="40.0" prefWidth="200.0" text="%settings" textFill="#7c7c7c">
-               <font>
-                  <Font name="Ubuntu" size="18.0" />
-               </font>
-            </Label>
-            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="92.0" prefHeight="40.0" prefWidth="200.0" text="%settings" textFill="#7c7c7c">
-               <font>
-                  <Font name="Ubuntu" size="18.0" />
-               </font>
-            </Label>
-            <Label alignment="CENTER" contentDisplay="CENTER" layoutY="132.0" prefHeight="40.0" prefWidth="200.0" text="%settings" textFill="#7c7c7c">
-               <font>
-                  <Font name="Ubuntu" size="18.0" />
-               </font>
-            </Label>
-         </children>
-      </Pane>
-      <Pane id="Network" fx:id="network" layoutX="800.0" layoutY="520.0" prefHeight="50.0" prefWidth="100.0" visible="false">
-         <children>
-            <Label fx:id="status" alignment="CENTER" contentDisplay="CENTER" prefHeight="40.0" prefWidth="100.0" text="а&#157;аЕб&#130; б&#129;аЕб&#130;аИ" textFill="#7c7c7c">
-               <font>
-                  <Font name="Ubuntu" size="18.0" />
-               </font>
-            </Label>
-            <Label id="BottomTriangle" layoutY="40.0" prefHeight="5.0" prefWidth="100.0" />
-         </children>
-      </Pane>
+         <cursor>
+            <Cursor fx:constant="MOVE" />
+         </cursor>
+     </AnchorPane>
       <Pane id="PincodeDialog" fx:id="pincode_dialog" layoutX="288.0" layoutY="150.0" prefHeight="150.0" prefWidth="300.0" visible="false">
          <children>
             <Label id="PincodeTitle" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="300.0" text="%enter_pin_code" textFill="#7c7c7c">
@@ -231,68 +318,207 @@
             </Pane>
          </children>
       </Pane>
-      <ProgressBar id="Progress" fx:id="progress" prefHeight="30.0" prefWidth="500.0" progress="0.0" visible="false" />
-      <Pane focusTraversable="true" layoutX="55.0" layoutY="55.0" prefHeight="595.0" prefWidth="210.0" style="-fx-background-color: #252B2D;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="765.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane focusTraversable="true" layoutX="55.0" layoutY="55.0" prefHeight="595.0" prefWidth="210.0" style="-fx-background-color: #252B2D;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <ImageView fx:id="settings" fitHeight="16.0" fitWidth="16.0" layoutX="175.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@img/setting.png" />
                </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
             </ImageView>
-            <Label layoutX="14.0" layoutY="25.0" text="MY FLASHSAFE" textFill="#515354" />
-            <Label layoutX="14.0" layoutY="317.0" text="SHARED" textFill="#515354" />
-            <Label layoutX="13.0" layoutY="352.0" prefHeight="80.0" prefWidth="180.0" text="Nobody has access to your files now." textAlignment="CENTER" textFill="#999999" wrapText="true">
+            <Label layoutX="14.0" layoutY="25.0" text="MY FLASHSAFE" textFill="#dddddd">
+               <font>
+                  <Font size="14.0" />
+               </font></Label>
+            <Label layoutX="14.0" layoutY="340.0" text="SHARED" textFill="#dddddd">
+               <font>
+                  <Font size="14.0" />
+               </font></Label>
+            <Label layoutX="13.0" layoutY="352.0" prefHeight="80.0" prefWidth="180.0" text="Nobody has access to your files now." textAlignment="CENTER" textFill="#999999" visible="false" wrapText="true">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <ListView fx:id="papki" layoutX="15.0" layoutY="65.0" prefHeight="228.0" prefWidth="180.0" style="-fx-background-color: #252B2D;" />
-            <Label layoutX="15.0" layoutY="620.0" text="USED 1147.2 GB / " textFill="#515354">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <Label layoutX="138.0" layoutY="612.0" text="∞" textFill="#515354">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Label>
-         </children>
-      </Pane>
-      <Pane fx:id="settings_pane" prefHeight="500.0" prefWidth="600.0" style="-fx-background-color: #ECEFF4; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);;" visible="false" AnchorPane.leftAnchor="200.0" AnchorPane.topAnchor="75.0">
-         <children>
-            <Pane prefHeight="500.0" prefWidth="180.0" style="-fx-background-color: #353F4B;">
+            <Pane prefHeight="25.0" prefWidth="200.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0">
                <children>
-                  <Label fx:id="rendering" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="%view" />
-                  <Label fx:id="caching" layoutY="50.0" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="%caching" />
-                  <Label fx:id="hardware" layoutY="100.0" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="%about_device" />
-                  <Label fx:id="software" layoutY="150.0" prefHeight="50.0" prefWidth="180.0" style="-fx-text-fill: #ECEFF4;" styleClass="category" text="%about" />
-                  <Pane fx:id="software_pane" layoutX="180.0" prefHeight="500.0" prefWidth="420.0" visible="false">
-                     <children>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="135.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../img/logo.png" />
-                           </image>
-                        </ImageView>
-                        <Label alignment="CENTER" layoutX="147.0" layoutY="149.0" style="-fx-padding: 0;" styleClass="category" text="Flashsafe 1.0.0" />
-                        <!--
-                            Removed
-                        -->
-                        <Hyperlink fx:id="link" contentDisplay="CENTER" layoutX="126.0" layoutY="466.0" text="http://flashsafe.ru">
-                           <font>
-                              <Font size="20.0" />
-                           </font>
-                        </Hyperlink>
-                     </children>
-                  </Pane>
+                  <Label layoutX="35.0" layoutY="5.0" text="USED 1147.2 GB / " textFill="#dddddd">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="150.0" layoutY="-3.0" text="∞" textFill="#dddddd">
+                     <font>
+                        <Font size="25.0" />
+                     </font>
+                  </Label>
                </children>
             </Pane>
-            <Label fx:id="settings_close" alignment="CENTER" contentDisplay="CENTER" layoutX="575.0" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #353F4B;" text="X" textFill="#eceff4">
+            <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="15.0" layoutY="352.0" pickOnBounds="true" preserveRatio="true" visible="false">
+               <image>
+                  <Image url="@img/boss.png" />
+               </image>
+            </ImageView>
+            <Label layoutX="72.0" layoutY="355.0" text="BOSS" textFill="#dddddd" visible="false">
                <font>
-                  <Font size="18.0" />
+                  <Font size="14.0" />
                </font>
             </Label>
+            <Label layoutX="72.0" layoutY="373.0" text="Online" textFill="#dddddd" visible="false" />
+            <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="14.0" layoutY="404.0" pickOnBounds="true" preserveRatio="true" visible="false">
+               <image>
+                  <Image url="@img/edward.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="15.0" layoutY="455.0" pickOnBounds="true" preserveRatio="true" visible="false">
+               <image>
+                  <Image url="@img/natasha.png" />
+               </image>
+            </ImageView>
+            <Label layoutX="72.0" layoutY="408.0" text="EDWARD" textFill="#dddddd" visible="false">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="72.0" layoutY="460.0" text="NATASHA" textFill="#dddddd" visible="false">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="72.0" layoutY="426.0" text="Offline" textFill="#cccccc" visible="false" />
+            <Label layoutX="72.0" layoutY="478.0" text="Offline" textFill="#cccccc" visible="false" />
+            <Pane fx:id="bosspane" layoutX="5.0" layoutY="351.0" prefHeight="44.0" prefWidth="200.0" visible="false" />
+            <AnchorPane fx:id="folder_one" layoutY="60.0" prefHeight="36.0" prefWidth="210.0">
+               <children>
+                  <Pane fx:id="folder_one_left" prefHeight="0.0" prefWidth="3.0" style="-fx-background-color: #6CD0F3;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <ImageView fx:id="folder_one_icon" fitHeight="20.0" layoutX="15.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@img/folder_light.png" />
+                     </image>
+                  </ImageView>
+                  <Label fx:id="folder_one_name" layoutX="45.0" layoutY="8.0" text="My workspace" textFill="WHITE" visible="false" AnchorPane.leftAnchor="45.0" AnchorPane.rightAnchor="10.0">
+                     <font>
+                        <Font name="Tahoma" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </AnchorPane>
+            <AnchorPane fx:id="folder_two" layoutY="96.0" prefHeight="36.0" prefWidth="210.0">
+               <children>
+                  <Pane fx:id="folder_two_left" prefHeight="0.0" prefWidth="3.0" style="-fx-background-color: #6CD0F3;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <ImageView fx:id="folder_two_icon" fitHeight="20.0" layoutX="15.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@img/folder_light.png" />
+                     </image>
+                  </ImageView>
+                  <Label fx:id="folder_two_name" layoutX="45.0" layoutY="8.0" text="My workspace" textFill="WHITE" visible="false" AnchorPane.leftAnchor="45.0" AnchorPane.rightAnchor="10.0">
+                     <font>
+                        <Font name="Tahoma" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </AnchorPane>
+            <AnchorPane fx:id="folder_three" layoutY="132.0" prefHeight="36.0" prefWidth="210.0">
+               <children>
+                  <Pane fx:id="folder_three_left" prefHeight="0.0" prefWidth="3.0" style="-fx-background-color: #6CD0F3;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <ImageView fx:id="folder_three_icon" fitHeight="20.0" layoutX="15.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@img/folder_light.png" />
+                     </image>
+                  </ImageView>
+                  <Label fx:id="folder_three_name" layoutX="45.0" layoutY="8.0" text="My workspace" textFill="WHITE" visible="false" AnchorPane.leftAnchor="45.0" AnchorPane.rightAnchor="10.0">
+                     <font>
+                        <Font name="Tahoma" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </AnchorPane>
+            <AnchorPane fx:id="folder_four" layoutY="168.0" prefHeight="36.0" prefWidth="210.0">
+               <children>
+                  <Pane fx:id="folder_four_left" prefHeight="0.0" prefWidth="3.0" style="-fx-background-color: #6CD0F3;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <ImageView fx:id="folder_four_icon" fitHeight="20.0" layoutX="15.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@img/folder_light.png" />
+                     </image>
+                  </ImageView>
+                  <Label fx:id="folder_four_name" layoutX="45.0" layoutY="8.0" text="My workspace" textFill="WHITE" visible="false" AnchorPane.leftAnchor="45.0" AnchorPane.rightAnchor="10.0">
+                     <font>
+                        <Font name="Tahoma" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </AnchorPane>
+            <AnchorPane fx:id="folder_five" layoutY="204.0" prefHeight="36.0" prefWidth="210.0">
+               <children>
+                  <Pane fx:id="folder_five_left" prefHeight="0.0" prefWidth="3.0" style="-fx-background-color: #6CD0F3;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <ImageView fx:id="folder_five_icon" fitHeight="20.0" layoutX="15.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                     <image>
+                        <Image url="@img/folder_light.png" />
+                     </image>
+                  </ImageView>
+                  <Label fx:id="folder_five_name" layoutX="45.0" layoutY="8.0" text="My workspace" textFill="WHITE" visible="false" AnchorPane.leftAnchor="45.0" AnchorPane.rightAnchor="10.0">
+                     <font>
+                        <Font name="Tahoma" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </AnchorPane>
+            <AnchorPane fx:id="add_folder" layoutY="258.0" prefHeight="36.0" prefWidth="210.0">
+               <children>
+                  <ImageView fitHeight="20.0" layoutX="15.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@img/add_folder.png" />
+                     </image>
+                  </ImageView>
+                  <Label layoutX="45.0" layoutY="10.0" text="Add new folder" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="45.0" AnchorPane.rightAnchor="10.0">
+                     <font>
+                        <Font name="Tahoma" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </AnchorPane>
+            <Pane fx:id="trash_pane" layoutY="294.0" onMouseClicked="#browseTrash" prefHeight="36.0" prefWidth="210.0">
+               <children>
+                  <Pane fx:id="trash_left" prefHeight="36.0" prefWidth="3.0" style="-fx-background-color: #6CD0F3;" visible="false" />
+                  <ImageView fitHeight="24.0" layoutX="12.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@img/trash.png" />
+                     </image>
+                  </ImageView>
+                  <Label layoutX="45.0" layoutY="10.0" text="Trash" textFill="WHITE">
+                     <font>
+                        <Font name="Tahoma" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Pane>
          </children>
-      </Pane>
+      </AnchorPane>
    </children>
+   <stylesheets>
+      <URL value="@css/scrolls.css" />
+      <URL value="@css/mainscene.css" />
+   </stylesheets>
 </AnchorPane>
