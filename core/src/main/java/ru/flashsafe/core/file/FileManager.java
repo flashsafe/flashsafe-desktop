@@ -32,6 +32,16 @@ public interface FileManager {
      */
     List<FileObject> list(String path) throws FileOperationException;
     
+    
+    /**
+     * 
+     * 
+     * @return
+     * @throws FileOperationException
+     */
+    List<FileObject> trashList() throws FileOperationException;
+    
+    
     /**
      * 
      * 
@@ -80,5 +90,15 @@ public interface FileManager {
      * @throws FileOperationException
      */
     FileOperation delete(String path) throws FileOperationException;
+    
+    /**
+     * Rename file/directory.
+     * 
+     * @param fileObjectId to rename
+     * @param name to set
+     * @return 
+     * @throws FileOperationException
+     */
+    FileOperation rename(long fileObjectId, String name) throws FileOperationException;
     
 }

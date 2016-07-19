@@ -19,7 +19,8 @@ public class IconUtil {
     
     private static final Image EMPTY_FOLDER_ICON = new Image(IconUtil.class.getResourceAsStream("/img/fs/folder_empty.png"));
     
-    private static final Image LOCKED_FOLDER_ICON = new Image(IconUtil.class.getResourceAsStream("/img/fs/folder_lock.png"));
+    @SuppressWarnings("unused")
+	private static final Image LOCKED_FOLDER_ICON = new Image(IconUtil.class.getResourceAsStream("/img/fs/folder_lock.png"));
     
     private static final Image FOLDER_ICON = new Image(IconUtil.class.getResourceAsStream("/img/fs/folder.png"));
 

@@ -128,7 +128,8 @@ public class CustomMultipart implements MessageBodyWriter<MultiPart> {
     *                             if an HTTP error response
     *                             needs to be produced (only effective if the response is not committed yet).
     */
-   @Override
+   @SuppressWarnings("unchecked")
+@Override
    public void writeTo(final MultiPart entity,
                        final Class<?> type,
                        final Type genericType,
@@ -216,13 +217,14 @@ public class CustomMultipart implements MessageBodyWriter<MultiPart> {
                throw new IllegalArgumentException(LocalizationMessages.MISSING_ENTITY_OF_BODY_PART(bodyMediaType));
            }
 
-           Class bodyClass = bodyEntity.getClass();
+           Class<?> bodyClass = bodyEntity.getClass();
            if (bodyEntity instanceof BodyPartEntity) {
                bodyClass = InputStream.class;
                bodyEntity = ((BodyPartEntity) bodyEntity).getInputStream();
            }
 
-           final MessageBodyWriter bodyWriter = providers.getMessageBodyWriter(
+           @SuppressWarnings("rawtypes")
+		final MessageBodyWriter bodyWriter = providers.getMessageBodyWriter(
                    bodyClass,
                    bodyClass,
                    EMPTY_ANNOTATIONS,

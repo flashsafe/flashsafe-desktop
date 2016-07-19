@@ -29,6 +29,7 @@ public class EnterPincodePane extends Pane {
 
 	private ResourceBundle resourceBundle;
 
+	@SuppressWarnings("unused")
 	private MainSceneController controller;
 
 	public EnterPincodePane(ResourceBundle resourceBundle) {

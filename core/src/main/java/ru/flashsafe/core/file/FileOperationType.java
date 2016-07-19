@@ -8,6 +8,8 @@ public enum FileOperationType {
     
     MOVE,
     
-    DELETE
+    DELETE,
+    
+    RENAME
 
 }

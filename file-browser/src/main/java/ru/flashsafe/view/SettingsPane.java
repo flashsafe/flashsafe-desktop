@@ -97,6 +97,7 @@ public class SettingsPane extends Pane {
 		return software_pane;
 	}
 
+	@SuppressWarnings("unused")
 	private Label getCloseLabel() {
 		settings_close.setAlignment(Pos.CENTER);
 		settings_close.setContentDisplay(ContentDisplay.CENTER);

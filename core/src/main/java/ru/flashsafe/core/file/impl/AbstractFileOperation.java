@@ -95,8 +95,13 @@ public abstract class AbstractFileOperation extends AbstractOperation implements
      * @param processedBytes processedBytes value
      */
     public void setProcessedBytes(long processedBytes) {
-        this.processedBytes = processedBytes;
-        int progress = (int) ((processedBytes * 100) /  getTotalBytes());
+    	this.processedBytes = processedBytes;
+    	int progress;
+    	if(processedBytes == getTotalBytes()) {
+    		progress = 100;
+    	} else {
+    		progress = (int) ((processedBytes * 100) /  getTotalBytes());
+    	}
         super.setProgress(progress);
     }
     

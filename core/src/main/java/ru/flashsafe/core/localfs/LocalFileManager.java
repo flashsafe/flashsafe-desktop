@@ -84,6 +84,23 @@ public class LocalFileManager implements FileManager {
             throw new FileOperationException(e);
         }
     }
+    
+    @Override
+    public List<FileObject> trashList() throws FileOperationException {
+        List<FileObject> fileObjects = new ArrayList<>();
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX))) {
+            for (Path currentPath : directoryStream) {
+                // TODO fix creating file
+                FileObject fileObject = Files.isDirectory(currentPath) ? new LocalDirectory(currentPath) : new LocalFile(
+                        currentPath);
+                fileObjects.add(fileObject);
+            }
+            return Collections.unmodifiableList(fileObjects);
+        } catch (IOException e) {
+            LOGGER.warn("Error while listing trash", e);
+            throw new FileOperationException(e);
+        }
+    }
 
     @Override
     public File createFile(String path) throws FileOperationException {
@@ -148,6 +165,14 @@ public class LocalFileManager implements FileManager {
         Future<OperationResult> operationFuture = executorService.submit(new AsyncFileTreeWalker(pathToDelete,
                 new DeleteDirectoryVisitor(fileOperation), fileOperation));
         fileOperation.setOperationFuture(operationFuture);
+        return fileOperation;
+    }
+    
+    @Override
+    public FileOperation rename(long fileObjectId, String name) throws FileOperationException {
+        FileOperationInfo operationInfo = new FileOperationInfo(String.valueOf(fileObjectId), null, name);
+        CompositeFileOperation fileOperation = new CompositeFileOperation(OperationIDGenerator.nextId(),
+                FileOperationType.RENAME, operationInfo);
         return fileOperation;
     }
     

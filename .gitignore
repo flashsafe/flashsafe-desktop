@@ -22,3 +22,4 @@ bin/
 /token/.nb-gradle/
 /token-examples/.nb-gradle/
 /.nb-gradle/
+/builtin-common/src/main/java/ru/flashsafe/common/application/Application.java

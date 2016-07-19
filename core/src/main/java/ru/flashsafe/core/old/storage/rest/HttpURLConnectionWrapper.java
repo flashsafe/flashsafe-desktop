@@ -7,18 +7,18 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.security.Permission;
-import java.security.SecureRandom;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+//import java.security.SecureRandom;
+//import java.security.cert.Certificate;
+//import java.security.cert.CertificateException;
+//import java.security.cert.CertificateFactory;
+//import java.security.cert.X509Certificate;
+//import javax.net.ssl.HostnameVerifier;
+//import javax.net.ssl.HttpsURLConnection;
+//import javax.net.ssl.SSLContext;
+//import javax.net.ssl.SSLPeerUnverifiedException;
+//import javax.net.ssl.SSLSession;
+//import javax.net.ssl.TrustManager;
+//import javax.net.ssl.X509TrustManager;
 
 /**
  * 

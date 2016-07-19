@@ -43,7 +43,7 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
 
     private static final String ID_PARAMETER = "id";
 
-    private static final String AUTH_URL = "auth.php";
+    private static final String AUTH_URL = "auth";
     
     private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeAuthClientFilter.class);
 
