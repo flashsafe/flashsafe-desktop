@@ -9,8 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -28,14 +26,12 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.HttpUrlConnectorProvider;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -49,7 +45,6 @@ import ru.flashsafe.core.event.ApplicationStopEvent;
 import ru.flashsafe.core.event.FlashSafeEventService;
 import ru.flashsafe.core.file.impl.FileOperationInfo;
 import ru.flashsafe.core.old.storage.rest.ContentTypeFixerFilter;
-import ru.flashsafe.core.old.storage.rest.CustomMultipart;
 import ru.flashsafe.core.old.storage.rest.ExternalExecutorProvider;
 import ru.flashsafe.core.old.storage.rest.FlashSafeAuthClientFilter;
 import ru.flashsafe.core.old.storage.rest.data.CopyResponse;
@@ -83,7 +78,6 @@ import com.google.inject.Singleton;
  * @author Andrew
  *
  */
-@SuppressWarnings("deprecation")
 @Singleton
 public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedService {
 
@@ -144,11 +138,7 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
     DefaultFlashSafeStorageService(FlashSafeEventService eventService, FlashSafeAuthClientFilter authFilter) {
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.register(JacksonFeature.class).register(authFilter).register(ContentTypeFixerFilter.class).register(new ExternalExecutorProvider(executorService))
-                .register(MultiPartFeature.class).register(CustomMultipart.class).register(ProcessMonitorInputStream.class)
-//                 .register(new
-//                 LoggingFilter(java.util.logging.Logger.getLogger(DefaultFlashSafeStorageService.class.getName()),
-//                 true))
-                .property(HttpUrlConnectorProvider.USE_FIXED_LENGTH_STREAMING, true);
+                .register(MultiPartFeature.class).register(ProcessMonitorInputStream.class);
         restClient = ClientBuilder.newClient(clientConfig);
         String storageAddress = FlashSafeRegistry.getStorageAddress();
         directoryTarget = restClient.target(storageAddress).path(DIRECTORY_API_PATH);
@@ -309,9 +299,7 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
         multiPart.field(DIRECTORY_ID_PARAMETER, Long.toString(directoryId));
         StreamDataBodyPart bp = buildStreamDataBodyPart(file, operation);
         multiPart.bodyPart(bp);
-        /* Achtung! - black magic was used */
-        long length = calculateContentLength(directoryId, file);
-        Future<Response> operationFuture = directoryTarget.request(MediaType.APPLICATION_JSON_TYPE).header(HttpHeaders.CONTENT_LENGTH, length).async()
+        Future<Response> operationFuture = directoryTarget.request(MediaType.APPLICATION_JSON_TYPE).async()
                 .post(Entity.entity(multiPart, multiPart.getMediaType()), new InvocationCallback<Response>() {
 
                     @Override
@@ -403,34 +391,6 @@ public class DefaultFlashSafeStorageService implements FlashSafeStorageIdBasedSe
             // TODO add message
             throw new FlashSafeStorageException("", e);
         }
-    }
-
-    /**
-     * Calculates content-length using a lot of calculated guesses..
-     * 
-     * Attention! CustomMultipart.class has to be registered in Jersey's config!
-     * ...or this method will be spoiled #####
-     * 
-     * 1. We send FormDataMultiPart which consists of 2 parts: - directory Id
-     * field, - file stream body part. 213 is a number of bytes produces by
-     * Jersey for these 2 parts. The we add directoryId length; Then we add file
-     * name - it can be different... Then the file length.
-     * 
-     * @param directoryId
-     * @param fileToLoad
-     * @return
-     * @throws FlashSafeStorageException
-     * @throws UnsupportedEncodingException
-     */
-    private static long calculateContentLength(long directoryId, Path fileToLoad) throws FlashSafeStorageException {
-        Objects.requireNonNull(fileToLoad);
-        long length = 213;
-        String boundaryString = CustomMultipart.generateBoundary();
-        length += boundaryString.length() * 2;
-        length += String.valueOf(directoryId).length();
-        length += fileToLoad.toFile().getName().getBytes(StandardCharsets.UTF_8).length;
-        length += fileToLoad.toFile().length();
-        return length;
     }
 
     private static SingleFileStorageOperation createUploadOperationStatus(long operationId, Path file)
