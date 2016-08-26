@@ -11,25 +11,36 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 public class CreateDirectoryResponse {
 
-    @JsonProperty("meta")
-    private CreateDirectoryResponseMeta responseMeta;
+    @JsonProperty("status")
+    private String status;
     
-    public CreateDirectoryResponseMeta getResponseMeta() {
-        return responseMeta;
+    @JsonProperty("response")
+    private String hash;
+    
+    @JsonProperty("result")
+    private String result;
+    
+    @JsonProperty("code")
+    private int code;
+    
+    public String getStatus() {
+        return status;
+    }
+    
+    public String getHash() {
+        return hash;
+    }
+    
+    public String getResult() {
+        return result;
+    }
+    
+    public int getCode() {
+        return code;
     }
 
     @JsonCreator
     public static CreateDirectoryResponse fromJSON(String jsonString) throws JsonParseException, JsonMappingException, IOException {
         return JSONHelper.fromJson(jsonString, CreateDirectoryResponse.class);
-    }
-
-    public static final class CreateDirectoryResponseMeta extends ResponseMeta {
-        
-        @JsonProperty("dir_id")
-        private long directoryId;
-
-        public long getDirectoryId() {
-            return directoryId;
-        }
     }
 }

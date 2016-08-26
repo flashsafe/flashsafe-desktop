@@ -58,13 +58,13 @@ public class CopyDirectoryToStorageVisitor extends SimpleFileVisitor<Path> {
         String resourcePath = convertToFlashSafeStoragePath(fromPath.relativize(dir));
         FlashSafeStorageFileObject directory = resolveResourceIfExists(toPath, resourcePath);
         if (directory == FlashSafeStorageNullFileObject.NULL_OBJECT) {
-            LOGGER.debug("Creating directory {}{}{}", toPath.getAbsolutePath(), STORAGE_PATH_SEPARATOR, resourcePath);
+            LOGGER.debug("Creating directory {}{}{}", toPath.getName(), STORAGE_PATH_SEPARATOR, resourcePath);
             FlashSafeStorageFileObject parentDirectory = toPath;
             int lastElementPosition = resourcePath.lastIndexOf(STORAGE_PATH_SEPARATOR);
             if (lastElementPosition > 0) {
                 parentDirectory = resolveResource(toPath, resourcePath.substring(0, lastElementPosition));
             }
-            createDirectory(parentDirectory.getId(), resourcePath.substring(lastElementPosition + 1));
+            createDirectory(parentDirectory.getObjectHash(), resourcePath.substring(lastElementPosition + 1));
         }
         return FileVisitResult.CONTINUE;
     }
@@ -87,14 +87,14 @@ public class CopyDirectoryToStorageVisitor extends SimpleFileVisitor<Path> {
         }
         boolean shouldContinue;
         if(operation.getStorageOperationType() == StorageOperationType.DOWNLOAD) {
-            LOGGER.debug("Downloading file {} to {}{}{}", file, toPath.getAbsolutePath(), STORAGE_PATH_SEPARATOR, resourcePath);
-            StorageFileOperation downloadOperation = downloadFile(((FlashSafeStorageFileObject) fromPath).getId(), Paths.get(toPath.getAbsolutePath()));
+            LOGGER.debug("Downloading file {} to {}{}{}", file, toPath.getName(), STORAGE_PATH_SEPARATOR, resourcePath);
+            StorageFileOperation downloadOperation = downloadFile(((FlashSafeStorageFileObject) fromPath).getObjectHash(), Paths.get(toPath.getName()));
             operation.setCurrentOperation(downloadOperation);
             shouldContinue = waitUntilFinished(downloadOperation);
             operation.submitCurrentOperationAsFinished();
         } else {
-            LOGGER.debug("Uploading file {} to {}{}{}", file, toPath.getAbsolutePath(), STORAGE_PATH_SEPARATOR, resourcePath);
-            StorageFileOperation uploadOperation = uploadFile(fileDirectory.getId(), file);
+            LOGGER.debug("Uploading file {} to {}{}{}", file, toPath.getName(), STORAGE_PATH_SEPARATOR, resourcePath);
+            StorageFileOperation uploadOperation = uploadFile(fileDirectory.getObjectHash(), file);
             operation.setCurrentOperation(uploadOperation);
             shouldContinue = waitUntilFinished(uploadOperation);
             operation.submitCurrentOperationAsFinished();
@@ -116,27 +116,27 @@ public class CopyDirectoryToStorageVisitor extends SimpleFileVisitor<Path> {
             return resolver.resolveResourceIfExists(parent, name);
     }
 
-    private StorageFileOperation uploadFile(long directoryId, Path file) throws IOException {
+    private StorageFileOperation uploadFile(String directoryHash, Path file) throws IOException {
         try {
-            return storageService.uploadFile(directoryId, file);
+            return storageService.uploadFile(directoryHash, file);
         } catch (FlashSafeStorageException e) {
             LOGGER.warn("Error while uploading file " + file, e);
             throw new IOException("Error while uploading file " + file, e);
         }
     }
     
-    private StorageFileOperation downloadFile(long fileId, Path directory) throws IOException {
+    private StorageFileOperation downloadFile(String fileHash, Path directory) throws IOException {
         try {
-            return storageService.downloadFile(fileId, directory);
+            return storageService.downloadFile(fileHash, directory);
         } catch (FlashSafeStorageException e) {
-            LOGGER.warn("Error while downloading file with id " + fileId, e);
-            throw new IOException("Error while downloading file with id " + fileId, e);
+            LOGGER.warn("Error while downloading file with id " + fileHash, e);
+            throw new IOException("Error while downloading file with id " + fileHash, e);
         }
     }
 
-    private void createDirectory(long parentDirectoryId, String name) throws IOException {
+    private void createDirectory(String parentDirectoryHash, String name) throws IOException {
         try {
-            storageService.createDirectory(parentDirectoryId, name);
+            storageService.createDirectory(parentDirectoryHash, name);
         } catch (FlashSafeStorageException e) {
             LOGGER.warn("Error while creating directory " + name, e);
             throw new IOException("Error while creating directory " + name, e);

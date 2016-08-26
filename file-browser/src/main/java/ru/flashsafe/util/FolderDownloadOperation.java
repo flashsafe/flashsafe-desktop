@@ -61,7 +61,7 @@ public class FolderDownloadOperation {
 		if(!inside) {}
 		new File(targetPath.getAbsolutePath() + "/" + path.getName()).mkdir();
 		try {
-			List<FileObject> childs = ((MainSceneController) fileController).fileManager.list(path.getAbsolutePath());
+			List<FileObject> childs = ((MainSceneController) fileController).fileManager.list(path.getHash());
 			int childs_count = childs.size();
 			if(childs_count > 0) {
 				for(FileObject child : childs) {
@@ -71,7 +71,7 @@ public class FolderDownloadOperation {
 		                    protected Void call() throws Exception {
 		                        try {
 		                        	new File(targetPath.getAbsolutePath() + "/" + path.getName() + "/" + child.getName()).createNewFile();
-		                            FileOperation downloadOperation = ((MainSceneController) fileController).fileManager.copy(child.getAbsolutePath(), targetPath.getAbsolutePath() + "/" + path.getName() + "/" + child.getName());
+		                            FileOperation downloadOperation = ((MainSceneController) fileController).fileManager.copy(child.getHash(), targetPath.getAbsolutePath() + "/" + path.getName() + "/" + child.getName());
 		                            fileUploadOperations.add(downloadOperation);
 		                            total_bytes = total_bytes + downloadOperation.getTotalBytes();
 		                        } catch (FileOperationException e) {

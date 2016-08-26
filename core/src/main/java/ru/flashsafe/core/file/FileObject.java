@@ -17,29 +17,22 @@ public interface FileObject {
     String getName();
 
     /**
-     * @return absolute path to the object, includes its name
-     */
-    String getAbsolutePath();
-
-    /**
      * @return size in bytes
      * @throws IOException
      */
     long getSize() throws IOException;
     
     /**
-     * @return 
-     */
-    long getCreationTime();
-    
-    /**
-     * @return 
-     */
-    long getLastModifiedTime();
-    
-    /**
      * @return the exact type of this fileObject 
      */
     FileObjectType getType();
+    
+    String getHash();
+    
+    String getParentHash();
+    
+    String getMimeType();
+    
+    String getExt();
 
 }

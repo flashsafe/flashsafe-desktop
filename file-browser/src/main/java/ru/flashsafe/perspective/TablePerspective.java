@@ -136,7 +136,7 @@ public class TablePerspective implements Perspective {
         TableColumn<FileObject, String> createDateColumn = (TableColumn<FileObject, String>) tableView.getColumns().get(1);
         createDateColumn.setCellValueFactory(cellData -> {
             FileObject value = cellData.getValue();
-            long timeInMilliseconds = (value.getCreationTime() * 1000);
+            long timeInMilliseconds = /*(value.getCreationTime() * 1000)*/0;
             // FIXME switch to Java8 API
                 return new SimpleStringProperty(new Date(timeInMilliseconds).toLocaleString());
             });
@@ -191,7 +191,7 @@ public class TablePerspective implements Perspective {
                     FileObject fileObject = tableView.getSelectionModel().getSelectedItem();
                     if (fileObject != null) {
                         if (fileObject.getType() == FileObjectType.DIRECTORY) {
-                            Platform.runLater(() -> ((MainSceneController) fileController).browseFolder(fileObject.getAbsolutePath()));
+                            Platform.runLater(() -> ((MainSceneController) fileController).browseFolder(fileObject.getHash()));
                         } else{
                             String ext = fileObject.getName().split("\\.")[fileObject.getName().split("\\.").length - 1].toLowerCase();
                             if(ext.equals("jpg") || ext.equals("jpe") || ext.equals("jpeg") || ext.equals("png") || ext.equals("bmp") || ext.equals("tiff") || ext.equals("gif")) {
@@ -399,12 +399,12 @@ public class TablePerspective implements Perspective {
     }
     
     private void openPicture(FileObject fileObject) {
-    	Main._scene.setCursor(javafx.scene.Cursor.WAIT);
+    	//Main._scene.setCursor(javafx.scene.Cursor.WAIT);
         Stage picStage = new Stage();
         picStage.initStyle(StageStyle.TRANSPARENT);
         picStage.setResizable(false);
         picStage.setFullScreen(true);
-        picStage.setTitle("Flashsafe - " + fileObject.getAbsolutePath());
+        picStage.setTitle("Flashsafe - " + fileObject.getHash());
         ImageView parent = new ImageView();
         parent.setVisible(false);
         
@@ -468,7 +468,7 @@ public class TablePerspective implements Perspective {
 		        			File iimg = new File(pictures.get(currentIndex).getName());
 		                    iimg.createNewFile();
 		                    iimg.deleteOnExit();
-		                    FileOperation idownloadOperation = ((MainSceneController) fileController).fileManager.copy(pictures.get(currentIndex).getAbsolutePath(), iimg.getAbsolutePath());
+		                    FileOperation idownloadOperation = ((MainSceneController) fileController).fileManager.copy(pictures.get(currentIndex).getHash(), iimg.getAbsolutePath());
 		                    while (idownloadOperation.getState() != OperationState.FINISHED) {
 		                        Thread.sleep(200);
 		                    }
@@ -488,7 +488,7 @@ public class TablePerspective implements Perspective {
 		                    if(currentIndex == 0) prev.setVisible(false);
 		                    if(!next.isVisible()) next.setVisible(true);
 		        		} catch(FileOperationException | IOException | InterruptedException e) {
-		        			LOGGER.error("Error on open picture " + fileObject.getAbsolutePath(), e);
+		        			LOGGER.error("Error on open picture " + fileObject.getHash(), e);
 		        		}
 		        	}
 		        	loading.setVisible(false);
@@ -524,7 +524,7 @@ public class TablePerspective implements Perspective {
 		        			File iimg = new File(pictures.get(currentIndex).getName());
 		                    iimg.createNewFile();
 		                    iimg.deleteOnExit();
-		                    FileOperation idownloadOperation = ((MainSceneController) fileController).fileManager.copy(pictures.get(currentIndex).getAbsolutePath(), iimg.getAbsolutePath());
+		                    FileOperation idownloadOperation = ((MainSceneController) fileController).fileManager.copy(pictures.get(currentIndex).getHash(), iimg.getAbsolutePath());
 		                    while (idownloadOperation.getState() != OperationState.FINISHED) {
 		                        Thread.sleep(200);
 		                    }
@@ -544,7 +544,7 @@ public class TablePerspective implements Perspective {
 		                    if(currentIndex == pictures.size() - 1) next.setVisible(false);
 		                    if(!prev.isVisible()) prev.setVisible(true);
 		        		} catch(FileOperationException | IOException | InterruptedException e) {
-		        			LOGGER.error("Error on open picture " + fileObject.getAbsolutePath(), e);
+		        			LOGGER.error("Error on open picture " + fileObject.getHash(), e);
 		        		}
 		        	}
 		        	loading.setVisible(false);
@@ -576,7 +576,7 @@ public class TablePerspective implements Perspective {
     		        			File iimg = new File(pictures.get(currentIndex).getName());
     		                    iimg.createNewFile();
     		                    iimg.deleteOnExit();
-    		                    FileOperation idownloadOperation = ((MainSceneController) fileController).fileManager.copy(pictures.get(currentIndex).getAbsolutePath(), iimg.getAbsolutePath());
+    		                    FileOperation idownloadOperation = ((MainSceneController) fileController).fileManager.copy(pictures.get(currentIndex).getHash(), iimg.getAbsolutePath());
     		                    while (idownloadOperation.getState() != OperationState.FINISHED) {
     		                        Thread.sleep(200);
     		                    }
@@ -596,7 +596,7 @@ public class TablePerspective implements Perspective {
     		                    if(currentIndex == 0) prev.setVisible(false);
     		                    if(!next.isVisible()) next.setVisible(true);
     		        		} catch(FileOperationException | IOException | InterruptedException e) {
-    		        			LOGGER.error("Error on open picture " + fileObject.getAbsolutePath(), e);
+    		        			LOGGER.error("Error on open picture " + fileObject.getHash(), e);
     		        		}
     		        	}
     		        	loading.setVisible(false);
@@ -618,7 +618,7 @@ public class TablePerspective implements Perspective {
     		        			File iimg = new File(pictures.get(currentIndex).getName());
     		                    iimg.createNewFile();
     		                    iimg.deleteOnExit();
-    		                    FileOperation idownloadOperation = ((MainSceneController) fileController).fileManager.copy(pictures.get(currentIndex).getAbsolutePath(), iimg.getAbsolutePath());
+    		                    FileOperation idownloadOperation = ((MainSceneController) fileController).fileManager.copy(pictures.get(currentIndex).getHash(), iimg.getAbsolutePath());
     		                    while (idownloadOperation.getState() != OperationState.FINISHED) {
     		                        Thread.sleep(200);
     		                    }
@@ -638,7 +638,7 @@ public class TablePerspective implements Perspective {
     		                    if(currentIndex == pictures.size() - 1) next.setVisible(false);
     		                    if(!prev.isVisible()) prev.setVisible(true);
     		        		} catch(FileOperationException | IOException | InterruptedException e) {
-    		        			LOGGER.error("Error on open picture " + fileObject.getAbsolutePath(), e);
+    		        			LOGGER.error("Error on open picture " + fileObject.getHash(), e);
     		        		}
     		        	}
     		        	loading.setVisible(false);
@@ -652,7 +652,7 @@ public class TablePerspective implements Perspective {
         });
         picStage.setScene(scene);
         picStage.getIcons().add(new Image("/img/logo.png"));
-        Main._scene.setCursor(javafx.scene.Cursor.DEFAULT);
+        //Main._scene.setCursor(javafx.scene.Cursor.DEFAULT);
         picStage.show();
         
         Task<Void> task = new Task<Void>() {
@@ -664,7 +664,7 @@ public class TablePerspective implements Perspective {
 		            img.deleteOnExit();
 		            
 		            
-		            FileOperation downloadOperation = ((MainSceneController) fileController).fileManager.copy(fileObject.getAbsolutePath(), img.getAbsolutePath());
+		            FileOperation downloadOperation = ((MainSceneController) fileController).fileManager.copy(fileObject.getHash(), img.getAbsolutePath());
 		            while (downloadOperation.getState() != OperationState.FINISHED) {
 		                Thread.sleep(200);
 		            }
@@ -688,7 +688,7 @@ public class TablePerspective implements Perspective {
 		            loading.setVisible(false);
 		            parent.setVisible(true);
             	} catch(IOException | InterruptedException | FileOperationException ex) {
-                    LOGGER.error("Error on open picture " + fileObject.getAbsolutePath(), ex);
+                    LOGGER.error("Error on open picture " + fileObject.getHash(), ex);
                 }
             	return null;
             }
@@ -697,53 +697,53 @@ public class TablePerspective implements Perspective {
     }
 
     private void openWithOfficeOnline(FileObject fileObject) {
-        Main._scene.setCursor(javafx.scene.Cursor.WAIT);
+        //Main._scene.setCursor(javafx.scene.Cursor.WAIT);
         Stage docStage = new Stage();
         docStage.setResizable(false);
-        docStage.setTitle("Flashsafe - " + fileObject.getAbsolutePath());
+        docStage.setTitle("Flashsafe - " + fileObject.getHash());
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/doc.fxml"));
         try {
-            String url = "https://view.officeapps.live.com/op/view.aspx?src=https://flashsafe-alpha.azurewebsites.net/cloud/" + ApplicationProperties.userId() + fileObject.getAbsolutePath().replace("fls:/", "").replace(" ", "%20");
+            String url = "https://view.officeapps.live.com/op/view.aspx?src=https://flashsafe-alpha.azurewebsites.net/cloud/" + ApplicationProperties.userId() + fileObject.getHash().replace("fls:/", "").replace(" ", "%20");
             loader.setController(new DocController(url));
             AnchorPane parent = loader.load();
             Scene scene = new Scene(parent);
             docStage.setScene(scene);
             docStage.getIcons().add(new Image("/img/logo.png"));
             docStage.initModality(Modality.WINDOW_MODAL);
-            docStage.initOwner(Main._stage);
-            Main._scene.setCursor(javafx.scene.Cursor.DEFAULT);
+            //docStage.initOwner(Main._stage);
+            //Main._scene.setCursor(javafx.scene.Cursor.DEFAULT);
             docStage.show();
         } catch(IOException ex) {
-            LOGGER.error("Error on open document " + fileObject.getAbsolutePath(), ex);
+            LOGGER.error("Error on open document " + fileObject.getHash(), ex);
         }
     }
     
     private void openWithGoogleDocsViewer(FileObject fileObject) {
-        Main._scene.setCursor(javafx.scene.Cursor.WAIT);
+        //Main._scene.setCursor(javafx.scene.Cursor.WAIT);
         Stage docStage = new Stage();
         docStage.setResizable(false);
-        docStage.setTitle("Flashsafe - " + fileObject.getAbsolutePath());
+        docStage.setTitle("Flashsafe - " + fileObject.getHash());
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/doc.fxml"));
         try {
-            String url = "https://docs.google.com/viewer?url=https://flashsafe-alpha.azurewebsites.net/cloud/" + ApplicationProperties.userId() + fileObject.getAbsolutePath().replace("fls:/", "").replace(" ", "%20");
+            String url = "https://docs.google.com/viewer?url=https://flashsafe-alpha.azurewebsites.net/cloud/" + ApplicationProperties.userId() + fileObject.getHash().replace("fls:/", "").replace(" ", "%20");
             loader.setController(new DocController(url));
             AnchorPane parent = loader.load();
             Scene scene = new Scene(parent);
             docStage.setScene(scene);
             docStage.getIcons().add(new Image("/img/logo.png"));
             docStage.initModality(Modality.WINDOW_MODAL);
-            docStage.initOwner(Main._stage);
-            Main._scene.setCursor(javafx.scene.Cursor.DEFAULT);
+            //docStage.initOwner(Main._stage);
+            //Main._scene.setCursor(javafx.scene.Cursor.DEFAULT);
             docStage.show();
         } catch(IOException ex) {
-            LOGGER.error("Error on open document " + fileObject.getAbsolutePath(), ex);
+            LOGGER.error("Error on open document " + fileObject.getHash(), ex);
         }
     }
     
     private void openAudio(FileObject fileObject) {
-        String url = "http://flashsafe-alpha.azurewebsites.net/gettrack.php?uid=" + ApplicationProperties.userId() + "&file=" + fileObject.getAbsolutePath().replace("fls:/", "").replace(" ", "%20");
+        String url = "http://flashsafe-alpha.azurewebsites.net/gettrack.php?uid=" + ApplicationProperties.userId() + "&file=" + fileObject.getHash().replace("fls:/", "").replace(" ", "%20");
         Media sound = new Media(url);
         MediaPlayer player;
         player = new MediaPlayer(sound);

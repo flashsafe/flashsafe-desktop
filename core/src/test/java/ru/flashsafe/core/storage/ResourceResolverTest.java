@@ -31,15 +31,15 @@ public class ResourceResolverTest {
 
     static {
         FlashSafeStorageDirectory directory1 = new FlashSafeStorageDirectory();
-        directory1.setId(1);
+        //directory1.setId(1);
         directory1.setName("Directory1");
         FlashSafeStorageDirectory directory2 = new FlashSafeStorageDirectory();
-        directory2.setId(2);
+        //directory2.setId(2);
         directory2.setName("Directory2");
         STORAGE_TEST_STRUCTURE.put(0L, Arrays.asList(new FlashSafeStorageFileObject[] { directory1, directory2 }));
 
         FlashSafeStorageDirectory directory21 = new FlashSafeStorageDirectory();
-        directory21.setId(3);
+        //directory21.setId(3);
         directory21.setName("SubDirectory21");
         STORAGE_TEST_STRUCTURE.put(2L, Collections.<FlashSafeStorageFileObject> singletonList(directory21));
     }
@@ -51,14 +51,14 @@ public class ResourceResolverTest {
     @Before
     public void init() throws FlashSafeStorageException {
         storageService = mock(FlashSafeStorageIdBasedService.class);
-        when(storageService.list(anyLong())).thenAnswer(new Answer<List<FlashSafeStorageFileObject>>() {
+        /*when(storageService.list(anyLong())).thenAnswer(new Answer<List<FlashSafeStorageFileObject>>() {
 
             @Override
             public List<FlashSafeStorageFileObject> answer(InvocationOnMock invocation) throws Throwable {
                 Object[] args = invocation.getArguments();
                 return STORAGE_TEST_STRUCTURE.get((Long) args[0]);
             }
-        });
+        });*/
         resolver = new ResourceResolver(storageService, mock(FileManagementEventHandlerProvider.class));
     }
 

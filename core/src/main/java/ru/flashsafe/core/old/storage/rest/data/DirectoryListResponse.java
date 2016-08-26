@@ -13,19 +13,26 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 public class DirectoryListResponse {
 
-    @JsonProperty("meta")
-    private ResponseMeta responseMeta;
+    @JsonProperty("status")
+    private String status;
     
-    @JsonProperty("data")
+    @JsonProperty("response")
     private List<FlashSafeStorageFileObject> fileObjects;
     
+    @JsonProperty("result")
+    private String result;
+    
 
-    public ResponseMeta getResponseMeta() {
-        return responseMeta;
+    public String getStatus() {
+        return status;
     }
 
     public List<FlashSafeStorageFileObject> getFileObjects() {
         return fileObjects;
+    }
+    
+    public String getResult() {
+        return result;
     }
     
     @JsonCreator

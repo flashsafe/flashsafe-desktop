@@ -22,6 +22,7 @@ import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 
 /**
  * 
@@ -72,10 +73,10 @@ public class UnifiedFileManager implements FileManager {
     }
 
     @Override
-    public Directory createDirectory(String path) throws FileOperationException {
+    public Directory createDirectory(String parentHash, String path) throws FileOperationException {
         requireNonNull(path);
         FileManager fileManager = getFileManagerForPath(path);
-        return fileManager.createDirectory(path);
+        return fileManager.createDirectory(parentHash, path);
     }
 
     @Override
@@ -126,24 +127,29 @@ public class UnifiedFileManager implements FileManager {
     }
     
     @Override
-    public FileOperation rename(long fileObjectId, String name) throws FileOperationException {
-    	requireNonNull(fileObjectId);
+    public FileOperation rename(String fileObjectHash, String name) throws FileOperationException {
+    	requireNonNull(fileObjectHash);
     	requireNonNull(name);
-        return flashSafeStorageFileManager.rename(fileObjectId, name);
+        return flashSafeStorageFileManager.rename(fileObjectHash, name);
     }
 
     private static boolean pathsRelateToSameStorage(String firstPath, String secondPath) {
-        boolean firstPathOnRemoteStorage = firstPath.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
-        boolean secondPathOnRemoteStorage = secondPath.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
-        return firstPathOnRemoteStorage == secondPathOnRemoteStorage;
+        //boolean firstPathOnRemoteStorage = firstPath.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
+        //boolean secondPathOnRemoteStorage = secondPath.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
+        return /*firstPathOnRemoteStorage == secondPathOnRemoteStorage*/ false;
     }
 
     private FileManager getFileManagerForPath(String path) {
-        return path.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX) ? flashSafeStorageFileManager
-                : localFileSystemManager;
+        return /*path.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX) ? */flashSafeStorageFileManager
+                /*: localFileSystemManager*/;
     }
     
     private static boolean isRemoteStoragePath(String path) {
-        return path.startsWith(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
+        return !path.contains("/");
+    }
+
+    @Override
+    public List<FlashSafeStorageFileObject> getTree() throws FileOperationException {
+        return flashSafeStorageService.getTree();
     }
 }

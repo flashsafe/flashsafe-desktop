@@ -14,7 +14,6 @@ public class FlashSafeStorageNullFileObject extends FlashSafeStorageFileObject {
         return null;
     }
 
-    @Override
     public String getAbsolutePath() {
         return null;
     }
@@ -24,18 +23,21 @@ public class FlashSafeStorageNullFileObject extends FlashSafeStorageFileObject {
         return 0;
     }
 
-    @Override
     public long getCreationTime() {
         return 0;
     }
 
-    @Override
     public long getLastModifiedTime() {
         return 0;
     }
 
     @Override
     public FileObjectType getType() {
+        return null;
+    }
+
+    @Override
+    public String getHash() {
         return null;
     }
 

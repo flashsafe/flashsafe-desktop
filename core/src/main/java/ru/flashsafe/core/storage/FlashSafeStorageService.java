@@ -35,7 +35,7 @@ public interface FlashSafeStorageService {
      * @return created {@link FlashSafeStorageDirectory} instance
      * @throws FlashSafeStorageException
      */
-    FlashSafeStorageDirectory createDirectory(String path) throws FlashSafeStorageException;
+    FlashSafeStorageDirectory createDirectory(String parentHash, String path) throws FlashSafeStorageException;
     
     FlashSafeStorageFile createEmptyFile(String path) throws FlashSafeStorageException;
 
@@ -49,6 +49,8 @@ public interface FlashSafeStorageService {
 
     void delete(String path) throws FlashSafeStorageException;
     
-    void rename(long fileObjectId, String name) throws FlashSafeStorageException;
+    void rename(String fileObjectHash, String name) throws FlashSafeStorageException;
+    
+    List<FlashSafeStorageFileObject> getTree();
     
 }

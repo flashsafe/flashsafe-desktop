@@ -5,7 +5,7 @@ import ru.flashsafe.core.file.FileObjectType;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonTypeName("dir")
+@JsonTypeName("FOLDER")
 public class FlashSafeStorageDirectory extends FlashSafeStorageFileObject implements Directory {
 
     private int count;
@@ -31,6 +31,11 @@ public class FlashSafeStorageDirectory extends FlashSafeStorageFileObject implem
 
     public void setFormat(String format) {
         this.format = format;
+    }
+
+    @Override
+    public String getHash() {
+        return getObjectHash();
     }
 
 }

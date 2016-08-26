@@ -1,12 +1,17 @@
 package ru.flashsafe;
 
+import com.trolltech.qt.core.QFile;
 import java.io.File;
 
 public interface FileController {
 
     void upload(File fileObject, String toPath);
     
+    void upload(QFile fileObject, String toPath);
+    
     void download(String fromPath, File toFile);
+    
+    void download(String fromPath, QFile toFile);
     
     void loadContent(String path);
     
@@ -14,7 +19,7 @@ public interface FileController {
     
     void copy(String fromPath, String toPath);
     
-    void rename(long fileObjectId, String name);
+    void rename(String fileObjectHash, String name);
     
     void delete(String path);
     

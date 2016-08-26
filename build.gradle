@@ -10,8 +10,8 @@ subprojects {
     }
 }
 
-project(':builtin-common') {
-}
+/*project(':builtin-common') {
+}*/
 
 project(':core') {
     dependencies {
@@ -25,15 +25,15 @@ project(':core-examples') {
     }
 }
 
-project(':version-checker') {
-}
+/*project(':version-checker') {
+}*/
 
-project(':updater') {
+/*project(':updater') {
     dependencies {
         compile project(':builtin-common')
         compile project(':loader-utils')
     }
-}
+}*/
 
 project(':token') {
 }
@@ -53,7 +53,8 @@ project(':file-browser') {
 
 project(':launcher') {
     dependencies {
-        compile project(':starter')
+        //compile project(':starter')
+        compile project(':file-browser')
     }
 }
 
@@ -63,8 +64,8 @@ project(':starter') {
     }
 }
 
-project(':assembly') {
-}
+/*project(':assembly') {
+}*/
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.11'

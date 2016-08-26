@@ -7,78 +7,46 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "objectType")
 @JsonSubTypes({ @JsonSubTypes.Type(value = FlashSafeStorageFile.class),
         @JsonSubTypes.Type(value = FlashSafeStorageDirectory.class) })
 public abstract class FlashSafeStorageFileObject implements FileObject {
 
-    private long id;
-
-    private String name;
-
-    private long size;
+    @JsonProperty("objectHash")
+    private String objectHash;
     
+    @JsonProperty("parentHash")
+    private String parentHash;
+
     private FileObjectType objectType;
     
-    private String absolutePath;
+    @JsonProperty("objectName")
+    private String objectName;
+   
+    @JsonProperty("extension")
+    private String extension;
 
-    @JsonProperty("create_time")
-    private long creationTime;
+    @JsonProperty("size")
+    private long size;
+    
+    private String mimeType;
 
-    @JsonProperty("update_time")
-    private long lastModifiedTime;
-
-    @JsonProperty("pincode")
-    private boolean needPassword;
-
-    public long getId() {
-        return id;
+    public String getObjectHash() {
+        return objectHash;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setObjectHash(String objectHash) {
+        this.objectHash = objectHash;
     }
 
-    public String getName() {
-        return name;
+    public String getParentHash() {
+        return parentHash;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
+    public void setParentHash(String parentHash) {
+        this.parentHash = parentHash;
     }
     
-    public long getCreationTime() {
-        return creationTime;
-    }
-
-    public void setCreationTime(long creationTime) {
-        this.creationTime = creationTime;
-    }
-
-    public long getLastModifiedTime() {
-        return lastModifiedTime;
-    }
-
-    public void setLastModifiedTime(long lastModifiedTime) {
-        this.lastModifiedTime = lastModifiedTime;
-    }
-
-    public boolean isNeedPassword() {
-        return needPassword;
-    }
-
-    public void setNeedPassword(boolean needPassword) {
-        this.needPassword = needPassword;
-    }
-
     @Override
     public FileObjectType getType() {
         return objectType;
@@ -88,61 +56,36 @@ public abstract class FlashSafeStorageFileObject implements FileObject {
         this.objectType = objectType;
     }
     
-    @Override
-    public String getAbsolutePath() {
-        return absolutePath;
+    public String getName() {
+        return objectName;
     }
     
-    public void setAbsolutePath(String path) {
-        absolutePath = path;
+    public void setName(String name) {
+        this.objectName = name;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((absolutePath == null) ? 0 : absolutePath.hashCode());
-        result = prime * result + (int) (creationTime ^ (creationTime >>> 32));
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + (int) (lastModifiedTime ^ (lastModifiedTime >>> 32));
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + (needPassword ? 1231 : 1237);
-        result = prime * result + ((objectType == null) ? 0 : objectType.hashCode());
-        result = prime * result + (int) (size ^ (size >>> 32));
-        return result;
+    public String getExt() {
+        return extension;
+    }
+    
+    public void setExt(String ext) {
+        this.extension = ext;
+    }
+    
+    public long getSize() {
+        return size;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        FlashSafeStorageFileObject other = (FlashSafeStorageFileObject) obj;
-        if (absolutePath == null) {
-            if (other.absolutePath != null)
-                return false;
-        } else if (!absolutePath.equals(other.absolutePath))
-            return false;
-        if (creationTime != other.creationTime)
-            return false;
-        if (id != other.id)
-            return false;
-        if (lastModifiedTime != other.lastModifiedTime)
-            return false;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        if (needPassword != other.needPassword)
-            return false;
-        if (objectType != other.objectType)
-            return false;
-        if (size != other.size)
-            return false;
-        return true;
+    public void setSize(long size) {
+        this.size = size;
     }
+    
+    public String getMimeType() {
+        return mimeType;
+    }
+    
+    public void setMimeType(String mimeType) {
+        this.mimeType= mimeType;
+    }
+    
 }

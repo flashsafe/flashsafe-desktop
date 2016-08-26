@@ -15,22 +15,7 @@ public class NullFileObject implements FileObject {
     }
 
     @Override
-    public String getAbsolutePath() {
-        return null;
-    }
-
-    @Override
     public long getSize() throws IOException {
-        return 0;
-    }
-
-    @Override
-    public long getCreationTime() {
-        return 0;
-    }
-
-    @Override
-    public long getLastModifiedTime() {
         return 0;
     }
 
@@ -38,5 +23,27 @@ public class NullFileObject implements FileObject {
     public FileObjectType getType() {
         return null;
     }
+
+    @Override
+    public String getHash() {
+        return null;
+    }
+
+    @Override
+    public String getParentHash() {
+        return null;
+    }
+
+    @Override
+    public String getMimeType() {
+        return null;
+    }
+
+    @Override
+    public String getExt() {
+        return null;
+    }
+    
+    
     
 }

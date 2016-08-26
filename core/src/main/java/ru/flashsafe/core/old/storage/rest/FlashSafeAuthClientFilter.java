@@ -43,7 +43,7 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
 
     private static final String ID_PARAMETER = "id";
 
-    private static final String AUTH_URL = "auth";
+    private static final String AUTH_URL = "auth.php";
     
     private static final Logger LOGGER = LoggerFactory.getLogger(FlashSafeAuthClientFilter.class);
 
@@ -55,7 +55,7 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
 
     private final WebTarget authTarget;
 
-    private AuthData currentAuthData;
+    private static AuthData currentAuthData;
 
     @Inject
     public FlashSafeAuthClientFilter(FlashSafeEventService eventService) {
@@ -110,7 +110,7 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
         form.param(ACCESS_TOKEN_PARAMETER, hash);
         /* add try-catch and try again - just temporary workaround - back-end do something weird when you request it first time */
         try {
-            AuthResponse authResponse2 = authTarget.request(MediaType.APPLICATION_JSON_TYPE).post(Entity.form(form), AuthResponse.class);
+            AuthResponse authResponse2 = authTarget.request(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(Entity.form(form), AuthResponse.class);
             return authResponse2.getAuthData();
         } catch (ProcessingException e) {
             LOGGER.info("Weird thing just happened", e);
@@ -128,7 +128,7 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
             return true;
         }
         long currentTime = System.currentTimeMillis();
-        long timeout = currentTime + currentAuthData.getTimeout() * 1000;
+        long timeout = currentTime + (currentAuthData.getTimeout() * (1000 * 60 * 60 * 24 * 7));
         return (timeout - currentTime) <= 0;
     }
 
@@ -154,5 +154,9 @@ public class FlashSafeAuthClientFilter implements ClientRequestFilter {
 
     private String getSecret() {
         return clientSecret;
+    }
+    
+    public static AuthData getAuthData() {
+        return currentAuthData;
     }
 }

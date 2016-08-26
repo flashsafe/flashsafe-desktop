@@ -40,6 +40,7 @@ import ru.flashsafe.core.storage.util.CopyDirectoryToStorageVisitor;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import java.util.logging.Level;
 
 @Singleton
 public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
@@ -79,53 +80,42 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
 
     @Override
     public List<FlashSafeStorageFileObject> list(String path) throws FlashSafeStorageException {
-        try {
-            FlashSafeStorageFileObject resource = resourceResolver.resolveResource(path);
-            if (resource.isNeedPassword()) {
-                FileObjectSecurityHandler handler = handlerProvider.getFileObjectSecurityHandler();
-                FileObjectSecurityEventResult eventResult = handler.handle(new FileObjectSecurityEvent(resource));
-                if (eventResult.getResult() == ResultType.CONTINUE) {
-                    return addAbsolutePath(storageService.list(resource.getId(), eventResult.getCode()),
-                            resource.getAbsolutePath());
-                }
-                // FIXME add specific exception
-                throw new FlashSafeStorageException("Security code request was canceled");
-            } else {
-                return addAbsolutePath(storageService.list(resource.getId()), resource.getAbsolutePath());
-            }
-        } catch (ResourceResolverException e) {
+        //try {
+            //FlashSafeStorageFileObject resource = resourceResolver.resolveResource(path);
+            return /*addAbsolutePath(*/storageService.list(/*resource*/path)/*, resource.getObjectHash())*/;
+        /*} catch (ResourceResolverException e) {
             throw new FlashSafeStorageException("Error while listing directory", e);
-        }
+        }*/
     }
     
     @Override
     public List<FlashSafeStorageFileObject> trashList() throws FlashSafeStorageException {
         try {
             FlashSafeStorageFileObject resource = resourceResolver.resolveResource(FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX);
-            return addAbsolutePath(storageService.trashList(), resource.getAbsolutePath());
+            return addAbsolutePath(storageService.trashList(), resource.getParentHash());
         } catch (ResourceResolverException e) {
             throw new FlashSafeStorageException("Error while listing directory", e);
         }
     }
 
     @Override
-    public FlashSafeStorageDirectory createDirectory(String path) throws FlashSafeStorageException {
-        String resourcePath = path.replaceFirst( FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX, StringUtils.EMPTY);
-        int lastPathSeparatorIndex = resourcePath.lastIndexOf(PATH_SEPARATOR);
-        String parentDirectoryPath = FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX;
-        if (lastPathSeparatorIndex > 0) {
-            parentDirectoryPath = resourcePath.substring(0, lastPathSeparatorIndex);
-        }
-        try {
-            FlashSafeStorageFileObject parentDirectory = resourceResolver.resolveResource(parentDirectoryPath);
-            String newDirectoryName = path.substring(path.lastIndexOf(PATH_SEPARATOR) + 1);
-            FlashSafeStorageDirectory directory = storageService.createDirectory(parentDirectory.getId(), newDirectoryName);
-            directory.setAbsolutePath(path);
+    public FlashSafeStorageDirectory createDirectory(String parentHash, String path) throws FlashSafeStorageException {
+        //String resourcePath = path.replaceFirst( FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX, StringUtils.EMPTY);
+        //int lastPathSeparatorIndex = resourcePath.lastIndexOf(PATH_SEPARATOR);
+        //String parentDirectoryPath = FileManager.FLASH_SAFE_STORAGE_PATH_PREFIX;
+        //if (lastPathSeparatorIndex > 0) {
+            //parentDirectoryPath = resourcePath.substring(0, lastPathSeparatorIndex);
+        //}
+        //try {
+            //FlashSafeStorageFileObject parentDirectory = resourceResolver.resolveResource(parentDirectoryPath);
+            //String newDirectoryName = path.substring(path.lastIndexOf(PATH_SEPARATOR) + 1);
+            FlashSafeStorageDirectory directory = storageService.createDirectory(parentHash, path);
+            //directory.setParentHash(parentDirectory.getObjectHash());
             return directory;
-        } catch (ResourceResolverException e) {
-            LOGGER.warn("Error while creating directory " + path, e);
-            throw new FlashSafeStorageException("Error while creating directory " + path, e);
-        }
+        //} catch (ResourceResolverException e) {
+            //LOGGER.warn("Error while creating directory " + path, e);
+            //throw new FlashSafeStorageException("Error while creating directory " + path, e);
+        //}
     }
     
     @Override
@@ -139,8 +129,8 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
         try {
             FlashSafeStorageFileObject parentDirectory = resourceResolver.resolveResource(parentDirectoryPath);
             String newDirectoryName = path.substring(path.lastIndexOf(PATH_SEPARATOR) + 1);
-            FlashSafeStorageFile file = storageService.createEmptyFile(parentDirectory.getId(), newDirectoryName);
-            file.setAbsolutePath(path);
+            FlashSafeStorageFile file = storageService.createEmptyFile(parentDirectory.getObjectHash(), newDirectoryName);
+            file.setParentHash(parentDirectory.getObjectHash());
             return file;
         } catch (ResourceResolverException e) {
             LOGGER.warn("Error while creating file " + path, e);
@@ -151,11 +141,11 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
     @Override
     public StorageFileOperation download(String remoteObjectPath, Path localDirectoryPath) throws FlashSafeStorageException {
         //String localDirectoryPathString = localDirectoryPath.toString();
-        try {
-            FlashSafeStorageFileObject fromPathResource = resourceResolver.resolveResource(remoteObjectPath);
-            if (fromPathResource.getType() == FileObjectType.DIRECTORY) {
-                throw new IllegalStateException("Download process for directories is not implemented yet");
-            }
+        //try {
+            //FlashSafeStorageFileObject fromPathResource = resourceResolver.resolveResource(remoteObjectPath);
+            //if (fromPathResource.getType() == FileObjectType.DIRECTORY) {
+                //throw new IllegalStateException("Download process for directories is not implemented yet");
+            //}
 //            FlashSafeStorageFileObject toPathResource = resourceResolver.resolveResource(remoteObjectPath);
 //            FileOperationInfo operationInfo = new FileOperationInfo(localDirectoryPathString, remoteObjectPath, localDirectoryPath
 //                    .getFileName().toString());
@@ -166,38 +156,38 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
 //                    new CopyDirectoryToStorageVisitor(localDirectoryPath, toPathResource, storageService, resourceResolver,
 //                            storageOperation), storageOperation));
 //            storageOperation.setOperationFuture(operationFuture);
-            return storageService.downloadFile(fromPathResource.getId(), localDirectoryPath);
-        } catch (ResourceResolverException e) {
-            LOGGER.warn("Error while copying " + remoteObjectPath + " from storage", e);
-            throw new FlashSafeStorageException("Error while copying " + remoteObjectPath + " from storage", e);
-        }
+            return storageService.downloadFile(remoteObjectPath, localDirectoryPath);
+        //} catch (ResourceResolverException e) {
+            //LOGGER.warn("Error while copying " + remoteObjectPath + " from storage", e);
+            //throw new FlashSafeStorageException("Error while copying " + remoteObjectPath + " from storage", e);
+        //}
     }
 
     @Override
     public StorageFileOperation upload(Path localObjectPath, String remoteDirectoryPath) throws FlashSafeStorageException {
-        String localObjectPathString = localObjectPath.toString();
-        try {
-            FlashSafeStorageFileObject toPathResource = resourceResolver.resolveResource(remoteDirectoryPath);
+        //String localObjectPathString = localObjectPath.toString();
+        //try {
+            //FlashSafeStorageFileObject toPathResource = resourceResolver.resolveResource(remoteDirectoryPath);
             /* we should think about moving this operation inside async context */
-            if (Files.isDirectory(localObjectPath)) {
-                String pathName = localObjectPath.getFileName().toString();
-                toPathResource = storageService.createDirectory(toPathResource.getId(), pathName);
-                setAbsolutePath(toPathResource, remoteDirectoryPath);
-            }
-            FileOperationInfo operationInfo = new FileOperationInfo(localObjectPathString, remoteDirectoryPath, localObjectPath
-                    .getFileName().toString());
-            CompositeFileStorageOperation storageOperation = new CompositeFileStorageOperation(OperationIDGenerator.nextId(),
-                    FileOperationType.COPY, StorageOperationType.UPLOAD, operationInfo);
+            //if (Files.isDirectory(localObjectPath)) {
+                //String pathName = localObjectPath.getFileName().toString();
+                //toPathResource = storageService.createDirectory(toPathResource.getObjectHash(), pathName);
+                //setAbsolutePath(toPathResource, remoteDirectoryPath);
+            //}
+            /*FileOperationInfo operationInfo = new FileOperationInfo(localObjectPathString, remoteDirectoryPath, localObjectPath
+                    .getFileName().toString());*/
+            /*CompositeFileStorageOperation storageOperation = new CompositeFileStorageOperation(OperationIDGenerator.nextId(),
+                    FileOperationType.COPY, StorageOperationType.UPLOAD, operationInfo);*/
 
-            Future<OperationResult> operationFuture = executorService.submit(new AsyncFileTreeWalker(localObjectPath,
-                    new CopyDirectoryToStorageVisitor(localObjectPath, toPathResource, storageService, resourceResolver,
-                            storageOperation), storageOperation));
-            storageOperation.setOperationFuture(operationFuture);
-            return storageOperation;
-        } catch (ResourceResolverException | FlashSafeStorageException e) {
-            LOGGER.warn("Error while copying " + localObjectPathString + " to storage", e);
-            throw new FlashSafeStorageException("Error while copying " + localObjectPathString + " to storage", e);
-        }
+            //Future<OperationResult> operationFuture = executorService.submit(new AsyncFileTreeWalker(localObjectPath,
+                    //new CopyDirectoryToStorageVisitor(localObjectPath, toPathResource, storageService, resourceResolver,
+                            //storageOperation), storageOperation));
+            //storageOperation.setOperationFuture(operationFuture);
+            return /*storageOperation*/ storageService.uploadFile(remoteDirectoryPath, localObjectPath);
+        //} catch (ResourceResolverException | FlashSafeStorageException e) {
+            //LOGGER.warn("Error while copying " + localObjectPathString + " to storage", e);
+            //throw new FlashSafeStorageException("Error while copying " + localObjectPathString + " to storage", e);
+        //}
     }
 
     @Override
@@ -205,7 +195,7 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
         try {
             FlashSafeStorageFileObject resourceToCopy = resourceResolver.resolveResource(fromPath);
             FlashSafeStorageFileObject targetDirectory = resourceResolver.resolveResource(toPath);
-            storageService.copy(resourceToCopy.getId(), targetDirectory.getId());
+            storageService.copy(resourceToCopy.getObjectHash(), targetDirectory.getObjectHash());
         } catch (ResourceResolverException e) {
             LOGGER.warn("Error while copying directory " + fromPath + " to " + toPath, e);
             throw new FlashSafeStorageException("Error while copying directory", e);
@@ -217,7 +207,7 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
         try {
             FlashSafeStorageFileObject resourceToCopy = resourceResolver.resolveResource(fromPath);
             FlashSafeStorageFileObject targetDirectory = resourceResolver.resolveResource(toPath);
-            storageService.move(resourceToCopy.getId(), targetDirectory.getId());
+            storageService.move(resourceToCopy.getObjectHash(), targetDirectory.getObjectHash());
         } catch (ResourceResolverException e) {
             LOGGER.warn("Error while moving " + fromPath + " to " + toPath, e);
             throw new FlashSafeStorageException("Error while moving ", e);
@@ -228,7 +218,7 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
     public void delete(String path) throws FlashSafeStorageException {
         try {
             FlashSafeStorageFileObject resource = resourceResolver.resolveResource(path);
-            storageService.delete(resource.getId());
+            storageService.delete(resource.getObjectHash());
         } catch (ResourceResolverException e) {
             LOGGER.warn("Error while deleting " + path, e);
             throw new FlashSafeStorageException("Error while deleting ", e);
@@ -236,8 +226,8 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
     }
     
     @Override
-    public void rename(long fileObjectId, String name) throws FlashSafeStorageException {
-    	storageService.rename(fileObjectId, name);
+    public void rename(String fileObjectHash, String name) throws FlashSafeStorageException {
+    	storageService.rename(fileObjectHash, name);
     }
 
     private static List<FlashSafeStorageFileObject> addAbsolutePath(List<FlashSafeStorageFileObject> fileObjects,
@@ -251,7 +241,17 @@ public class FlashSafeStorageServiceImpl implements FlashSafeStorageService {
     private static void setAbsolutePath(FlashSafeStorageFileObject fileObject, String absolutePath) {
         String path = absolutePath
                 + (absolutePath.endsWith(PATH_SEPARATOR) ? fileObject.getName() : PATH_SEPARATOR + fileObject.getName());
-        fileObject.setAbsolutePath(path);
+        fileObject.setParentHash(path);
+    }
+
+    @Override
+    public List<FlashSafeStorageFileObject> getTree() {
+        try {
+            return storageService.getTree();
+        } catch (FlashSafeStorageException ex) {
+            LOGGER.error("Error on load tree", ex);
+        }
+        return null;
     }
 
 }

@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 /**
  * Utility which can be used to resize view.
  * 
- * @author alex_xpert
  */
 public class ResizeHandler implements EventHandler<MouseEvent> {
 

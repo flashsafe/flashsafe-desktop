@@ -25,7 +25,7 @@ public class LocalDirectory implements Directory {
         return directoryPath.getFileName().toString();
     }
 
-    @Override
+    
     public String getAbsolutePath() {
         return directoryPath.toString();
     }
@@ -41,13 +41,13 @@ public class LocalDirectory implements Directory {
         return -1;
     }
     
-    @Override
+    
     public long getCreationTime() {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    @Override
+    
     public long getLastModifiedTime() {
         // TODO Auto-generated method stub
         return 0;
@@ -56,6 +56,26 @@ public class LocalDirectory implements Directory {
     @Override
     public FileObjectType getType() {
         return objectType;
+    }
+
+    @Override
+    public String getHash() {
+        return null;
+    }
+
+    @Override
+    public String getParentHash() {
+        return null;
+    }
+
+    @Override
+    public String getMimeType() {
+        return null;
+    }
+
+    @Override
+    public String getExt() {
+        return null;
     }
 
 }

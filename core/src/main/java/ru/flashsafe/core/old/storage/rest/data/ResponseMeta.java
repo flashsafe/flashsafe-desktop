@@ -10,6 +10,9 @@ public class ResponseMeta {
     @JsonProperty("msg")
     private String responseMessage;
     
+    @JsonProperty("file_hash")
+    private String file_hash;
+    
     private String info;
 
     public int getResponseCode() {
@@ -28,6 +31,14 @@ public class ResponseMeta {
         this.responseMessage = responseMessage;
     }
 
+    public String getFileHash() {
+        return file_hash;
+    }
+    
+    public void setFilehash(String file_hash) {
+        this.file_hash = file_hash;
+    }
+    
     public String getInfo() {
         return info;
     }

@@ -49,7 +49,6 @@ public class CreatePathPane extends Pane {
 		pathname_textfield.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> val, String oldval, String newval) {
-				System.out.println("VAL: " + val + "\nOLDVAL: " + oldval + "\nNEWVAL: " + newval);
 				if(oldval.equals("")) pathname_submit.setStyle("-fx-effect: dropshadow(three-pass-box, #6CD0F3, 2, 5,0, 0);");
 				if(newval.equals("")) pathname_submit.setStyle("-fx-effect: null;");
 			}

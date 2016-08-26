@@ -5,6 +5,7 @@
  */
 package ru.flashsafe.controller;
 
+import com.trolltech.qt.core.QFile;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.io.File;
@@ -285,6 +286,16 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     public Window getWindow() {
         return this.stage;
     }
+
+    @Override
+    public void upload(QFile fileObject, String toPath) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void download(String fromPath, QFile toFile) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
     private class AddHandlersTask implements Callable<Void> {
 
@@ -300,7 +311,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                     KeyCombination backwardCombination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN);
                     KeyCombination forwardCombination = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.ALT_DOWN);
                     KeyCombination createFolderCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN);
-                    Main._stage.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
+                    /*Main._stage.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
                         if (backwardCombination.match(event)) {
                             navigateBackward();
                         } else if (forwardCombination.match(event)) {
@@ -308,7 +319,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                         } else if (createFolderCombination.match(event)) {
                             onCreatePathClick();
                         }
-                    });
+                    });*/
                     
                     add_folder.setOnMouseClicked((event) -> onCreatePathClick());
 
@@ -337,6 +348,8 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                             }
                         }
                     });
+                    files_area.setCursor(Cursor.DEFAULT);
+                    files.setCursor(Cursor.DEFAULT);
                 }
             });
             return null;
@@ -375,14 +388,14 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     	Dragboard db = event.getDragboard();
         if (db.hasFiles()) {
             for(File f : db.getFiles()) {
-            	Task<Void> task = new Task<Void>() {
-            		@Override
-            		public Void call() {
-            			upload(f, getCurrentLocation());
-            			return null;
-            		}
-            	};
-            	new Thread(task).start();
+                Task<Void> task = new Task<Void>() {
+                    @Override
+                    public Void call() {
+                        upload(f, getCurrentLocation());
+                        return null;
+                    }
+                };
+                new Thread(task).start();
             }
         }
         event.setDropCompleted(true);
@@ -618,7 +631,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
             return;
         }
         try {
-            fileManager.createDirectory(currentFolder + "/" + folderName);
+            fileManager.createDirectory("", currentFolder + "/" + folderName);
             refresh();
         } catch (FileOperationException e) {
             LOGGER.warn("Error while creating a new folder", e);
@@ -631,7 +644,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
             return;
         }
         try {
-            fileManager.createDirectory(currentFolder.replace("fls://", "").equals("") ? currentFolder + folderName : currentFolder + "/" + folderName);
+            fileManager.createDirectory("", currentFolder.replace("fls://", "").equals("") ? currentFolder + folderName : currentFolder + "/" + folderName);
             refresh();
         } catch (FileOperationException e) {
             LOGGER.warn("Error while creating a new folder", e);
@@ -731,7 +744,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     private boolean listFolder(String path) {
         try {
             Platform.runLater(() -> {
-                Main._scene.setCursor(Cursor.WAIT);
+                //Main._scene.setCursor(Cursor.WAIT);
                 disableSidebarFolders();
             });
             List<FileObject> folderEntries = fileManager.list(path);
@@ -754,7 +767,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
 			                    		for(Pane left : lefts) left.setVisible(false);
 			                    		folders[fc].setStyle("-fx-background-color: #2D3335;");
 			                    		lefts[fc].setVisible(true);
-			                    		List<FileObject> entries = fileManager.list(fo.getAbsolutePath());
+			                    		List<FileObject> entries = fileManager.list(fo.getHash());
 			                    		currentFolderEntries.clear();
 			                            currentFolderEntries.addAll(entries);
 			                    	} catch (FileOperationException e) {
@@ -789,16 +802,16 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
             LOGGER.warn("Error while executing list", e);
             return false;
         } finally {
-            Platform.runLater(() -> {
+            /*Platform.runLater(() -> {
                 Main._scene.setCursor(Cursor.DEFAULT);
-            });
+            });*/
         }
     }
     
     private boolean trashList() {
         try {
             Platform.runLater(() -> {
-                Main._scene.setCursor(Cursor.WAIT);
+                //Main._scene.setCursor(Cursor.WAIT);
                 disableSidebarFolders();
             });
             List<FileObject> folderEntries = fileManager.trashList();
@@ -816,7 +829,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
 		                    		for(Pane left : lefts) left.setVisible(false);
 		                    		folders[fc].setStyle("-fx-background-color: #2D3335;");
 		                    		lefts[fc].setVisible(true);
-		                    		List<FileObject> entries = fileManager.list(fo.getAbsolutePath());
+		                    		List<FileObject> entries = fileManager.list(fo.getHash());
 		                    		currentFolderEntries.clear();
 		                            currentFolderEntries.addAll(entries);
 		                    	} catch (FileOperationException e) {
@@ -841,9 +854,9 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
             LOGGER.warn("Error while executing list", e);
             return false;
         } finally {
-            Platform.runLater(() -> {
+            /*Platform.runLater(() -> {
                 Main._scene.setCursor(Cursor.DEFAULT);
-            });
+            });*/
         }
     }
 
@@ -1199,12 +1212,12 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
     }
     
     @Override
-    public void rename(long fileObjectId, String name) {
+    public void rename(String fileObjectHash, String name) {
     	Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 try {
-                	/*FileOperation renameOperation = */fileManager.rename(fileObjectId, name);
+                	/*FileOperation renameOperation = */fileManager.rename(fileObjectHash, name);
                     /*while (renameOperation.getState() != OperationState.FINISHED) {
                         Thread.sleep(200);
                     }*/
@@ -1213,7 +1226,7 @@ public class MainSceneController implements FileController, FileObjectSecurityHa
                         refresh();
                     });
                 } catch (FileOperationException e) {
-                    LOGGER.warn("Error while rename object " + fileObjectId, e);
+                    LOGGER.warn("Error while rename object " + fileObjectHash, e);
                 }
                 return null;
             }

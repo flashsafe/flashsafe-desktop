@@ -19,12 +19,18 @@ public class IconUtil {
     
     private static final Image EMPTY_FOLDER_ICON = new Image(IconUtil.class.getResourceAsStream("/img/fs/folder_empty.png"));
     
+    private static final String EMPTY_FOLDER_ICON_URI = "classpath:img/fs/folder_empty.png";
+    
     @SuppressWarnings("unused")
-	private static final Image LOCKED_FOLDER_ICON = new Image(IconUtil.class.getResourceAsStream("/img/fs/folder_lock.png"));
+    private static final Image LOCKED_FOLDER_ICON = new Image(IconUtil.class.getResourceAsStream("/img/fs/folder_lock.png"));
     
     private static final Image FOLDER_ICON = new Image(IconUtil.class.getResourceAsStream("/img/fs/folder.png"));
+    
+    private static final String FOLDER_ICON_URI = "classpath:img/fs/folder.png";
 
     private static final Map<String, Image> extensionToIconMap = new HashMap<>();
+    
+    private static final Map<String, String> extensionToIconUriMap = new HashMap<>();
 
     private static final String UNKNOWN_EXTENSION = "UNKNOWN_EXTENSION";
     
@@ -63,11 +69,26 @@ public class IconUtil {
         }
         return EMPTY_FOLDER_ICON;
     }
+    
+    public static String getFileIconUri(String filename) {
+        String extension = filename.substring(filename.lastIndexOf(".") + 1);
+        String fileIconUri = extensionToIconUriMap.get(extension);
+        return fileIconUri != null ? fileIconUri : extensionToIconUriMap.get(UNKNOWN_EXTENSION); 
+    }
+    
+    public static String getFolderIconUri(Directory folder) {
+        if (folder.getCount() > 0 ) {
+            return FOLDER_ICON_URI;
+        }
+        return EMPTY_FOLDER_ICON_URI;
+    }
 
     private static void init() {
         Map<IconType, Image> typeToImageMap = loadIcons();
+        Map<IconType, String> typeToImageUriMap = loadUris();
         Map<IconType, List<String>> typeToExtentionMap = getExtensions();
         mapExtensionsToIcons(typeToExtentionMap, typeToImageMap);
+        mapExtensionsToIconUris(typeToExtentionMap, typeToImageUriMap);
     }
 
     private static void mapExtensionsToIcons(Map<IconType, List<String>> typeToExtentionMap, Map<IconType, Image> typeToImageMap) {
@@ -77,6 +98,15 @@ public class IconUtil {
             }
         }
         extensionToIconMap.put(UNKNOWN_EXTENSION, typeToImageMap.get(IconType.BINARY));
+    }
+    
+    private static void mapExtensionsToIconUris(Map<IconType, List<String>> typeToExtentionMap, Map<IconType, String> typeToImageUriMap) {
+        for (Entry<IconType, List<String>> typeToExtention : typeToExtentionMap.entrySet()) {
+            for (String extension : typeToExtention.getValue()) {
+                extensionToIconUriMap.put(extension, typeToImageUriMap.get(typeToExtention.getKey()));
+            }
+        }
+        extensionToIconUriMap.put(UNKNOWN_EXTENSION, typeToImageUriMap.get(IconType.BINARY));
     }
 
     private static Map<IconType, List<String>> getExtensions() {
@@ -100,6 +130,17 @@ public class IconUtil {
         typeToImage.put(IconType.VIDEO, new Image(IconUtil.class.getResourceAsStream("/img/fs/video.png")));
         typeToImage.put(IconType.BINARY, new Image(IconUtil.class.getResourceAsStream("/img/fs/binary.png")));
         return typeToImage;
+    }
+    
+    private static Map<IconType, String> loadUris() {
+        Map<IconType, String> typeToUri = new HashMap<>();
+        typeToUri.put(IconType.ARCHIVE, "classpath:img/fs/archive.png");
+        typeToUri.put(IconType.DOCUMENT, "classpath:img/fs/document.png");
+        typeToUri.put(IconType.PICTURE, "classpath:img/fs/picture.png");
+        typeToUri.put(IconType.MUSIC, "classpath:img/fs/music.png");
+        typeToUri.put(IconType.VIDEO, "classpath:img/fs/video.png");
+        typeToUri.put(IconType.BINARY, "classpath:img/fs/binary.png");
+        return typeToUri;
     }
 
 }

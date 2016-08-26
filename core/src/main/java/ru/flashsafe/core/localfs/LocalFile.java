@@ -24,7 +24,6 @@ public class LocalFile implements File {
         return filePath.getFileName().toString();
     }
 
-    @Override
     public String getAbsolutePath() {
         return filePath.toString();
     }
@@ -34,13 +33,11 @@ public class LocalFile implements File {
         return Files.size(filePath);
     }
     
-    @Override
     public long getCreationTime() {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    @Override
     public long getLastModifiedTime() {
         // TODO Auto-generated method stub
         return 0;
@@ -54,6 +51,26 @@ public class LocalFile implements File {
     @Override
     public FileObjectType getType() {
         return objectType;
+    }
+
+    @Override
+    public String getHash() {
+        return null;
+    }
+
+    @Override
+    public String getParentHash() {
+        return null;
+    }
+
+    @Override
+    public String getMimeType() {
+        return null;
+    }
+
+    @Override
+    public String getExt() {
+        return null;
     }
 
 }

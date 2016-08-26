@@ -15,6 +15,7 @@ import ru.flashsafe.core.storage.exception.FlashSafeStorageException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 
 @Singleton
 public class FlashSafeStorageFileManager implements FileManager {
@@ -57,9 +58,9 @@ public class FlashSafeStorageFileManager implements FileManager {
     }
 
     @Override
-    public Directory createDirectory(String path) throws FileOperationException {
+    public Directory createDirectory(String parentHash, String path) throws FileOperationException {
         try {
-            return storageService.createDirectory(path);
+            return storageService.createDirectory(parentHash, path);
         } catch (FlashSafeStorageException e) {
             LOGGER.warn("Error while creating directory " + path, e);
             throw new FileOperationException("Error while creating directory " + path, e);
@@ -100,9 +101,9 @@ public class FlashSafeStorageFileManager implements FileManager {
     }
     
     @Override
-    public FileOperation rename(long fileObjectId, String name) throws FileOperationException {
+    public FileOperation rename(String fileObjectHash, String name) throws FileOperationException {
         try {
-            storageService.rename(fileObjectId, name);
+            storageService.rename(fileObjectHash, name);
             return null;
         } catch (FlashSafeStorageException e) {
             LOGGER.warn("Error while rename to " + name, e);
@@ -113,6 +114,11 @@ public class FlashSafeStorageFileManager implements FileManager {
     @SuppressWarnings("unchecked")
     private static List<FileObject> cast(List<? extends FileObject> fileObject) {
         return (List<FileObject>) fileObject;
+    }
+
+    @Override
+    public List<FlashSafeStorageFileObject> getTree() throws FileOperationException {
+        return storageService.getTree();
     }
 
 }

@@ -3,6 +3,7 @@ package ru.flashsafe.core.file;
 import java.util.List;
 
 import ru.flashsafe.core.file.exception.FileOperationException;
+import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 import ru.flashsafe.core.storage.util.StorageUtils;
 
 /**
@@ -58,7 +59,7 @@ public interface FileManager {
      * @return
      * @throws FileOperationException
      */
-    Directory createDirectory(String path) throws FileOperationException;
+    Directory createDirectory(String parentHash, String path) throws FileOperationException;
     
     /**
      * Copies file/directory {@link fromPath} into {@link toPath}.
@@ -99,6 +100,8 @@ public interface FileManager {
      * @return 
      * @throws FileOperationException
      */
-    FileOperation rename(long fileObjectId, String name) throws FileOperationException;
+    FileOperation rename(String fileObjectHash, String name) throws FileOperationException;
+    
+    List<FlashSafeStorageFileObject> getTree() throws FileOperationException;
     
 }

@@ -49,9 +49,8 @@ public class ResourceResolver {
     //TODO move out to runtime configuration
     static {
         ROOT_DIRECTORY = new FlashSafeStorageDirectory();
-        ROOT_DIRECTORY.setId(0);
-        ROOT_DIRECTORY.setName(StorageUtils.STORAGE_PATH_PREFIX);
-        ROOT_DIRECTORY.setAbsolutePath(StorageUtils.STORAGE_PATH_PREFIX);
+        ROOT_DIRECTORY.setObjectHash("");
+        ROOT_DIRECTORY.setName("");
     }
 
     @Inject
@@ -146,14 +145,12 @@ public class ResourceResolver {
             currentPathObject = findResource(currentPathObject, pathElement);
             if (currentPathObject == null) {
                 if (exceptionIfNotExists) {
-                    throw new ResourceResolverException("Can't resolve "+ parent.getAbsolutePath() + resourcePath + ". " + pathElement + " is unknown");
+                    throw new ResourceResolverException("Can't resolve "+ parent.getName() + resourcePath + ". " + pathElement + " is unknown");
                 }
                 return FlashSafeStorageNullFileObject.NULL_OBJECT;
             }
         }
-        String absolutePath = parent.getAbsolutePath()
-                + (parent.getAbsolutePath().endsWith("/") ? resourcePath : "/" + resourcePath);
-        currentPathObject.setAbsolutePath(absolutePath);
+        currentPathObject.setParentHash(parent.getObjectHash());
         return currentPathObject;
     }
     
@@ -164,21 +161,10 @@ public class ResourceResolver {
     private FlashSafeStorageFileObject findResource(FlashSafeStorageFileObject parent, String resourceName) throws ResourceResolverException {
         List<FlashSafeStorageFileObject> content;
         try {
-            if (parent.isNeedPassword()) {
-                FileObjectSecurityHandler handler = handlerProvider.getFileObjectSecurityHandler();
-                FileObjectSecurityEventResult eventResult = handler.handle(new FileObjectSecurityEvent(parent));
-                if (eventResult.getResult() == ResultType.CONTINUE) {
-                    content = storageService.list(parent.getId(), eventResult.getCode());
-                } else {
-                    // FIXME add specific exception
-                    throw new FlashSafeStorageException("Security code request was canceled");
-                }
-            } else {
-                content = storageService.list(parent.getId());
-            }
+            content = storageService.list(parent.getObjectHash());
         } catch (FlashSafeStorageException e) {
-            LOGGER.warn("Error while finding resource with id " + parent.getId() + " name " + parent.getAbsolutePath(), e);
-            throw new ResourceResolverException("Error while finding resource with id " + parent.getId(), e);
+            LOGGER.warn("Error while finding resource with id " + parent.getObjectHash() + " name " + parent.getObjectHash(), e);
+            throw new ResourceResolverException("Error while finding resource with id " + parent.getObjectHash(), e);
         }
         for (FlashSafeStorageFileObject resource : content) {
             if (resourceName.equals(resource.getName())) {
@@ -247,7 +233,7 @@ public class ResourceResolver {
 
         @Override
         public String toString() {
-            return "ResourceCacheKey [parent=" + parent.getAbsolutePath() + ", resourceName=" + resourceName + "]";
+            return "ResourceCacheKey [parent=" + parent.getObjectHash() + ", resourceName=" + resourceName + "]";
         }
     }
 }

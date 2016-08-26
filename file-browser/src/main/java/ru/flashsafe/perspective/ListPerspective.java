@@ -37,7 +37,7 @@ public class ListPerspective implements Perspective {
             if (clickCount == 2) {
                 FileObject row = listView.getSelectionModel().getSelectedItem();
                 if (row.getType() == FileObjectType.DIRECTORY) {
-                    fileController.loadContent(row.getAbsolutePath());
+                    fileController.loadContent(row.getHash());
                 }
             }
         });

@@ -175,7 +175,7 @@ public class FileObjectViewHelper {
         item = new MenuItem("Move");
         menu.getItems().add(item);
         item = new MenuItem("Delete");
-        item.setOnAction(event -> ((MainSceneController) fileController).delete(fileObject.getAbsolutePath()));
+        item.setOnAction(event -> ((MainSceneController) fileController).delete(fileObject.getHash()));
         menu.getItems().add(item);
         item = new MenuItem("Rename");
         menu.getItems().add(item);
@@ -250,12 +250,12 @@ public class FileObjectViewHelper {
 	private void delete(FileObject fileObject) {
         try {
             /*if(fileObject.getType() == FileObjectType.FILE) {*/
-                ((MainSceneController) fileController).fileManager.delete(fileObject.getAbsolutePath());
+                ((MainSceneController) fileController).fileManager.delete(fileObject.getHash());
             /*} else { // directory
                 deleteDirectory(fileObject);
             }*/
         } catch(/*FileOperation*/Exception ex) {
-            ((MainSceneController) fileController).LOGGER.error("Error on delete directory " + fileObject.getAbsolutePath(), ex);
+            ((MainSceneController) fileController).LOGGER.error("Error on delete directory " + fileObject.getHash(), ex);
         }
     }
     
@@ -289,7 +289,7 @@ public class FileObjectViewHelper {
 		        if(targetPath[0] != null) { // If path was choosed
 		            if(fileObject.getType() == FileObjectType.FILE) {
 		        		try { new java.io.File(targetPath[0].getAbsolutePath() + "/" + fileObject.getName()).createNewFile(); } catch(IOException e) { e.printStackTrace(); }
-		        		fileController.download(fileObject.getAbsolutePath(), new java.io.File(targetPath[0].getAbsolutePath() + "/" + fileObject.getName()));
+		        		fileController.download(fileObject.getHash(), new java.io.File(targetPath[0].getAbsolutePath() + "/" + fileObject.getName()));
 		            } else { // directory
 		            	new java.io.File(targetPath[0].getAbsolutePath() + "/" + fileObject.getName()).mkdir();
 		            	new FolderDownloadOperation(fileController, fileObject, targetPath[0]).common();
@@ -312,7 +312,7 @@ public class FileObjectViewHelper {
     	        	for(FileObject fileObject : fileObjects) {
     	        		if(fileObject.getType() == FileObjectType.FILE) {
     	            		try { new java.io.File(targetPath.getAbsolutePath() + "/" + fileObject.getName()).createNewFile(); } catch(IOException e) { e.printStackTrace(); }
-    	            		fileController.download(fileObject.getAbsolutePath(), new java.io.File(targetPath.getAbsolutePath() + "/" + fileObject.getName()));
+    	            		fileController.download(fileObject.getHash(), new java.io.File(targetPath.getAbsolutePath() + "/" + fileObject.getName()));
     	                } else { // directory
     	                	new java.io.File(targetPath.getAbsolutePath() + "/" + fileObject.getName()).mkdir();
     	                	new FolderDownloadOperation(fileController, fileObject, targetPath).common();
@@ -336,13 +336,13 @@ public class FileObjectViewHelper {
 	        FXMLLoader fxmlLoader = new FXMLLoader();
 	        fxmlLoader.setLocation(getClass().getResource("/oldfs.fxml"));
 	        fxmlLoader.setResources(((MainSceneController) fileController).resourceBundle);
-	        fxmlLoader.setController(new MainSceneController(((MainSceneController) fileController).resourceBundle, fileObject.getAbsolutePath(), stage));
+	        fxmlLoader.setController(new MainSceneController(((MainSceneController) fileController).resourceBundle, fileObject.getHash(), stage));
 	        Parent root = fxmlLoader.load();
 	        Scene scene = new Scene(root, Color.TRANSPARENT);
 	        stage.setScene(scene);
 	        stage.show();
     	} catch(IOException e) {
-    		((MainSceneController) fileController).LOGGER.error("Error on open directory " + fileObject.getAbsolutePath() + " in new window", e);
+    		((MainSceneController) fileController).LOGGER.error("Error on open directory " + fileObject.getHash() + " in new window", e);
     	}
     }
 }

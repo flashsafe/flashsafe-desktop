@@ -22,7 +22,7 @@ public interface FlashSafeStorageIdBasedService {
      * @return list of fileObjects in this directory
      * @throws FlashSafeStorageException
      */
-    List<FlashSafeStorageFileObject> list(long directoryId) throws FlashSafeStorageException;
+    List<FlashSafeStorageFileObject> list(String directoryHash) throws FlashSafeStorageException;
 
     /**
      * Retrieves list of file objects inside specified directory.
@@ -32,7 +32,7 @@ public interface FlashSafeStorageIdBasedService {
      * @return list of fileObjects in this directory
      * @throws FlashSafeStorageException
      */
-    List<FlashSafeStorageFileObject> list(long directoryId, String pincode) throws FlashSafeStorageException;
+    List<FlashSafeStorageFileObject> list(String directoryHash, String pincode) throws FlashSafeStorageException;
     
     /**
      * Retrieves list of file objects inside trash.
@@ -50,19 +50,23 @@ public interface FlashSafeStorageIdBasedService {
      * @return created {@link FlashSafeStorageDirectory} instance
      * @throws FlashSafeStorageException
      */
-    FlashSafeStorageDirectory createDirectory(long parentDirectoryId, String name) throws FlashSafeStorageException;
+    FlashSafeStorageDirectory createDirectory(String parentDirectoryHash, String name) throws FlashSafeStorageException;
     
-    FlashSafeStorageFile createEmptyFile(long parentDirectoryId, String name) throws FlashSafeStorageException;
+    FlashSafeStorageFile createEmptyFile(String parentDirectoryHash, String name) throws FlashSafeStorageException;
 
-    StorageFileOperation downloadFile(long fileId, Path directory) throws FlashSafeStorageException;
+    StorageFileOperation downloadFile(String fileHash, Path directory) throws FlashSafeStorageException;
 
-    StorageFileOperation uploadFile(long directoryId, Path file) throws FlashSafeStorageException;
-
-    void copy(long fileObjectId, long destinationDirectoryId) throws FlashSafeStorageException;
-
-    void move(long fileObjectId, long destinationDirectoryId) throws FlashSafeStorageException;
-
-    void delete(long fileObjectId) throws FlashSafeStorageException;
+    StorageFileOperation uploadFile(String directoryHash, Path file) throws FlashSafeStorageException;
     
-    void rename(long fileObject, String name) throws FlashSafeStorageException;
+    StorageFileOperation uploadFilePart(String directoryHash, String fhash, long part_num, Path file) throws FlashSafeStorageException;
+    
+    void copy(String fileObjectHash, String destinationDirectoryHash) throws FlashSafeStorageException;
+
+    void move(String fileObjectHash, String destinationDirectoryHash) throws FlashSafeStorageException;
+
+    void delete(String fileObjectHash) throws FlashSafeStorageException;
+    
+    void rename(String fileObject, String name) throws FlashSafeStorageException;
+    
+    List<FlashSafeStorageFileObject> getTree() throws FlashSafeStorageException;
 }

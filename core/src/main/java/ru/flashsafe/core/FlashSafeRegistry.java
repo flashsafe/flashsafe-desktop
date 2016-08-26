@@ -29,7 +29,7 @@ public class FlashSafeRegistry {
     private static Properties flashSafeProperties = new Properties();
     
     static {
-        flashSafeProperties.put(STORAGE_ADDRESS, "http://localhost:8080/flashsafe-backend/api/");
+        flashSafeProperties.put(STORAGE_ADDRESS, "http://api.flash.so/");
         flashSafeProperties.put(LOCAL_SIMULTANEOUSLY_EXECUTED_OPERATIONS, 10);
         flashSafeProperties.put(LOCAL_TO_STORAGE_SIMULTANEOUSLY_EXECUTED_OPERATIONS, 10);
     }

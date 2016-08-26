@@ -35,6 +35,7 @@ import ru.flashsafe.core.operation.OperationResult;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import ru.flashsafe.core.old.storage.FlashSafeStorageFileObject;
 
 /**
  * The implementation of {@link FileManager} which is used to work with local file system.
@@ -113,7 +114,7 @@ public class LocalFileManager implements FileManager {
     }
 
     @Override
-    public Directory createDirectory(String path) throws FileOperationException {
+    public Directory createDirectory(String parentHash, String path) throws FileOperationException {
         try {
             Path newDirectory = Files.createDirectory(Paths.get(path));
             return new LocalDirectory(newDirectory);
@@ -169,8 +170,8 @@ public class LocalFileManager implements FileManager {
     }
     
     @Override
-    public FileOperation rename(long fileObjectId, String name) throws FileOperationException {
-        FileOperationInfo operationInfo = new FileOperationInfo(String.valueOf(fileObjectId), null, name);
+    public FileOperation rename(String fileObjectHash, String name) throws FileOperationException {
+        FileOperationInfo operationInfo = new FileOperationInfo(fileObjectHash, null, name);
         CompositeFileOperation fileOperation = new CompositeFileOperation(OperationIDGenerator.nextId(),
                 FileOperationType.RENAME, operationInfo);
         return fileOperation;
@@ -178,6 +179,11 @@ public class LocalFileManager implements FileManager {
     
     private static String sanitizePath(String path) {
         return path.replaceFirst(FILE_SEPARATOR + "$", "");
+    }
+
+    @Override
+    public List<FlashSafeStorageFileObject> getTree() throws FileOperationException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
